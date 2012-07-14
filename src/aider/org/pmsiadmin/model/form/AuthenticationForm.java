@@ -1,6 +1,6 @@
 package aider.org.pmsiadmin.model.form;
 
-import aider.org.pmsi.validator.AuthenticationFormValidatorAnnotation;
+import aider.org.pmsiadmin.validator.AuthenticationFormValidatorAnnotation;
 import aider.org.pmsiamin.model.ldap.DtoSession;
 import aider.org.pmsiamin.model.ldap.Session;
 

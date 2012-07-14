@@ -1,4 +1,4 @@
-package aider.org.pmsi.validator;
+package aider.org.pmsiadmin.validator;
 
 import javax.naming.NamingException;
 import javax.validation.ConstraintValidator;

@@ -1,4 +1,4 @@
-package aider.org.pmsi.validator;
+package aider.org.pmsiadmin.validator;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;

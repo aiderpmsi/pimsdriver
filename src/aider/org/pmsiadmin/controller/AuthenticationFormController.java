@@ -90,7 +90,7 @@ public class AuthenticationFormController {
 			HttpSession httpSession = request.getSession(true);
 			httpSession.setAttribute("session", authenticationForm.getSession());
 			
-			return "redirect:/Pmsi/Insertions";
+			return "redirect:/Pmsi/Insert/Form";
 		} 
 	}
 }

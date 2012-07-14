@@ -92,6 +92,12 @@
 	<version>1.0.0.GA</version>
  </dependency>
  
+ <dependency>
+	<groupId>jstl</groupId>
+	<artifactId>jstl</artifactId>
+	<version>1.2</version>
+</dependency>
+
    <dependency>
     <groupId>sedna</groupId>
     <artifactId>sednadriver</artifactId>
