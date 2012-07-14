@@ -18,30 +18,18 @@
 </style>
 </head>
 <body>
-	<h2>Authentification</h2>
+	<h2>Fichier à importer</h2>
  
-	<form:form method="POST" commandName="authenticationform">
+ 	<form:form method="POST" commandName="insertionpmsiform"
+		enctype="multipart/form-data">
+ 
 		<form:errors path="*" cssClass="errorblock" element="div" />
-		<table>
-			<tr>
-				<td>User :</td>
-				<td><form:input path="user" />
-				</td>
-				<td><form:errors path="user" cssClass="error" />
-				</td>
-			</tr>
-			<tr>
-				<td>Password :</td>
-				<td><form:password path="pass" />
-				</td>
-				<td><form:errors path="pass" cssClass="error" />
-				</td>
-			</tr>
-			<tr>
-				<td colspan="3"><input type="submit" /></td>
-			</tr>
-		</table>
-	</form:form>
  
+		Fichier Pmsi à Uploader : <input type="file" name="file" />
+		<input type="submit" value="upload" />
+		<span><form:errors path="file" cssClass="error" />
+		</span>
+ 
+	</form:form> 
 </body>
 </html>

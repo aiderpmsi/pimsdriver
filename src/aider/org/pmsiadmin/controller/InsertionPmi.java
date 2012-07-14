@@ -1,8 +1,8 @@
 package aider.org.pmsiadmin.controller;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLException;
-import java.util.List;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -46,18 +46,18 @@ public class InsertionPmi {
 	@RequestMapping(method = RequestMethod.GET)
 	public String initForm(ModelMap model) throws ClassNotFoundException, SQLException, IOException{
 
-		InsertionPmsiForm labosListForm = new InsertionPmsiForm();
+		InsertionPmsiForm insertionPmsiForm = new InsertionPmsiForm();
 
 		//command object
-		model.addAttribute("laboslistform", labosListForm);
+		model.addAttribute("insertionpmsiform", insertionPmsiForm);
  
 		//return form view
-		return "LabosListForm";
+		return "InsertionPmsiForm";
 	}
 
 	@RequestMapping(method = RequestMethod.POST)
 	public String processSubmit(
-		@Valid @ModelAttribute("laboslistform") InsertionPmsiForm labosListForm,
+		@Valid @ModelAttribute("insertionpmsiform") InsertionPmsiForm insertionPmsiForm,
 		BindingResult result,
 		SessionStatus status,
 		ModelMap model) throws ClassNotFoundException, SQLException, IOException {
@@ -66,31 +66,19 @@ public class InsertionPmi {
 			return "redirect:/Authentification/Form";
 		else if (result.hasErrors()) {
 			//if validator failed
-			return "LabosListForm";
+			return "InsertionPmsiForm";
 		} else {
 			status.setComplete();
 			//form success
 			
-			BioManagerConnection connection = null;
-			List<Labo_LabosList> laboslist = null;
-			
-			try {
-				connection = new BioManagerConnection(bioManagerDataSource.getConnection());
-			
-				laboslist = connection.getDTOLabosList().getListByName(labosListForm.getLabo());
-			
-				connection.commit();
-				
-				model.addAttribute("user", labosListForm.getSession());
-				model.addAttribute("laboslist", laboslist);
-				model.addAttribute("encoding", bioManagerConfig.getEncoding());
-			} finally {
-				if (connection != null) {
-					connection.close();
-				}
+			InputStream in = insertionPmsiForm.getFile().getInputStream();
+			byte[] buffer = new byte[512];
+			int size;
+			while ((size = in.read(buffer)) != -1) {
+				System.out.println(new String(buffer, 0, size));
 			}
-						
-			return "LabosList";
+
+			return "InsertionPmsiForm";
 		} 
 	}
 	
