@@ -82,6 +82,21 @@
   		<version>${spring.version}</version>
 	</dependency>
  
+   <dependency>
+    <groupId>sedna</groupId>
+    <artifactId>sednadriver</artifactId>
+    <version>1.0</version>
+    <scope>system</scope>
+    <systemPath>${project.basedir}/WebContent/WEB-INF/lib/sednadriver.jar</systemPath>
+  </dependency>
+
+   <dependency>
+    <groupId>sedna</groupId>
+    <artifactId>jpmsi2stream</artifactId>
+    <version>0.0.1</version>
+    <scope>system</scope>
+    <systemPath>${project.basedir}/WebContent/WEB-INF/lib/jpmsi2stream-0.0.1.jar</systemPath>
+  </dependency>
 
 	</dependencies>
 	<packaging>war</packaging>
