@@ -30,6 +30,10 @@
                   <targetPath>WEB-INF\conf</targetPath>
                 </resource>
                 <resource>
+                  <directory>WebContent\WEB-INF\jsp</directory>
+                  <targetPath>WEB-INF\jsp</targetPath>
+                </resource>
+                <resource>
                   <directory>WebContent\WEB-INF\</directory>
                   <targetPath>WEB-INF</targetPath>
                     <includes>
