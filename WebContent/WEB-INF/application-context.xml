@@ -17,7 +17,6 @@
 	<context:component-scan base-package="aider.org.pmsiadmin" />
 	<context:annotation-config />
 	<mvc:annotation-driven />
-
 	<context:property-placeholder location="WEB-INF/conf/pmsiadmin.conf"/>
-        
+
 </beans>
