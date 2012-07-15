@@ -26,7 +26,7 @@ public class LdapAuthenticator {
 		this.config = config;
 	}
 
-	public Map<String, Object> authenticate(String user, String pass) throws NamingException {
+	public Map<String, String> authenticate(String user, String pass) throws NamingException {
 		String returnedAtts[] = {
 				config.getLdapMappingUniqueUserId(),
 				config.getLdapMappingSurname(),
@@ -48,7 +48,8 @@ public class LdapAuthenticator {
 		env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
 		env.put(Context.PROVIDER_URL, config.getLdapHost());
 		env.put(Context.SECURITY_AUTHENTICATION, "simple");
-		env.put(Context.SECURITY_PRINCIPAL, user + "@" + config.getLdapHost());
+		env.put(Context.SECURITY_PRINCIPAL, config.getLdapUserlogin() + "=" +
+			user + "," + config.getLdapDn());
 		env.put(Context.SECURITY_CREDENTIALS, pass);
     
 		LdapContext ctxGC = null;
@@ -62,13 +63,13 @@ public class LdapAuthenticator {
 		while (answer.hasMoreElements()) {
 			SearchResult sr = (SearchResult) answer.next();
 			Attributes attrs = sr.getAttributes();
-			Map<String, Object> amap = null;
+			Map<String, String> amap = null;
 			if (attrs != null) {
-				amap = new HashMap<String, Object>();
+				amap = new HashMap<String, String>();
 				NamingEnumeration<?> ne = attrs.getAll();
 				while (ne.hasMore()) {
 					Attribute attr = (Attribute) ne.next();
-					amap.put(attr.getID(), attr.get());
+					amap.put(attr.getID(), (String) attr.get());
 				}
 				ne.close();
 			}

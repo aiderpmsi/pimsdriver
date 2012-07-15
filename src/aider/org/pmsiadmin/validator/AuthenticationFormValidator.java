@@ -28,7 +28,9 @@ public class AuthenticationFormValidator implements ConstraintValidator<Authenti
 		try {
 			session = authenticationForm.getDtoSession().getSession(
 					authenticationForm.getUser(), authenticationForm.getPass());
-		} catch (NamingException e) { }
+		} catch (NamingException e) {
+			// Aithentification interdite (quelle que soit la cause)
+		}
 		
 		authenticationForm.setSession(session);
 

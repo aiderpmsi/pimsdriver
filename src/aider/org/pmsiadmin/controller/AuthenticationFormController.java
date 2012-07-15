@@ -57,7 +57,7 @@ public class AuthenticationFormController {
 				LdapAuthenticator adAuthentificator =
 						new LdapAuthenticator(ldapConfiguration);
 				
-				DtoSession dtoSession = new DtoSession(adAuthentificator);
+				DtoSession dtoSession = new DtoSession(adAuthentificator, configuration);
 				
 				authenticationForm.setDtoSession(dtoSession);
 			}

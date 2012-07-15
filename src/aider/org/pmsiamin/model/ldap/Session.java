@@ -8,32 +8,32 @@ package aider.org.pmsiamin.model.ldap;
  */
 public class Session {
 	
-	private String user;
+	private String userLogin;
 	
-	private String userGUID;
+	private String uniqueUserId;
 	
 	private String givenName;
 	
-	private String sn;
+	private String surname;
 	
 	private String mail;
 
 	// =================== Getters et Setters ==================
 	
-	public String getUser() {
-		return user;
+	public String getUserLogin() {
+		return userLogin;
 	}
 
-	public void setUser(String user) {
-		this.user = user;
+	public void setUserLogin(String userLogin) {
+		this.userLogin = userLogin;
 	}
 
-	public String getUserGUID() {
-		return userGUID;
+	public String getUniqueUserId() {
+		return uniqueUserId;
 	}
 
-	public void setUserGUID(String userGUID) {
-		this.userGUID = userGUID;
+	public void setUniqueUserId(String uniqueUserId) {
+		this.uniqueUserId = uniqueUserId;
 	}
 
 	public String getGivenName() {
@@ -44,12 +44,12 @@ public class Session {
 		this.givenName = givenName;
 	}
 
-	public String getSn() {
-		return sn;
+	public String getSurname() {
+		return surname;
 	}
 
-	public void setSn(String sn) {
-		this.sn = sn;
+	public void setSurname(String surname) {
+		this.surname = surname;
 	}
 
 	public String getMail() {
