@@ -48,8 +48,7 @@ public class LdapAuthenticator {
 		env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
 		env.put(Context.PROVIDER_URL, config.getLdapHost());
 		env.put(Context.SECURITY_AUTHENTICATION, "simple");
-		env.put(Context.SECURITY_PRINCIPAL, config.getLdapUserlogin() + "=" +
-			user + "," + config.getLdapDn());
+		env.put(Context.SECURITY_PRINCIPAL, config.getProcessedAuthIdentifier(user));
 		env.put(Context.SECURITY_CREDENTIALS, pass);
     
 		LdapContext ctxGC = null;

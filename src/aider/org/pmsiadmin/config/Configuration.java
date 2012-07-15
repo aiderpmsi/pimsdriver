@@ -18,9 +18,9 @@ public class Configuration {
 	@Value("${sedna.pwd}")
 	private String sednaPwd;
 	
-	@Value("${ldap.domain}")
-	private String ldapDomain;
-	
+	@Value("${ldap.authentication}")
+	private String ldapAuthentication;
+		
 	@Value("${ldap.host}")
 	private String ldapHost;
 	
@@ -73,13 +73,13 @@ public class Configuration {
 	public void setSednaPwd(String sednaPwd) {
 		this.sednaPwd = sednaPwd;
 	}
-
-	public String getLdapDomain() {
-		return ldapDomain;
+	
+	public String getLdapAuthentication() {
+		return ldapAuthentication;
 	}
 
-	public void setLdapDomain(String ldapDomain) {
-		this.ldapDomain = ldapDomain;
+	public void setLdapAuthentication(String ldapAuthentication) {
+		this.ldapAuthentication = ldapAuthentication;
 	}
 
 	public String getLdapHost() {

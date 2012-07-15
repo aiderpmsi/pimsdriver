@@ -10,7 +10,7 @@ public class InsertionPmsiForm {
 
 	@NotNull(message = "Vous n'êtes pas identifié")
 	private Session session = null;
-	
+		
     @NotNull
     @MultipartNotEmpty
     private MultipartFile file = null;
@@ -22,13 +22,12 @@ public class InsertionPmsiForm {
 	public void setSession(Session session) {
 		this.session = session;
 	}
-    
-    public void setFile(MultipartFile file) {
+
+	public void setFile(MultipartFile file) {
     	this.file = file;
     }
     
     public MultipartFile getFile() {
     	return file;
     }
-    
 }

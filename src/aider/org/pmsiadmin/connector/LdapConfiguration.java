@@ -2,7 +2,7 @@ package aider.org.pmsiadmin.connector;
 
 public class LdapConfiguration {
 
-	private String ldapDomain;
+	private String ldapAuthentication;
 	
 	private String ldapHost;
 	
@@ -22,12 +22,27 @@ public class LdapConfiguration {
 	
 	private String ldapMappingMail;
 
-	public String getLdapDomain() {
-		return ldapDomain;
+	public String getLdapAuthentication() {
+		return ldapAuthentication;
 	}
 
-	public void setLdapDomain(String ldapDomain) {
-		this.ldapDomain = ldapDomain;
+	public void setLdapAuthentication(String ldapAuthentication) {
+		this.ldapAuthentication = ldapAuthentication;
+	}
+	
+	/**
+	 * Utilise les informations de {@link LdapConfiguration#ldapAuthentication} pour
+	 * renvoyer l'identifiant qu'attend l'implémentation de ldap sous-jacente
+	 * @param user le login de l'utilisateur
+	 * @return
+	 */
+	public String getProcessedAuthIdentifier(String user) {
+		// TODO : Il existe un risque de sécurité à l'injection de ldap, il faudrait
+		// limiter les caractères acceptés en entrée
+		String processed = new String(getLdapAuthentication());
+		processed = processed.replaceAll("%u", user);
+		processed = processed.replaceAll("%d", getLdapDn());
+		return processed;
 	}
 
 	public String getLdapHost() {

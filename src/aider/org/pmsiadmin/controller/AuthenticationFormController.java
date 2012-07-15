@@ -42,7 +42,7 @@ public class AuthenticationFormController {
 			// il faut le créer
 			
 			LdapConfiguration ldapConfiguration = new LdapConfiguration();
-			ldapConfiguration.setLdapDomain(configuration.getLdapDomain());
+			ldapConfiguration.setLdapAuthentication(configuration.getLdapAuthentication());
 			ldapConfiguration.setLdapHost(configuration.getLdapHost());
 			ldapConfiguration.setLdapDn(configuration.getLdapDn());
 			ldapConfiguration.setLdapObjectClass(configuration.getLdapObjectClass());

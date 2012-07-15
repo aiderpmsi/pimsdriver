@@ -18,14 +18,14 @@
 </style>
 </head>
 <body>
-	<h2>Fichier Ã  importer</h2>
+	<h2>Fichier à importer</h2>
  
  	<form:form method="POST" commandName="insertionpmsiform"
 		enctype="multipart/form-data">
  
 		<form:errors path="*" cssClass="errorblock" element="div" />
- 
-		Fichier Pmsi Ã  Uploader : <input type="file" name="file" />
+ 		<input type="text" name="name" />
+		Fichier Pmsi à Uploader : <input type="file" name="file" />
 		<input type="submit" value="upload" />
 		<span><form:errors path="file" cssClass="error" />
 		</span>
