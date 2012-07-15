@@ -18,7 +18,7 @@ import javax.validation.Payload;
 @Retention(value = java.lang.annotation.RetentionPolicy.RUNTIME)
 public @interface AuthenticationFormValidatorAnnotation {
 	
-	String message() default "{aider.org.bio.biomanager.validator.AuthentificationFormValidator.message}";
+	String message() default "{aider.org.bio.biomanager.validator.AuthenticationFormValidator.message}";
 	
 	Class<?>[] groups() default {};
 	

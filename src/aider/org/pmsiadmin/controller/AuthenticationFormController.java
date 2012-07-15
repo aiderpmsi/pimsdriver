@@ -65,7 +65,7 @@ public class AuthenticationFormController {
 		model.addAttribute("authenticationform", authenticationForm);
  
 		//return form view
-		return "AuthentificationForm";
+		return "AuthenticationForm";
 	}
 
 	@RequestMapping(method = RequestMethod.POST)
