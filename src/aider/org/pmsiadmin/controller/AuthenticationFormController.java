@@ -19,7 +19,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.support.SessionStatus;
 
 import aider.org.pmsiadmin.config.Configuration;
-import aider.org.pmsiadmin.connector.AdAuthenticator;
+import aider.org.pmsiadmin.connector.LdapAuthenticator;
+import aider.org.pmsiadmin.connector.LdapConfiguration;
 import aider.org.pmsiadmin.model.form.AuthenticationForm;
 import aider.org.pmsiamin.model.ldap.DtoSession;
 
@@ -39,11 +40,22 @@ public class AuthenticationFormController {
 			AuthenticationForm authenticationForm = (AuthenticationForm) binder.getTarget();
 			// Si il n'y a pas d'objet de transfert de données de session dans l'objet
 			// il faut le créer
+			
+			LdapConfiguration ldapConfiguration = new LdapConfiguration();
+			ldapConfiguration.setLdapDomain(configuration.getLdapDomain());
+			ldapConfiguration.setLdapHost(configuration.getLdapHost());
+			ldapConfiguration.setLdapDn(configuration.getLdapDn());
+			ldapConfiguration.setLdapObjectClass(configuration.getLdapObjectClass());
+			ldapConfiguration.setLdapUserlogin(configuration.getLdapUserlogin());
+			ldapConfiguration.setLdapAdditionalFilters(configuration.getLdapAdditionalFilters());
+			ldapConfiguration.setLdapMappingUniqueUserId(configuration.getLdapMappingUniqueUserId());
+			ldapConfiguration.setLdapMappingSurname(configuration.getLdapMappingSurname());
+			ldapConfiguration.setLdapMappingGivenName(configuration.getLdapMappingGivenName());
+			ldapConfiguration.setLdapMappingMail(configuration.getLdapMappingMail());
+						
 			if (authenticationForm.getDtoSession() == null) {
-				AdAuthenticator adAuthentificator = new AdAuthenticator(
-						configuration.getLdapDomain(),
-						configuration.getLdapHost(),
-						configuration.getLdapDn());
+				LdapAuthenticator adAuthentificator =
+						new LdapAuthenticator(ldapConfiguration);
 				
 				DtoSession dtoSession = new DtoSession(adAuthentificator);
 				

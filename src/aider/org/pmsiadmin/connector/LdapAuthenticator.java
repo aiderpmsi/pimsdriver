@@ -18,21 +18,24 @@ import javax.naming.ldap.LdapContext;
  * @author delabre
  *
  */
-public class AdAuthenticator {
+public class LdapAuthenticator {
 	
-	private String domain;
-	private String ldapHost;
-	private String searchBase;
+	private LdapConfiguration config;
   
-	public AdAuthenticator(String domain, String host, String dn) {
-		this.domain = domain;
-		this.ldapHost = host;
-		this.searchBase = dn;
+	public LdapAuthenticator(LdapConfiguration config) {
+		this.config = config;
 	}
 
 	public Map<String, Object> authenticate(String user, String pass) throws NamingException {
-		String returnedAtts[] ={ "ObjectGUID", "sn", "givenName", "mail" };
-		String searchFilter = "(&(objectClass=user)(title=MEDECIN)(sAMAccountName=" + user + "))";
+		String returnedAtts[] = {
+				config.getLdapMappingUniqueUserId(),
+				config.getLdapMappingSurname(),
+				config.getLdapMappingGivenName(),
+				config.getLdapMappingMail()
+				};
+		String searchFilter = "(&(objectClass=" + config.getLdapObjectClass() + ")" +
+				config.getLdapAdditionalFilters() + "(" +
+				config.getLdapUserlogin() + "=" + user + "))";
     
 		//Create the search controls
 		SearchControls searchCtls = new SearchControls();
@@ -43,16 +46,17 @@ public class AdAuthenticator {
     
 		Hashtable<String, String> env = new Hashtable<String, String>();
 		env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-		env.put(Context.PROVIDER_URL, ldapHost);
+		env.put(Context.PROVIDER_URL, config.getLdapHost());
 		env.put(Context.SECURITY_AUTHENTICATION, "simple");
-		env.put(Context.SECURITY_PRINCIPAL, user + "@" + domain);
+		env.put(Context.SECURITY_PRINCIPAL, user + "@" + config.getLdapHost());
 		env.put(Context.SECURITY_CREDENTIALS, pass);
     
 		LdapContext ctxGC = null;
         
 		ctxGC = new InitialLdapContext(env, null);
 		//Search objects in GC using filters
-		NamingEnumeration<SearchResult> answer = ctxGC.search(searchBase, searchFilter, searchCtls);
+		NamingEnumeration<SearchResult> answer = ctxGC.search(
+				config.getLdapDn(), searchFilter, searchCtls);
 		
 		// Only get the first element retrieved
 		while (answer.hasMoreElements()) {

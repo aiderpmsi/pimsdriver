@@ -5,7 +5,7 @@ import java.util.Map;
 
 import javax.naming.NamingException;
 
-import aider.org.pmsiadmin.connector.AdAuthenticator;
+import aider.org.pmsiadmin.connector.LdapAuthenticator;
 
 /**
  * Transforme un couple mot de passe + uilisateur en session
@@ -14,7 +14,7 @@ import aider.org.pmsiadmin.connector.AdAuthenticator;
  */
 public class DtoSession {
 
-	private AdAuthenticator adAuthenticator = null;
+	private LdapAuthenticator adAuthenticator = null;
 	
 	/**
 	 * Interdit la construction d'un {@link DtoSession} sans connecteur AD
@@ -22,7 +22,7 @@ public class DtoSession {
 	@SuppressWarnings("unused")
 	private DtoSession() {}
 	
-	public DtoSession(AdAuthenticator adAuthenticator) throws SQLException {
+	public DtoSession(LdapAuthenticator adAuthenticator) throws SQLException {
 		this.adAuthenticator = adAuthenticator;
 	}
 	
