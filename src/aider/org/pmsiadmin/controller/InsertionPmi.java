@@ -1,7 +1,6 @@
 package aider.org.pmsiadmin.controller;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.sql.SQLException;
 
 import javax.annotation.Resource;
@@ -20,6 +19,8 @@ import org.springframework.web.bind.support.SessionStatus;
 
 import aider.org.pmsiadmin.config.Configuration;
 import aider.org.pmsiadmin.model.form.InsertionPmsiForm;
+import aider.org.pmsiadmin.parser.PmsiParser;
+import aider.org.pmsiadmin.parser.PmsiParser.FileType;
 import aider.org.pmsiamin.model.ldap.Session;
 
 @Controller
@@ -27,7 +28,7 @@ import aider.org.pmsiamin.model.ldap.Session;
 public class InsertionPmi {
 	
 	@Resource(name="configuration")
-	Configuration configuation = null;
+	Configuration configuration = null;
 	
 	@InitBinder
 	public void initBinder(HttpServletRequest request, WebDataBinder binder) throws SQLException {
@@ -60,7 +61,7 @@ public class InsertionPmi {
 		@Valid @ModelAttribute("insertionpmsiform") InsertionPmsiForm insertionPmsiForm,
 		BindingResult result,
 		SessionStatus status,
-		ModelMap model) throws ClassNotFoundException, SQLException, IOException {
+		ModelMap model) throws Throwable {
  
 		if (result.getFieldError("session") != null)
 			return "redirect:/Authentification/Form";
@@ -71,14 +72,20 @@ public class InsertionPmi {
 			status.setComplete();
 			//form success
 			
-			InputStream in = insertionPmsiForm.getFile().getInputStream();
-			byte[] buffer = new byte[512];
-			int size;
-			while ((size = in.read(buffer)) != -1) {
-				System.out.println(new String(buffer, 0, size));
+			PmsiParser parser = new PmsiParser();
+			
+			FileType ret = parser.parse(
+					insertionPmsiForm.getFile().getInputStream(),
+					configuration);
+			
+			if (ret == null) {
+				model.addAttribute("ret", "Impossible d'insérer le fichier");
+				model.addAttribute("val", parser.getPmsiErrors());
+			} else {
+				model.addAttribute("ret", "Insertion réussie");
+				model.addAttribute("val", "Oui!");
 			}
-
-			return "InsertionPmsiForm";
+			return "InsertionPmsi";
 		} 
 	}
 	
