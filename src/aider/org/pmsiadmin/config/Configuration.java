@@ -12,6 +12,9 @@ public class Configuration {
 	@Value("${sedna.host}")
 	private String sednaHost;
 
+	@Value("${sedna.db}")
+	private String sednaDb;
+	
 	@Value("${sedna.user}")
 	private String sednaUser;
 
@@ -56,6 +59,14 @@ public class Configuration {
 
 	public void setSednaHost(String sednaHost) {
 		this.sednaHost = sednaHost;
+	}
+
+	public String getSednaDb() {
+		return sednaDb;
+	}
+
+	public void setSednaDb(String sednaDb) {
+		this.sednaDb = sednaDb;
 	}
 
 	public String getSednaUser() {

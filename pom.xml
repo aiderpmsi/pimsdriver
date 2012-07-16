@@ -127,9 +127,9 @@
    <dependency>
     <groupId>jpmsi2stream</groupId>
     <artifactId>jpmsi2stream</artifactId>
-    <version>0.0.1</version>
+    <version>0.0.2-SNAPSHOT</version>
     <scope>system</scope>
-    <systemPath>${project.basedir}/WebContent/WEB-INF/lib/jpmsi2stream-0.0.1.jar</systemPath>
+    <systemPath>${project.basedir}/WebContent/WEB-INF/lib/jpmsi2stream-0.0.2-SNAPSHOT.jar</systemPath>
   </dependency>
 
 	</dependencies>

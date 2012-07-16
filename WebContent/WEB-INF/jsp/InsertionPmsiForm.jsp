@@ -24,7 +24,6 @@
 		enctype="multipart/form-data">
  
 		<form:errors path="*" cssClass="errorblock" element="div" />
- 		<input type="text" name="name" />
 		Fichier Pmsi à Uploader : <input type="file" name="file" />
 		<input type="submit" value="upload" />
 		<span><form:errors path="file" cssClass="error" />
