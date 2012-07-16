@@ -10,8 +10,8 @@ import aider.org.pmsi.parser.PmsiRSF2009Reader;
 import aider.org.pmsi.parser.PmsiRSF2012Reader;
 import aider.org.pmsi.parser.PmsiRSS116Reader;
 import aider.org.pmsi.parser.PmsiReader;
-import aider.org.pmsi.parser.exceptions.PmsiFileNotInserable;
-import aider.org.pmsi.parser.exceptions.PmsiFileNotReadable;
+import aider.org.pmsi.parser.exceptions.PmsiIOException;
+import aider.org.pmsi.parser.exceptions.PmsiPipedIOException;
 import aider.org.pmsiadmin.config.Configuration;
 import aider.org.pmsiadmin.model.xml.PmsiSednaPipedReaderFactory;
 
@@ -66,7 +66,7 @@ public class PmsiParser {
         			return fileTypeEntry;
         		}
             } catch (Throwable e) {
-            	if (e instanceof PmsiFileNotReadable || e instanceof PmsiFileNotInserable) {
+            	if (e instanceof PmsiPipedIOException || e instanceof PmsiIOException) {
             		pmsiErrors += (e.getMessage() == null ? "" : e.getMessage());
             	} else
             		throw e;
@@ -106,10 +106,22 @@ public class PmsiParser {
 	
 			// Lecture du fichier par mise en route de la machine à états
 	        reader.run();
-		} finally {
-			if (reader != null)
+		} catch (Exception e) {
+			// Si on arrive ici, c'est qu'il existe une erreur qui interdit la transformation
+			// du pmsi en xml
+			// Les 2 seules erreurs qui peuvent arriver ici sont :
+			// - PmsiIOException (Lecture impossible)
+			// - PmsiPipedIOException (ecriture impossible)
+			// Ce sont les erreurs les plus importantes, peu importe dans ce cas si la
+			// fermeture du reader échoue
+			try {
 				reader.close();
+			} catch (PmsiPipedIOException ignore) {}
+			throw e;
 		}
+
+        // Arrivé ici, le fichier a pu être lu, on ferme le reader
+		reader.close();
 			
         // Arrivé ici, le fichier a pu être lu, on retourne true
         return true;

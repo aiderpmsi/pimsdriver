@@ -3,10 +3,10 @@ package aider.org.pmsiadmin.model.xml;
 import ru.ispras.sedna.driver.DatabaseManager;
 import ru.ispras.sedna.driver.DriverException;
 import ru.ispras.sedna.driver.SednaConnection;
-import aider.org.pmsi.dto.PmsiPipedIOException;
 import aider.org.pmsi.dto.PmsiPipedReader;
 import aider.org.pmsi.dto.PmsiPipedReaderFactory;
 import aider.org.pmsi.parser.PmsiReader;
+import aider.org.pmsi.parser.exceptions.PmsiPipedIOException;
 import aider.org.pmsiadmin.config.Configuration;
 
 /**

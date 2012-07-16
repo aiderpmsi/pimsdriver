@@ -1,8 +1,8 @@
 package aider.org.pmsiadmin.model.xml;
 
-import aider.org.pmsi.dto.PmsiPipedIOException;
 import aider.org.pmsi.dto.Rsf2012PipedWriter;
 import aider.org.pmsi.parser.PmsiRSF2012Reader;
+import aider.org.pmsi.parser.exceptions.PmsiPipedIOException;
 
 /**
  * Objet de transfert de données pour un objet de type {@link PmsiRSF2012Reader}

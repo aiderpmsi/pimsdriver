@@ -1,13 +1,14 @@
 package aider.org.pmsiadmin.model.xml;
 
+import java.io.IOException;
 import java.io.InputStream;
 import ru.ispras.sedna.driver.DriverException;
 import ru.ispras.sedna.driver.SednaConnection;
 import ru.ispras.sedna.driver.SednaSerializedResult;
 import ru.ispras.sedna.driver.SednaStatement;
 
-import aider.org.pmsi.dto.PmsiPipedIOException;
 import aider.org.pmsi.dto.PmsiPipedReaderImpl;
+import aider.org.pmsi.parser.exceptions.PmsiPipedIOException;
 
 /**
  * Classe permettant de lire le flux écrit par le thread principal pour l'écrire où il
@@ -37,35 +38,19 @@ public class PmsiSednaPipedReader extends PmsiPipedReaderImpl {
 		// Définition de l'heure de sedna
 		setSednaTime();
 	}
-
-	@Override
-	public void run() {
-		try {
-			writeInputStream(getPipedInputStream());
-			setStatus(true);
-		} catch (PmsiPipedIOException e) {
-			setStatus(false);
-			setTerminalException(e);
-		} finally {
-			try {
-				getSemaphore().release();
-			} catch (PmsiPipedIOException e) {
-				setStatus(false);
-				setTerminalException(e);
-			}
-		}
-	}
 	
-	/**
-	 * Ecrit les données de l'inputstream là où c'est nécessaire
-	 * (peut être surchargé pour écrire dans une base de données)
-	 * @throws DtoPmsiException si l'écriture a été un éches
-	 */
+	@Override
 	protected void writeInputStream(InputStream input) throws PmsiPipedIOException {
 		try {
 			SednaStatement st = connection.createStatement();
 			st.loadDocument(input, "pmsi-" + getPmsiDocNumber(), "Pmsi");
-		} catch (Exception e) {
+		} catch (DriverException e) {
+			if (e.getErrorCode() == 168)
+				// Le  fichier est mal formé 
+				throw new PmsiPipedIOException("Malformed file");
+			else
+				throw new PmsiPipedIOException(e);
+		} catch (IOException e) {
 			throw new PmsiPipedIOException(e);
 		}
 	}
@@ -127,7 +112,11 @@ public class PmsiSednaPipedReader extends PmsiPipedReaderImpl {
 			else
 				connection.commit();
 		} catch (DriverException e) {
-			throw new PmsiPipedIOException(e);
+			if (e.getErrorCode() == 411)
+				// Il n'y a pas de transaction à annuler : c'est plus une info qu'une erreur à cet endroit
+				return;
+			else
+				throw new PmsiPipedIOException(e);
 		}
 		super.close();
 	}
