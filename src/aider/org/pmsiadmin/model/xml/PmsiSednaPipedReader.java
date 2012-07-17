@@ -2,6 +2,13 @@ package aider.org.pmsiadmin.model.xml;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
+
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.events.XMLEvent;
+
 import ru.ispras.sedna.driver.DriverException;
 import ru.ispras.sedna.driver.SednaConnection;
 import ru.ispras.sedna.driver.SednaSerializedResult;
@@ -24,6 +31,12 @@ public class PmsiSednaPipedReader extends PmsiPipedReaderImpl {
 	
 	private String sednaTime;
 	
+	private String finess = null;
+	
+	private String root1= null;
+	
+	private String root2 = null;
+	
 	public PmsiSednaPipedReader(SednaConnection connection) throws PmsiPipedIOException {
 		super();
 		this.connection = connection;
@@ -44,6 +57,13 @@ public class PmsiSednaPipedReader extends PmsiPipedReaderImpl {
 		try {
 			SednaStatement st = connection.createStatement();
 			st.loadDocument(input, "pmsi-" + getPmsiDocNumber(), "Pmsi");
+			// Récupération de la racine de ce pmsi
+			setUniqueElements("pmsi-" + getPmsiDocNumber(), "Pmsi");
+
+			// Vérification 1 : Si rsf2012 / 2009, vérification qu'il n'existe pas d'autre
+			// rsf2010 ou 2009 à cette date d'insertion pour ce finess et ce mois de fin
+			// de finess
+
 		} catch (DriverException e) {
 			if (e.getErrorCode() == 168)
 				// Le  fichier est mal formé 
@@ -100,6 +120,46 @@ public class PmsiSednaPipedReader extends PmsiPipedReaderImpl {
 	 */
 	public String getSednaTime() {
 		return sednaTime;
+	}
+	
+	/**
+	 * Récupère dans la base de données les éléments permettant d'identifier de manière unique 
+	 * un document par ses éléments
+	 * @param doc
+	 * @param collection
+	 * @throws PmsiPipedIOException
+	 */
+	private void setUniqueElements(String doc, String collection) throws PmsiPipedIOException {
+		try {
+			SednaStatement st = connection.createStatement();
+			st.execute("for $i in fn:doc(\"" + doc + "\", \"" + collection + "\")/(*[1])/(*[1])\n" +
+					"return <entry type = \"{name($i/..)}\" headertype = \"{name($i)}\" finess = \"{string($i/@Finess)}\" />");
+			
+			SednaSerializedResult pr = st.getSerializedResult();
+			String result = pr.next();
+			XMLInputFactory xmlif = XMLInputFactory.newInstance();
+			XMLStreamReader xmlsr = xmlif.createXMLStreamReader(new StringReader(result));
+			
+			int eventType;
+			while (xmlsr.hasNext()) {
+				eventType = xmlsr.next();
+				if (eventType == XMLEvent.START_ELEMENT) {
+					int attCount = xmlsr.getAttributeCount();
+					for (int i = 0 ; i < attCount ; i++) {
+						if (xmlsr.getAttributeLocalName(i).equals("type"))
+							root1 = xmlsr.getAttributeValue(i);
+						else if (xmlsr.getAttributeLocalName(i).equals("headertype"))
+							root2 = xmlsr.getAttributeValue(i);
+						else if (xmlsr.getAttributeLocalName(i).equals("finess"))
+							finess = xmlsr.getAttributeValue(i);
+					}
+				}
+			}
+		} catch (DriverException e) {
+			throw new PmsiPipedIOException(e);
+		} catch (XMLStreamException e) {
+			throw new PmsiPipedIOException(e);
+		}
 	}
 	
 	@Override

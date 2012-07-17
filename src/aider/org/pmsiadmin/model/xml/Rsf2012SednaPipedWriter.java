@@ -30,8 +30,8 @@ public class Rsf2012SednaPipedWriter extends Rsf2012PipedWriter {
 		System.arraycopy(attributes, 0, newAttributes, 0, attributes.length);
 		System.arraycopy(values, 0, newValues, 0, attributes.length);
 		
-		newAttributes[attributes.length + 1] = "insertionTimeStamp";
-		newValues[attributes.length + 1] = reader.getSednaTime();
-		super.writeStartDocument(name, attributes, values);
+		newAttributes[attributes.length] = "insertionTimeStamp";
+		newValues[attributes.length] = reader.getSednaTime();
+		super.writeStartDocument(name, newAttributes, newValues);
 	};
 }

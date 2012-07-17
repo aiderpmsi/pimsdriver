@@ -13,6 +13,7 @@ import aider.org.pmsi.parser.exceptions.PmsiIOException;
 import aider.org.pmsi.parser.exceptions.PmsiPipedIOException;
 import aider.org.pmsiadmin.config.Configuration;
 import aider.org.pmsiadmin.model.xml.PmsiSednaPipedReaderFactory;
+import aider.org.pmsiadmin.model.xml.PmsiSednaPipedWriterFactory;
 
 /**
  * Entrée du programme permettant de lire un fichier pmsi et de le transformer en xml
@@ -55,7 +56,7 @@ public class PmsiParser {
 	 */
 	public FileType parse(Reader re, Configuration config) throws Throwable  {
 		// Création de la facrique de transfert du pmsi
-		PmsiPipedWriterFactory pmsiPipedWriterFactory = new PmsiPipedWriterFactory(
+		PmsiSednaPipedWriterFactory pmsiPipedWriterFactory = new PmsiSednaPipedWriterFactory(
 				new PmsiSednaPipedReaderFactory(config));
         // On essaye de lire le fichier pmsi donné avec tous les lecteurs dont on dispose,
         // Le premier qui réussit est considéré comme le bon

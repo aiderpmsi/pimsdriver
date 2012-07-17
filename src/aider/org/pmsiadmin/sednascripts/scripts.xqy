@@ -135,3 +135,6 @@ return
 </entry>
 )[1]
 
+// récupération du type de document et du finess
+for $i in fn:doc("pmsi-16", "Pmsi")/(*[1])/(*[1])
+return <entry type = "{name($i/..)}" headertype = "{name($i)}" finess = "{string($i/@Finess)}" />&
