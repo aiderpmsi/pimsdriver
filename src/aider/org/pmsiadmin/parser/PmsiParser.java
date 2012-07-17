@@ -1,7 +1,6 @@
 package aider.org.pmsiadmin.parser;
 
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,7 +53,7 @@ public class PmsiParser {
 	 * @param args
 	 * @throws Throwable 
 	 */
-	public FileType parse(InputStream in, Configuration config) throws Throwable  {
+	public FileType parse(Reader re, Configuration config) throws Throwable  {
 		// Création de la facrique de transfert du pmsi
 		PmsiPipedWriterFactory pmsiPipedWriterFactory = new PmsiPipedWriterFactory(
 				new PmsiSednaPipedReaderFactory(config));
@@ -62,7 +61,7 @@ public class PmsiParser {
         // Le premier qui réussit est considéré comme le bon
         for (FileType fileTypeEntry : listTypes) {
         	try {
-        		if (readPMSI(in, fileTypeEntry, pmsiPipedWriterFactory) == true) {
+        		if (readPMSI(re, fileTypeEntry, pmsiPipedWriterFactory) == true) {
         			return fileTypeEntry;
         		}
             } catch (Throwable e) {
@@ -87,20 +86,20 @@ public class PmsiParser {
 	 * @return true si le fichier a pu être inséré, false sinon
 	 * @throws Exception 
 	 */
-	public boolean readPMSI(InputStream in, FileType type, PmsiPipedWriterFactory pmsiPipedWriterFactory) throws Exception {
+	public boolean readPMSI(Reader re, FileType type, PmsiPipedWriterFactory pmsiPipedWriterFactory) throws Exception {
 		PmsiReader<?, ?> reader = null;
-		
+		re.reset();
 		try {
 			// Choix du reader
 			switch(type) {
 				case RSS116:
-					reader = new PmsiRSS116Reader(new InputStreamReader(in), pmsiPipedWriterFactory);
+					reader = new PmsiRSS116Reader(re, pmsiPipedWriterFactory);
 					break;
 				case RSF2009:
-					reader = new PmsiRSF2009Reader(new InputStreamReader(in), pmsiPipedWriterFactory);
+					reader = new PmsiRSF2009Reader(re, pmsiPipedWriterFactory);
 					break;
 				case RSF2012:
-					reader = new PmsiRSF2012Reader(new InputStreamReader(in), pmsiPipedWriterFactory);
+					reader = new PmsiRSF2012Reader(re, pmsiPipedWriterFactory);
 					break;
 				}
 	
@@ -115,7 +114,8 @@ public class PmsiParser {
 			// Ce sont les erreurs les plus importantes, peu importe dans ce cas si la
 			// fermeture du reader échoue
 			try {
-				reader.close();
+				if (reader != null)
+					reader.close();
 			} catch (PmsiPipedIOException ignore) {}
 			throw e;
 		}

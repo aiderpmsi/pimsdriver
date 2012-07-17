@@ -111,6 +111,7 @@ public class PmsiSednaPipedReader extends PmsiPipedReaderImpl {
 				connection.rollback();
 			else
 				connection.commit();
+			connection.close();
 		} catch (DriverException e) {
 			if (e.getErrorCode() == 411)
 				// Il n'y a pas de transaction à annuler : c'est plus une info qu'une erreur à cet endroit

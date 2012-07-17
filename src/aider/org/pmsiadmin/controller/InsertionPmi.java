@@ -1,6 +1,11 @@
 package aider.org.pmsiadmin.controller;
 
+import java.io.BufferedReader;
+import java.io.CharArrayReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.nio.CharBuffer;
 import java.sql.SQLException;
 
 import javax.annotation.Resource;
@@ -74,9 +79,28 @@ public class InsertionPmi {
 			
 			PmsiParser parser = new PmsiParser();
 			
-			FileType ret = parser.parse(
-					insertionPmsiForm.getFile().getInputStream(),
-					configuration);
+			// Dans un premier temps, on utilise une copie du fichier en mémoire, mais il faudrait :
+			// 1 - Le sérialiser dans un container par exemple Derby pour le lire et le relire si
+			//     nécessaire
+			// 2 - Utiliser un mécanisme de transaction sans commit pour que chaque fichier inséré
+			//     Puisse être supprimé si inutilisé
+			
+			Reader re = new BufferedReader(
+					new InputStreamReader(insertionPmsiForm.getFile().getInputStream(), "ISO-8859-1"));
+
+			char[] target = new char[512];
+			int nbread;
+			
+			StringBuilder stringBuilder = new StringBuilder();
+			
+			while ((nbread = re.read(target)) != -1) {
+				stringBuilder.append(target, 0, nbread);
+			}
+			
+			Reader re2 = new CharArrayReader(stringBuilder.toString().toCharArray());
+
+			PmsiParser pmsiParser = new PmsiParser();
+			FileType ret = pmsiParser.parse(re2, configuration);
 			
 			if (ret == null) {
 				model.addAttribute("ret", "Impossible d'insérer le fichier");
