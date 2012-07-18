@@ -3,8 +3,8 @@ package aider.org.pmsiadmin.model.xml;
 import ru.ispras.sedna.driver.DatabaseManager;
 import ru.ispras.sedna.driver.DriverException;
 import ru.ispras.sedna.driver.SednaConnection;
-import aider.org.pmsi.dto.PmsiPipedReader;
-import aider.org.pmsi.dto.PmsiPipedReaderFactory;
+import aider.org.pmsi.dto.PmsiThreadedPipedReader;
+import aider.org.pmsi.dto.PmsiThreadedPipedReaderFactory;
 import aider.org.pmsi.parser.PmsiReader;
 import aider.org.pmsi.parser.exceptions.PmsiPipedIOException;
 import aider.org.pmsiadmin.config.Configuration;
@@ -14,7 +14,7 @@ import aider.org.pmsiadmin.config.Configuration;
  * @author delabre
  *
  */
-public class PmsiSednaPipedReaderFactory extends PmsiPipedReaderFactory {
+public class PmsiSednaPipedReaderFactory extends PmsiThreadedPipedReaderFactory {
 	
 	private Configuration config = null;
 	
@@ -32,7 +32,7 @@ public class PmsiSednaPipedReaderFactory extends PmsiPipedReaderFactory {
 	 * @return L'objet de transfert de donné adapté
 	 * @throws PmsiPipedIOException
 	 */
-	public PmsiPipedReader getPmsiPipedReader(PmsiReader<?, ?> reader) throws PmsiPipedIOException {
+	public PmsiThreadedPipedReader getPmsiPipedReader(PmsiReader<?, ?> reader) throws PmsiPipedIOException {
 		SednaConnection connection = null;
 		try {
 			connection = DatabaseManager.getConnection(
@@ -44,7 +44,7 @@ public class PmsiSednaPipedReaderFactory extends PmsiPipedReaderFactory {
 			throw new PmsiPipedIOException(e);
 		}
 		
-		return new PmsiSednaPipedReader(connection);
+		return new PmsiSednaPipedReader(new PmsiDtoSedna(connection));
 	}
 	
 	/**

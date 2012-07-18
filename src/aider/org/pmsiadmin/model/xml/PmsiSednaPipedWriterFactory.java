@@ -1,6 +1,5 @@
 package aider.org.pmsiadmin.model.xml;
 
-import aider.org.pmsi.dto.PmsiPipedReader;
 import aider.org.pmsi.dto.PmsiPipedWriter;
 import aider.org.pmsi.dto.PmsiPipedWriterFactory;
 import aider.org.pmsi.parser.PmsiRSF2009Reader;
