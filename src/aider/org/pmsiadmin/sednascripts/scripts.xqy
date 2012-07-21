@@ -136,5 +136,55 @@ return
 )[1]
 
 // récupération du type de document et du finess
-for $i in fn:doc("pmsi-16", "Pmsi")/(*[1])/(*[1])
-return <entry type = "{name($i/..)}" headertype = "{name($i)}" finess = "{string($i/@Finess)}" />&
+for $i in fn:doc("pmsi-20", "Pmsi")/(*[1])/(*[1])
+return <entry type = "{name($i/..)}"
+              headertype = "{name($i)}"
+              finess = "{string($i/@Finess)}"
+              insertion = "{string($i/../@insertionTimeStamp)}"
+              finperiode = "{string($i/@DateFin)}"/>&
+
+(: Recherche d'un même document avec le même finess et la même date d'insertion :)
+(for $i in fn:doc("pmsi-18", "Pmsi")/(*[1])/(*[1])
+return if (name($i/..) = "RSF2012" or (name($i/..) = "RSF2009"))
+then
+<result>
+  <parent>
+    <doc type = "{name($i/..)}"
+         headertype = "{name($i)}"
+         finess = "{string($i/@Finess)}"
+         insertion = "{string($i/../@insertionTimeStamp)}"
+         finperiode = "{string($i/@DateFin)}"/>
+  </parent> {
+  let $items:=fn:collection("Pmsi")/
+    (RSF2012 | RSF2009)[string(@insertionTimeStamp) = string($i/../@insertionTimeStamp)]/
+      RsfHeader[. != $i and string(@Finess) = string($i/@Finess)]
+      return <identityerrors count="{count($items)}">{
+        for $l in $items
+        return
+          <doc type = "{name($l/..)}" headertype = "{name($l)}" finess = "{string($l/@Finess)}" insertion = "{string($l/../@insertionTimeStamp)}"/>
+      }</identityerrors> 
+} {
+  let $rsfcontent:=$i/(RsfA | RsfA/(RsfB | RsfC | RsfH | RsfM))[@Finess != $i/@Finess]
+  return <finesserrors count="{count($rsfcontent)}"> {
+    for $rsf in $rsfcontent 
+    return
+    <rsf type="{name($rsf)}" numfacture="{$rsf/@NumFacture}"/>
+  }
+  </finesserrors> 
+} {
+  let $rsfchildren:=$i/RsfA/(RsfB | RsfC | RsfH | RsfM)[@NumFacture != ../@NumFacture]
+  return <numfactureerrors count="{count($rsfchildren)}"> {
+    for $rsf in $rsfchildren
+    return
+    <rsf type="{name($rsf)}" numfacture="{$rsf/@NumFacture}"/>
+  }
+  </numfactureerrors>
+}
+</result>
+else
+<toimplement/>)[1]
+
+(: test comment :)
+for $i in fn:doc("pmsi-19", "Pmsi")/(*[1])/(*[1])
+let $rsfchildren:=$i/RsfA/(RsfB | RsfC | RsfH | RsfM)[@NumFacture = ../@NumFacture]
+  return <numfactureerrors count="{count($rsfchildren)}"/>

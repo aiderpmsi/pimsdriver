@@ -24,7 +24,6 @@ import org.springframework.web.bind.support.SessionStatus;
 import aider.org.pmsiadmin.config.Configuration;
 import aider.org.pmsiadmin.model.form.InsertionPmsiForm;
 import aider.org.pmsiadmin.parser.PmsiParser;
-import aider.org.pmsiadmin.parser.PmsiParser.FileType;
 import aider.org.pmsiamin.model.ldap.Session;
 
 @Controller
@@ -75,9 +74,7 @@ public class InsertionPmi {
 		} else {
 			status.setComplete();
 			//form success
-			
-			PmsiParser parser = new PmsiParser();
-			
+						
 			// Dans un premier temps, on utilise une copie du fichier en mémoire, mais il faudrait :
 			// 1 - Le sérialiser dans un container par exemple Derby pour le lire et le relire si
 			//     nécessaire
@@ -99,17 +96,20 @@ public class InsertionPmi {
 			Reader re2 = new CharArrayReader(stringBuilder.toString().toCharArray());
 
 			PmsiParser pmsiParser = new PmsiParser();
-			FileType ret = pmsiParser.parse(re2, configuration);
-			
-			if (ret == null) {
-				model.addAttribute("ret", "Impossible d'insérer le fichier");
-				model.addAttribute("val", parser.getPmsiErrors());
-			} else {
-				model.addAttribute("ret", "Insertion réussie");
-				model.addAttribute("val", "Oui!");
+			String ret;
+			boolean succeded;
+			try {
+				ret = pmsiParser.parse(re2, configuration);
+				succeded = true;
+			} catch (Exception e) {
+				ret = e.getMessage();
+				succeded = false;
 			}
-			return "InsertionPmsi";
-		} 
-	}
+			
+			model.addAttribute("status", succeded);
+			model.addAttribute("report", ret);
+		}
+		return "InsertionPmsi";
+	} 
 	
 }

@@ -4,16 +4,21 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 
-import aider.org.pmsi.dto.PmsiPipedWriterFactory;
+import aider.org.pmsi.dto.PmsiStreamMuxer;
+import aider.org.pmsi.dto.PmsiThread;
 import aider.org.pmsi.parser.PmsiRSF2009Reader;
 import aider.org.pmsi.parser.PmsiRSF2012Reader;
 import aider.org.pmsi.parser.PmsiRSS116Reader;
 import aider.org.pmsi.parser.PmsiReader;
-import aider.org.pmsi.parser.exceptions.PmsiIOException;
-import aider.org.pmsi.parser.exceptions.PmsiPipedIOException;
+import aider.org.pmsi.parser.exceptions.PmsiException;
+import aider.org.pmsi.parser.exceptions.PmsiReaderException;
+import aider.org.pmsi.parser.exceptions.PmsiRunnableException;
+import aider.org.pmsi.writer.PmsiWriter;
 import aider.org.pmsiadmin.config.Configuration;
-import aider.org.pmsiadmin.model.xml.PmsiSednaPipedReaderFactory;
-import aider.org.pmsiadmin.model.xml.PmsiSednaPipedWriterFactory;
+import aider.org.pmsiadmin.model.xml.PmsiSednaStreamRunner;
+import aider.org.pmsiadmin.model.xml.Rsf2009SednaWriter;
+import aider.org.pmsiadmin.model.xml.Rsf2012SednaWriter;
+import aider.org.pmsiadmin.model.xml.Rss116SednaWriter;
 
 /**
  * Entrée du programme permettant de lire un fichier pmsi et de le transformer en xml
@@ -44,39 +49,31 @@ public class PmsiParser {
 	};
 	
 	/**
-	 * Chaine de caractère stockant les erreurs des
-	 * lecteurs de fichiers de PMSI
-	 */
-	public String pmsiErrors = "";
-	
-	/**
 	 * Fonction principale du programme
 	 * @param args
 	 * @throws Throwable 
 	 */
-	public FileType parse(Reader re, Configuration config) throws Throwable  {
-		// Création de la facrique de transfert du pmsi
-		PmsiSednaPipedWriterFactory pmsiPipedWriterFactory = new PmsiSednaPipedWriterFactory(
-				new PmsiSednaPipedReaderFactory(config));
-        // On essaye de lire le fichier pmsi donné avec tous les lecteurs dont on dispose,
-        // Le premier qui réussit est considéré comme le bon
-        for (FileType fileTypeEntry : listTypes) {
+	public String parse(Reader re, Configuration config) throws Throwable {
+		String errors = new String();
+		for (FileType fileTypeEntry : listTypes) {
         	try {
-        		if (readPMSI(re, fileTypeEntry, pmsiPipedWriterFactory) == true) {
-        			return fileTypeEntry;
-        		}
-            } catch (Throwable e) {
-            	if (e instanceof PmsiPipedIOException || e instanceof PmsiIOException) {
-            		pmsiErrors += (e.getMessage() == null ? "" : e.getMessage());
-            	} else
-            		throw e;
+        		re.reset();
+        		String report = readPMSI(re, fileTypeEntry, config);
+        		return report;
+            } catch (PmsiReaderException e) {
+            	// Erreur de reader = le reader n'est pas adapté, il faut en essayer un autre
+            	errors += e.getMessage();
+            } catch (PmsiRunnableException e) {
+            	// Erreur du runner = la lecture a été bien réalisée, mais l'écriture n'est pas bonne :
+            	// C'est une erreur, il faut arrêter
+            	throw e;
+            } catch (Exception e) {
+            	// Pour les autres exceptions, c'est qu'il y a eu une erreur non récupérable
+            	throw new RuntimeException(e);
             }
-        }
-        return null;
-	}
-	
-	public String getPmsiErrors() {
-		return pmsiErrors;
+		}
+		// Aucun reader n'est adapté
+		throw new PmsiException(errors);
 	}
 	
 	/**
@@ -84,47 +81,76 @@ public class PmsiParser {
 	 * @param options Options du programme (en particulier le fichier à insérer)
 	 * @param type Type de fichier à insérer
 	 * @param dtoPmsiReaderFactory Fabrique d'objets de sérialisation
-	 * @return true si le fichier a pu être inséré, false sinon
-	 * @throws Exception 
+	 * @return Le rapport du runner si existe
+
 	 */
-	public boolean readPMSI(Reader re, FileType type, PmsiPipedWriterFactory pmsiPipedWriterFactory) throws Exception {
+	public String readPMSI(Reader re, FileType type, Configuration config) throws Exception {
+		// Reader et writer
 		PmsiReader<?, ?> reader = null;
-		re.reset();
+		PmsiWriter writer = null;
+		PmsiStreamMuxer muxer = null;
+		// Thread du lecteur de writer
+		PmsiThread thread = null;
+		PmsiSednaStreamRunner runner = null;
+				
 		try {
-			// Choix du reader
+			// Création du transformateur de outputstream en inputstream
+			muxer = new PmsiStreamMuxer();
+			
+			// Création de lecteur de inputstream et conenction au muxer
+			runner = new PmsiSednaStreamRunner(muxer.getInputStream(), config);
+			// Création du thread du lecteur de inputstream
+			thread = new PmsiThread(runner);
+			
+			// Choix du reader et du writer et connection au muxer
 			switch(type) {
 				case RSS116:
-					reader = new PmsiRSS116Reader(re, pmsiPipedWriterFactory);
+					writer = new Rss116SednaWriter(muxer.getOutputStream(), runner);
+					reader = new PmsiRSS116Reader(re, writer);
 					break;
 				case RSF2009:
-					reader = new PmsiRSF2009Reader(re, pmsiPipedWriterFactory);
+					writer = new Rsf2009SednaWriter(muxer.getOutputStream(), runner);
+					reader = new PmsiRSF2009Reader(re, writer);
 					break;
 				case RSF2012:
-					reader = new PmsiRSF2012Reader(re, pmsiPipedWriterFactory);
+					writer = new Rsf2012SednaWriter(muxer.getOutputStream(), runner);
+					reader = new PmsiRSF2012Reader(re, writer);
 					break;
 				}
+			
+			// lancement du lecteur de muxer
+			thread.start();
 	
 			// Lecture du fichier par mise en route de la machine à états
-	        reader.run();
-		} catch (Exception e) {
-			// Si on arrive ici, c'est qu'il existe une erreur qui interdit la transformation
-			// du pmsi en xml
-			// Les 2 seules erreurs qui peuvent arriver ici sont :
-			// - PmsiIOException (Lecture impossible)
-			// - PmsiPipedIOException (ecriture impossible)
-			// Ce sont les erreurs les plus importantes, peu importe dans ce cas si la
-			// fermeture du reader échoue
-			try {
-				if (reader != null)
-					reader.close();
-			} catch (PmsiPipedIOException ignore) {}
-			throw e;
-		}
-
-        // Arrivé ici, le fichier a pu être lu, on ferme le reader
-		reader.close();
+			reader.run();
 			
-        // Arrivé ici, le fichier a pu être lu, on retourne true
-        return true;
+			// Fin de fichier evoyé au muxer
+			muxer.eof();
+	
+			// Attente que le lecteur de muxer ait fini
+			thread.waitEndOfProcess();
+
+			// Récupération d'une erreur éventuelle du lecteur de muxer
+			if (thread.getTerminalException() != null)
+				throw thread.getTerminalException();
+
+			// Arrivé ici, on commit, puisqu'il n'y a pas eu d'erreurs
+			runner.commit();
+
+			return runner.getReport();
+
+		} finally {
+			// Fermeture de resources
+			if (reader != null)
+				reader.close();
+			if (writer != null)
+				writer.close();
+			if (muxer != null)
+				muxer.close();
+			if (runner != null) {
+				runner.rollback();
+				runner.close();
+			}
+		}
 	}
 }
