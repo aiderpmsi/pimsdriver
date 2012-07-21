@@ -16,7 +16,7 @@
       <p>Echec de l'insertion</p>
     </c:if>
     <p>
-    	<c:out value="${report}" />
+    	<% out.print((String) request.getAttribute("report")); %>
     </p>
 </body>
 </html>
