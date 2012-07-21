@@ -10,7 +10,7 @@
 </head>
 <body>
 	<c:if test="${status}">
-      <p>RÃ©ussite de l'insertion</p>
+      <p>Réussite de l'insertion</p>
     </c:if>
 	<c:if test="${!status}">
       <p>Echec de l'insertion</p>

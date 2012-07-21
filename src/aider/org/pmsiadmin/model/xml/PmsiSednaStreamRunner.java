@@ -67,9 +67,9 @@ public class PmsiSednaStreamRunner implements PmsiRunnable {
 			// Parsing du rapport
 			XmlReport xmlReport = new XmlReport(getReport());
 			
-			if (xmlReport.getCountFinessErrors() != 0 ||
-					xmlReport.getCountIdentityErrors() != 0 ||
-					xmlReport.getCountNumFactureErrors() != 0)
+			if (xmlReport.getCountFinessErrors() != null && xmlReport.getCountFinessErrors() != 0 ||
+					xmlReport.getCountIdentityErrors() != null && xmlReport.getCountIdentityErrors() != 0 ||
+							xmlReport.getCountNumFactureErrors() != null && xmlReport.getCountNumFactureErrors() != 0)
 				throw new PmsiRunnableException(getReport());
 			
 		} catch (DriverException e) {
