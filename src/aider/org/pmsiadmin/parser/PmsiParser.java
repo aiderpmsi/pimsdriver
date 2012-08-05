@@ -6,13 +6,12 @@ import java.util.List;
 
 import aider.org.pmsi.dto.PmsiStreamMuxer;
 import aider.org.pmsi.dto.PmsiThread;
+import aider.org.pmsi.exceptions.PmsiDtoRunnableException;
+import aider.org.pmsi.exceptions.PmsiReaderException;
 import aider.org.pmsi.parser.PmsiRSF2009Reader;
 import aider.org.pmsi.parser.PmsiRSF2012Reader;
 import aider.org.pmsi.parser.PmsiRSS116Reader;
 import aider.org.pmsi.parser.PmsiReader;
-import aider.org.pmsi.parser.exceptions.PmsiException;
-import aider.org.pmsi.parser.exceptions.PmsiReaderException;
-import aider.org.pmsi.parser.exceptions.PmsiRunnableException;
 import aider.org.pmsi.writer.PmsiWriter;
 import aider.org.pmsiadmin.config.Configuration;
 import aider.org.pmsiadmin.model.xml.PmsiSednaStreamRunner;
@@ -63,7 +62,7 @@ public class PmsiParser {
             } catch (PmsiReaderException e) {
             	// Erreur de reader = le reader n'est pas adapté, il faut en essayer un autre
             	errors += e.getMessage();
-            } catch (PmsiRunnableException e) {
+            } catch (PmsiDtoRunnableException e) {
             	// Erreur du runner = la lecture a été bien réalisée, mais l'écriture n'est pas bonne :
             	// C'est une erreur, il faut arrêter
             	throw e;
@@ -73,7 +72,7 @@ public class PmsiParser {
             }
 		}
 		// Aucun reader n'est adapté
-		throw new PmsiException(errors);
+		throw new Exception(errors);
 	}
 	
 	/**
@@ -147,6 +146,8 @@ public class PmsiParser {
 				writer.close();
 			if (muxer != null)
 				muxer.close();
+			// On vérifie que le runner ait bien fini son travail :
+			thread.waitEndOfProcess();
 			if (runner != null) {
 				runner.rollback();
 				runner.close();

@@ -2,7 +2,7 @@ package aider.org.pmsiadmin.model.xml;
 
 import java.io.OutputStream;
 
-import aider.org.pmsi.parser.exceptions.PmsiWriterException;
+import aider.org.pmsi.exceptions.PmsiWriterException;
 import aider.org.pmsi.writer.Rss116Writer;
 
 /**
