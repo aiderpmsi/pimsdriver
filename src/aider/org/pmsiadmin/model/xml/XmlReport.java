@@ -12,12 +12,16 @@ public class XmlReport {
 	private Integer countIdentityErrors = null,
 			countFinessErrors = null,
 			countNumFactureErrors = null;
+	
+	private String report;
 		
 	public XmlReport(String inputString) throws XMLStreamException {
+		// Définition du report
+		this.report = inputString;
 		// Création du reader stax
 		XMLInputFactory xmlif = XMLInputFactory.newInstance();
 		XMLStreamReader xmlsr = xmlif.createXMLStreamReader(new StringReader(inputString));
-		
+		// Lecture du xml
 		readMain(xmlsr);
 	}
 	
@@ -107,6 +111,10 @@ public class XmlReport {
 
 	public Integer getCountNumFactureErrors() {
 		return countNumFactureErrors;
+	}
+
+	public String getReport() {
+		return report;
 	}
 
 }

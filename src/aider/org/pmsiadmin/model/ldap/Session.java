@@ -1,4 +1,4 @@
-package aider.org.pmsiamin.model.ldap;
+package aider.org.pmsiadmin.model.ldap;
 
 /**
  * Objet de session contenant les identifiants de l'utilisateur connecté.

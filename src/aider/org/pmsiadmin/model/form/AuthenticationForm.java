@@ -1,8 +1,8 @@
 package aider.org.pmsiadmin.model.form;
 
+import aider.org.pmsiadmin.model.ldap.DtoSession;
+import aider.org.pmsiadmin.model.ldap.Session;
 import aider.org.pmsiadmin.validator.AuthenticationFormValidatorAnnotation;
-import aider.org.pmsiamin.model.ldap.DtoSession;
-import aider.org.pmsiamin.model.ldap.Session;
 
 /**
  * Bean permettant de stocker les valeurs du formulaire de recherche de patients

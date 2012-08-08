@@ -23,8 +23,9 @@ import org.springframework.web.bind.support.SessionStatus;
 
 import aider.org.pmsiadmin.config.Configuration;
 import aider.org.pmsiadmin.model.form.InsertionPmsiForm;
+import aider.org.pmsiadmin.model.ldap.Session;
 import aider.org.pmsiadmin.parser.PmsiParser;
-import aider.org.pmsiamin.model.ldap.Session;
+
 
 @Controller
 @RequestMapping("/Pmsi/Insert/Form")
@@ -100,7 +101,8 @@ public class InsertionPmi {
 			String ret;
 			boolean succeded;
 			try {
-				ret = pmsiParser.parse(re2, configuration);
+				pmsiParser.parse(re2, configuration);
+				ret = pmsiParser.getParserLogErrors();
 				succeded = true;
 			} catch (Exception e) {
 				ret = e.getMessage();

@@ -22,7 +22,7 @@ import aider.org.pmsiadmin.config.Configuration;
 import aider.org.pmsiadmin.connector.LdapAuthenticator;
 import aider.org.pmsiadmin.connector.LdapConfiguration;
 import aider.org.pmsiadmin.model.form.AuthenticationForm;
-import aider.org.pmsiamin.model.ldap.DtoSession;
+import aider.org.pmsiadmin.model.ldap.DtoSession;
 
 @Controller
 @RequestMapping("/Authentification/Form")

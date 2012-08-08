@@ -1,23 +1,23 @@
 package aider.org.pmsiadmin.parser;
 
+import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
+import ru.ispras.sedna.driver.DatabaseManager;
+import ru.ispras.sedna.driver.DriverException;
+import ru.ispras.sedna.driver.SednaConnection;
 
-import aider.org.pmsi.dto.PmsiStreamMuxer;
-import aider.org.pmsi.dto.PmsiThread;
-import aider.org.pmsi.exceptions.PmsiDtoRunnableException;
-import aider.org.pmsi.exceptions.PmsiReaderException;
-import aider.org.pmsi.parser.PmsiRSF2009Reader;
-import aider.org.pmsi.parser.PmsiRSF2012Reader;
-import aider.org.pmsi.parser.PmsiRSS116Reader;
-import aider.org.pmsi.parser.PmsiReader;
-import aider.org.pmsi.writer.PmsiWriter;
+import aider.org.machinestate.MachineStateException;
+import aider.org.pmsi.exceptions.PmsiParserException;
+import aider.org.pmsi.exceptions.PmsiWriterException;
+import aider.org.pmsi.parser.PmsiRSF2009Parser;
+import aider.org.pmsi.parser.PmsiRSF2012Parser;
+import aider.org.pmsi.parser.PmsiRSS116Parser;
 import aider.org.pmsiadmin.config.Configuration;
-import aider.org.pmsiadmin.model.xml.PmsiSednaStreamRunner;
-import aider.org.pmsiadmin.model.xml.Rsf2009SednaWriter;
-import aider.org.pmsiadmin.model.xml.Rsf2012SednaWriter;
-import aider.org.pmsiadmin.model.xml.Rss116SednaWriter;
+import aider.org.pmsiadmin.model.xml.PmsiDtoSedna;
+import aider.org.pmsiadmin.model.xml.PmsiSednaXmlWriter;
+
 
 /**
  * Entrée du programme permettant de lire un fichier pmsi et de le transformer en xml
@@ -47,32 +47,52 @@ public class PmsiParser {
 		}
 	};
 	
+	public String getParserLogErrors() {
+		return parserLogErrors;
+	}
+
+	private String parserLogErrors = new String();
+	
 	/**
 	 * Fonction principale du programme
 	 * @param args
-	 * @throws Throwable 
+	 * @return renvoie true si l'insertion a été bonne, false sinon
+	 * @throws DriverException 
+	 * @throws PmsiWriterException 
+	 * @throws MachineStateException 
 	 */
-	public String parse(Reader re, Configuration config) throws Throwable {
-		String errors = new String();
-		for (FileType fileTypeEntry : listTypes) {
-        	try {
-        		re.reset();
-        		String report = readPMSI(re, fileTypeEntry, config);
-        		return report;
-            } catch (PmsiReaderException e) {
-            	// Erreur de reader = le reader n'est pas adapté, il faut en essayer un autre
-            	errors += e.getMessage();
-            } catch (PmsiDtoRunnableException e) {
-            	// Erreur du runner = la lecture a été bien réalisée, mais l'écriture n'est pas bonne :
-            	// C'est une erreur, il faut arrêter
-            	throw e;
-            } catch (Exception e) {
-            	// Pour les autres exceptions, c'est qu'il y a eu une erreur non récupérable
-            	throw new RuntimeException(e);
-            }
+	public boolean parse(Reader re, Configuration config) throws IOException, DriverException, PmsiWriterException, MachineStateException {
+		// On crée une connection Sedna
+		SednaConnection sednaConnection = DatabaseManager.getConnection(
+				config.getSednaHost(),
+				config.getSednaDb(),
+				config.getSednaUser(),
+				config.getSednaPwd());
+		
+		try {
+			for (FileType fileTypeEntry : listTypes) {
+	        	try {
+	        		re.reset();
+	        		if (readPMSI(re, fileTypeEntry, sednaConnection))
+	        			return true;
+	            } catch (MachineStateException e) {
+	            	// Si l'erreur parente est PmsiParserException, c'est que le parseur n'a
+	            	// juste pas été capable de déchiffrer le fichier, tout le reste marchait.
+	            	// Il faut donc essayer avec un autre parseur
+	            	if (e.getCause() instanceof PmsiParserException) {
+	            		parserLogErrors += 
+	            				e.getStackTrace()[0].getClassName() + " : " +
+	            				e.getCause().getMessage() + "\n";
+	            	} else
+	            		throw e;
+	            }
+	        }
+		} finally {
+			sednaConnection.close();
 		}
+		
 		// Aucun reader n'est adapté
-		throw new Exception(errors);
+		throw new IOException("Aucun parseur n'est adapté");
 	}
 	
 	/**
@@ -81,76 +101,95 @@ public class PmsiParser {
 	 * @param type Type de fichier à insérer
 	 * @param dtoPmsiReaderFactory Fabrique d'objets de sérialisation
 	 * @return Le rapport du runner si existe
+	 * @throws DriverException 
+	 * @throws MachineStateException 
+	 * @throws PmsiWriterException 
 
 	 */
-	public String readPMSI(Reader re, FileType type, Configuration config) throws Exception {
-		// Reader et writer
-		PmsiReader<?, ?> reader = null;
-		PmsiWriter writer = null;
-		PmsiStreamMuxer muxer = null;
-		// Thread du lecteur de writer
-		PmsiThread thread = null;
-		PmsiSednaStreamRunner runner = null;
-				
+	public boolean readPMSI(Reader re, FileType type, SednaConnection sedna) throws DriverException, MachineStateException, PmsiWriterException {
+		// Définitions
+		aider.org.pmsi.parser.PmsiParser<?, ?> parser = null;
+		PmsiSednaXmlWriter writer = null;
+		PmsiDtoSedna pmsiDtoSedna = null;
+		String docNumber = null;
+		String date = null;
+
 		try {
-			// Création du transformateur de outputstream en inputstream
-			muxer = new PmsiStreamMuxer();
 			
-			// Création de lecteur de inputstream et conenction au muxer
-			runner = new PmsiSednaStreamRunner(muxer.getInputStream(), config);
-			// Création du thread du lecteur de inputstream
-			thread = new PmsiThread(runner);
-			
-			// Choix du reader et du writer et connection au muxer
-			switch(type) {
-				case RSS116:
-					writer = new Rss116SednaWriter(muxer.getOutputStream(), runner);
-					reader = new PmsiRSS116Reader(re, writer);
-					break;
-				case RSF2009:
-					writer = new Rsf2009SednaWriter(muxer.getOutputStream(), runner);
-					reader = new PmsiRSF2009Reader(re, writer);
-					break;
-				case RSF2012:
-					writer = new Rsf2012SednaWriter(muxer.getOutputStream(), runner);
-					reader = new PmsiRSF2012Reader(re, writer);
-					break;
+			try {
+				// On débute une transaction
+				sedna.begin();
+	
+				// Instanciations
+				writer = new PmsiSednaXmlWriter();
+				pmsiDtoSedna = new PmsiDtoSedna(sedna);
+				
+				// Récupération d'un nouveau numéro de fichier pmsi
+				docNumber = pmsiDtoSedna.getNewPmsiDocNumber("PmsiDocIndice");
+				// Récupération de la date de sedna
+				date = pmsiDtoSedna.getSednaTime();
+				// Activation du writer de xml dans Sedna
+				writer.open(sedna, "pmsi-" + docNumber, "Pmsi", date);
+				
+				// Création du parseur
+				switch(type) {
+					case RSS116:
+						parser = new PmsiRSS116Parser(re, writer);
+						break;
+					case RSF2009:
+						parser = new PmsiRSF2009Parser(re, writer);
+						break;
+					case RSF2012:
+						parser = new PmsiRSF2012Parser(re, writer);
+						break;
 				}
-			
-			// lancement du lecteur de muxer
-			thread.start();
+				
+				// lancement du parseur
+				parser.call();
+			} finally {
+				cleanup(parser, writer);
+			}
+		} catch (DriverException e) {
+			// il faut tenter un rollback
+			rollback(sedna);
+			throw e;
+		} catch (MachineStateException e) {
+			// Il faut tenter un rollback
+			rollback(sedna);
+			throw e;
+		} catch (PmsiWriterException e){
+			// Il faut tenter un rolback
+			rollback(sedna);
+			throw e;
+		}
+
+		// Si il n'y a pas eu d'erreurs avec le parseur, on commit et on renvoie true
+		sedna.commit();
+		return true;
+	}
 	
-			// Lecture du fichier par mise en route de la machine à états
-			reader.run();
-			
-			// Fin de fichier evoyé au muxer
-			muxer.eof();
+	private void cleanup(
+			aider.org.pmsi.parser.PmsiParser<?, ?> parser,
+			PmsiSednaXmlWriter writer) throws PmsiWriterException, MachineStateException {
+		if (writer != null) {
+			writer.close();
+			writer = null;
+		}
+		if (parser != null) {
+			parser.close();
+			parser = null;
+		}
+	}
 	
-			// Attente que le lecteur de muxer ait fini
-			thread.waitEndOfProcess();
-
-			// Récupération d'une erreur éventuelle du lecteur de muxer
-			if (thread.getTerminalException() != null)
-				throw thread.getTerminalException();
-
-			// Arrivé ici, on commit, puisqu'il n'y a pas eu d'erreurs
-			runner.commit();
-
-			return runner.getReport();
-
-		} finally {
-			// Fermeture de resources
-			if (reader != null)
-				reader.close();
-			if (writer != null)
-				writer.close();
-			if (muxer != null)
-				muxer.close();
-			// On vérifie que le runner ait bien fini son travail :
-			thread.waitEndOfProcess();
-			if (runner != null) {
-				runner.rollback();
-				runner.close();
+	private void rollback(SednaConnection sednaConnection) throws DriverException {
+		try {
+			sednaConnection.rollback();
+		} catch (DriverException e) {
+			if (e.getErrorCode() == 411) {
+				// Pas une erreur, une info plutôt qui dit qu'aucune transaction
+				// n'était ouverte
+			} else {
+				throw e;
 			}
 		}
 	}

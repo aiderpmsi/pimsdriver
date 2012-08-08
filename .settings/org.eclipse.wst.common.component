@@ -3,6 +3,9 @@
     <wb-module deploy-name="pmsiadmin">
         <wb-resource deploy-path="/" source-path="/WebContent" tag="defaultRootSource"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src"/>
+        <dependent-module archiveName="jpmsi2stream.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/jpmsi2stream/jpmsi2stream">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
         <property name="java-output-path" value="/pmsiadmin/build/classes"/>
         <property name="context-root" value="pmsiadmin"/>
     </wb-module>

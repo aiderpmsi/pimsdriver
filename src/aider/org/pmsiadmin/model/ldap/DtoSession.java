@@ -1,4 +1,4 @@
-package aider.org.pmsiamin.model.ldap;
+package aider.org.pmsiadmin.model.ldap;
 
 import java.sql.SQLException;
 import java.util.Map;

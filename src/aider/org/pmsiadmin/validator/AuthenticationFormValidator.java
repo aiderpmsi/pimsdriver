@@ -5,7 +5,7 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 import aider.org.pmsiadmin.model.form.AuthenticationForm;
-import aider.org.pmsiamin.model.ldap.Session;
+import aider.org.pmsiadmin.model.ldap.Session;
 
 /**
  * Classe faisant le travail de validation

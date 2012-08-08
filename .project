@@ -3,6 +3,7 @@
 	<name>pmsiadmin</name>
 	<comment></comment>
 	<projects>
+		<project>jpmsi2stream</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
