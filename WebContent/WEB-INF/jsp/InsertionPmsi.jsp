@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
+<%@page import="aider.org.pmsiadmin.model.xml.XmlReport"%>
 <jsp:directive.page contentType="application/xml; charset=ISO-8859-1"
   pageEncoding="ISO-8859-1" 
   import="org.springframework.web.util.UriUtils"
@@ -6,7 +7,7 @@
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
-<insertion type="PMSI">
+<insertionpmsi>
   
   <status value="${status}"/>
   
@@ -20,9 +21,9 @@
   </listinfos>
   
   <report>
-    <c:if test="${report != null}">
-      <% out.print((String) request.getAttribute("report")); %>
+    <c:if test="${xmlreport != null}">
+      <% out.print(((XmlReport) request.getAttribute("xmlreport")).getReport()); %>
     </c:if>
   </report>
-</body>
-</html>
+  
+</insertionpmsi>

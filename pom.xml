@@ -34,6 +34,10 @@
                   <targetPath>WEB-INF\jsp</targetPath>
                 </resource>
                 <resource>
+                  <directory>WebContent\static</directory>
+                  <targetPath>static</targetPath>
+                </resource>
+                <resource>
                   <directory>WebContent\WEB-INF\</directory>
                   <targetPath>WEB-INF</targetPath>
                     <includes>

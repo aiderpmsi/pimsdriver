@@ -114,10 +114,15 @@ public class InsertionPmsi {
 			XmlReport xmlReport = null;
 			try {
 				sednaConnector.open(configuration);
-				sednaConnector.begin();
 				PmsiDtoSedna pmsiDtoSedna = sednaConnector.getPmsiDto();
+				
+				sednaConnector.begin();
+				String newDocName = "pmsi-" + pmsiDtoSedna.getNewPmsiDocNumber("PmsiDocIndice");
+				sednaConnector.commit();				
+				
+				sednaConnector.begin();
 				storeResult = pmsiDtoSedna.storePmsi(re2,
-						"pmsi-" + pmsiDtoSedna.getNewPmsiDocNumber("PmsiDocIndice"),
+						newDocName,
 						"Pmsi",
 						pmsiDtoSedna.getSednaTime());
 				
@@ -128,7 +133,7 @@ public class InsertionPmsi {
 							xmlReport.getCountNumFactureErrors() != 0) {
 						storeResult.stateSuccess = false;
 						storeResult.parseErrors.add(new PmsiParserException("Erreurs de contenu du fichier Pmsi"));
-						sednaConnector.rollback();
+						sednaConnector.commit();
 					}
 					else
 						sednaConnector.commit();
@@ -136,7 +141,6 @@ public class InsertionPmsi {
 				
 				model.addAttribute("status", storeResult.stateSuccess);
 				model.addAttribute("parserreport", storeResult.parseErrors);
-				storeResult.parseErrors.get(1).getStackTrace()[0].getClass().getName()
 				model.addAttribute("xmlreport", xmlReport);
 				
 				

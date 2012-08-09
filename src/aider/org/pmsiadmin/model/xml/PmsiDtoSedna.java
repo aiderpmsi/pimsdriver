@@ -53,6 +53,8 @@ public class PmsiDtoSedna {
         		re.reset();
         		storePmsi(re, fileType, docName, collectionName, date);
         		storeResult.stateSuccess = true;
+        		// sortir de cette boucle, le parseur a effectué correctement son travail
+        		break;
             } catch (MachineStateException e) {
             	// Si l'erreur parente est PmsiParserException, c'est que le parseur n'a
             	// juste pas été capable de déchiffrer le fichier, tout le reste marchait.
@@ -67,7 +69,7 @@ public class PmsiDtoSedna {
 		return storeResult;
 	}
 	
-	private void storePmsi(Reader re, FileType fileType, String docName, String collectionName, String date) throws DriverException, MachineStateException, PmsiWriterException  {
+	private void storePmsi(Reader re, FileType fileType, String docName, String collectionName, String date) throws DriverException, PmsiWriterException, MachineStateException {
 		// Définitions
 		aider.org.pmsi.parser.PmsiParser<?, ?> parser = null;
 		PmsiSednaXmlWriter writer = null;
@@ -97,6 +99,14 @@ public class PmsiDtoSedna {
 		} catch (MachineStateException e) {
 			// En cas de cleanup après une exception de MachineState, le parseur a échoué,
 			// ses erreurs ont priorité sur les autres
+			try {
+				cleanup(parser, writer);
+			} catch (Exception e2) {}
+			// Il faut tenter un rollback, puis recommencer la transaction
+			rollback(sednaConnection);
+			sednaConnection.begin();
+			throw e;
+		} catch (PmsiWriterException e) {
 			try {
 				cleanup(parser, writer);
 			} catch (Exception e2) {}
@@ -213,7 +223,7 @@ public class PmsiDtoSedna {
 			"  return <finesserrors count=\"{count($rsfcontent)}\"> {\n" +
 			"    for $rsf in $rsfcontent \n" +
 			"    return\n" +
-			"    <rsf type=\"{name($rsf)}\" numfacture=\"{$rsf/@NumFacture}\"/>\n" +
+			"    <rsf type=\"{name($rsf)}\" numFacture=\"{$rsf/@NumFacture}\" lineNumber=\"{$rsf/@lineNumber}\"/>\n" +
 			"  }\n" +
 			"  </finesserrors> \n" +
 			"} {\n" +
@@ -221,7 +231,7 @@ public class PmsiDtoSedna {
 			"  return <numfactureerrors count=\"{count($rsfchildren)}\"> {\n" +
 			"    for $rsf in $rsfchildren\n" +
 			"    return\n" +
-			"    <rsf type=\"{name($rsf)}\" numfacture=\"{$rsf/@NumFacture}\"/>\n" +
+			"    <rsf type=\"{name($rsf)}\" numFacture=\"{$rsf/@NumFacture}\" lineNumber=\"{$rsf/@lineNumber}\"/>\n" +
 			"  }\n" +
 			"  </numfactureerrors>\n" +
 			"}\n" +

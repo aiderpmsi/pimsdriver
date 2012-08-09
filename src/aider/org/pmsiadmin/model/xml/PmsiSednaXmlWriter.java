@@ -79,7 +79,7 @@ public class PmsiSednaXmlWriter extends PmsiXmlWriter {
 	}
 	
 	@Override
-	public void writeStartDocument(String name, String[] attributes, String[] values) throws PmsiWriterException {
+	public void writeStartDocument(String name, String[] attributes, String[] values, int lineNumber) throws PmsiWriterException {
 		checkFutureFailed(threadExecuted);
 		
 		String[] newAttributes = new String[attributes.length + 1];
@@ -89,28 +89,28 @@ public class PmsiSednaXmlWriter extends PmsiXmlWriter {
 
 		newAttributes[attributes.length] = "insertionTimeStamp";
 		newValues[attributes.length] = date;
-		super.writeStartDocument(name, newAttributes, newValues);
+		super.writeStartDocument(name, newAttributes, newValues, lineNumber);
 	}
 	
 	@Override
-	public void writeStartElement(String name) throws PmsiWriterException {
+	public void writeStartElement(String name, int lineNumber) throws PmsiWriterException {
 		checkFutureFailed(threadExecuted);
-		super.writeStartElement(name);
+		super.writeStartElement(name, lineNumber);
 	}
 
-	public void writeEndElement() throws PmsiWriterException {
+	public void writeEndElement(int lineNumber) throws PmsiWriterException {
 		checkFutureFailed(threadExecuted);
-		super.writeEndElement();
+		super.writeEndElement(lineNumber);
 	}
 
-	public void writeLineElement(PmsiLineType lineType) throws PmsiWriterException {
+	public void writeLineElement(PmsiLineType lineType, int lineNumber) throws PmsiWriterException {
 		checkFutureFailed(threadExecuted);
-		super.writeLineElement(lineType);
+		super.writeLineElement(lineType, lineNumber);
 	}
 
-	public void writeEndDocument() throws PmsiWriterException {
+	public void writeEndDocument(int lineNumber) throws PmsiWriterException {
 		checkFutureFailed(threadExecuted);
-		super.writeEndDocument();
+		super.writeEndDocument(lineNumber);
 	}
 
 	

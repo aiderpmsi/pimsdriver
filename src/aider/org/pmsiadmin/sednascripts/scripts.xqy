@@ -144,7 +144,7 @@ return <entry type = "{name($i/..)}"
               finperiode = "{string($i/@DateFin)}"/>&
 
 (: Recherche d'un même document avec le même finess et la même date d'insertion :)
-(for $i in fn:doc("pmsi-18", "Pmsi")/(*[1])/(*[1])
+(for $i in fn:doc("pmsi-13", "Pmsi")/(*[1])/(*[1])
 return if (name($i/..) = "RSF2012" or (name($i/..) = "RSF2009"))
 then
 <result>
@@ -168,7 +168,7 @@ then
   return <finesserrors count="{count($rsfcontent)}"> {
     for $rsf in $rsfcontent 
     return
-    <rsf type="{name($rsf)}" numfacture="{$rsf/@NumFacture}"/>
+    <rsf type="{name($rsf)}" numFacture="{$rsf/@NumFacture}"/>
   }
   </finesserrors> 
 } {
@@ -176,7 +176,7 @@ then
   return <numfactureerrors count="{count($rsfchildren)}"> {
     for $rsf in $rsfchildren
     return
-    <rsf type="{name($rsf)}" numfacture="{$rsf/@NumFacture}"/>
+    <rsf type="{name($rsf)}" numFacture="{$rsf/@NumFacture}" numFactureRef="{$rsf/../@NumFacture}" lineNumber="{$rsf/@lineNumber}"/>
   }
   </numfactureerrors>
 }
