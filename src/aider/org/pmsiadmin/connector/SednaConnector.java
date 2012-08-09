@@ -44,6 +44,24 @@ public class SednaConnector {
 		return pmsiDtoSedna;
 	}
 	
+	public void begin() throws DriverException {
+		checkIsConnected();
+		
+		sednaConnection.begin();
+	}
+	
+	public void rollback() throws DriverException {
+		checkIsConnected();
+		
+		sednaConnection.rollback();
+	}
+	
+	public void commit() throws DriverException {
+		checkIsConnected();
+		
+		sednaConnection.commit();
+	}
+	
 	private void checkIsDeconnected() throws DriverException {
 		if (sednaConnection != null)
 			throw new DriverException("Sedna déjà connectée", 10001);

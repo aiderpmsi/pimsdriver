@@ -5,11 +5,13 @@ import java.io.CharArrayReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import javax.xml.stream.XMLStreamException;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -21,10 +23,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.support.SessionStatus;
 
+import ru.ispras.sedna.driver.DriverException;
+
+import aider.org.machinestate.MachineStateException;
+import aider.org.pmsi.exceptions.PmsiParserException;
+import aider.org.pmsi.exceptions.PmsiWriterException;
 import aider.org.pmsiadmin.config.Configuration;
+import aider.org.pmsiadmin.connector.SednaConnector;
 import aider.org.pmsiadmin.model.form.InsertionPmsiForm;
 import aider.org.pmsiadmin.model.ldap.Session;
-import aider.org.pmsiadmin.parser.PmsiParser;
+import aider.org.pmsiadmin.model.xml.PmsiDtoSedna;
+import aider.org.pmsiadmin.model.xml.PmsiDtoSedna.StoreResult;
+import aider.org.pmsiadmin.model.xml.XmlReport;
 
 
 @Controller
@@ -65,7 +75,7 @@ public class InsertionPmi {
 		@Valid @ModelAttribute("insertionpmsiform") InsertionPmsiForm insertionPmsiForm,
 		BindingResult result,
 		SessionStatus status,
-		ModelMap model) throws Throwable {
+		ModelMap model) throws UnsupportedEncodingException, IOException, DriverException, PmsiWriterException, MachineStateException, XMLStreamException {
  
 		if (result.getFieldError("session") != null)
 			return "redirect:/Authentification/Form";
@@ -80,9 +90,7 @@ public class InsertionPmi {
 			// Dans un premier temps, on utilise une copie du fichier en mémoire, mais il faudrait :
 			// 1 - Le sérialiser dans un container par exemple Derby pour le lire et le relire si
 			//     nécessaire
-			// 2 - Utiliser un mécanisme de transaction sans commit pour que chaque fichier inséré
-			//     Puisse être supprimé si inutilisé
-			
+
 			Reader re = new BufferedReader(
 					new InputStreamReader(insertionPmsiForm.getFile().getInputStream(), "ISO-8859-1"));
 
@@ -97,22 +105,43 @@ public class InsertionPmi {
 			
 			Reader re2 = new CharArrayReader(stringBuilder.toString().toCharArray());
 
-			PmsiParser pmsiParser = new PmsiParser();
-			String ret;
-			boolean succeded;
+			// Connexion à Sedna :
+			SednaConnector sednaConnector;
+			sednaConnector = new SednaConnector();
+			// Résultat de stockage de pmsi
+			StoreResult storeResult;
+			// Résultat du report d'insertion
+			XmlReport xmlReport = null;
 			try {
-				pmsiParser.parse(re2, configuration);
-				ret = pmsiParser.getParserLogErrors();
-				succeded = true;
-			} catch (Exception e) {
-				ret = e.getMessage();
-				succeded = false;
+				sednaConnector.open(configuration);
+				sednaConnector.begin();
+				PmsiDtoSedna pmsiDtoSedna = sednaConnector.getPmsiDto();
+				storeResult = pmsiDtoSedna.storePmsi(re2);
+				
+				if (storeResult.stateSuccess) {
+					xmlReport = new XmlReport(pmsiDtoSedna.getReport("pmsi-" + pmsiDtoSedna.getPmsiDocNumber("PmsiDocIndice"), "Pmsi"));
+					if (xmlReport.getCountFinessErrors() != 0 ||
+							xmlReport.getCountIdentityErrors() !=0 ||
+							xmlReport.getCountNumFactureErrors() != 0) {
+						storeResult.stateSuccess = false;
+						storeResult.parseErrors.add(new PmsiParserException("Erreurs de contenu du fichier Pmsi"));
+						sednaConnector.rollback();
+					}
+					else
+						sednaConnector.commit();
+				}
+				
+				model.addAttribute("status", storeResult.stateSuccess);
+				model.addAttribute("parserreport", storeResult.parseErrors);
+				model.addAttribute("xmlreport", xmlReport);
+				
+				
+			} finally {
+				sednaConnector.close();
 			}
-			
-			model.addAttribute("status", succeded);
-			model.addAttribute("report", ret);
+
+			return "InsertionPmsi";
 		}
-		return "InsertionPmsi";
 	} 
 	
 }

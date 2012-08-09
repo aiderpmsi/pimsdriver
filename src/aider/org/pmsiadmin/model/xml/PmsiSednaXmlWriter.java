@@ -116,8 +116,10 @@ public class PmsiSednaXmlWriter extends PmsiXmlWriter {
 		} finally {
 			// 3 - Fermeture de l'inputstream
 			try {
-				inputStream.close();
-				inputStream = null;
+				if (inputStream != null) {
+					inputStream.close();
+					inputStream = null;
+				}
 			} catch (IOException e) {
 				throw new PmsiWriterException(e);
 			}

@@ -9,9 +9,9 @@ import javax.xml.stream.events.XMLEvent;
 
 public class XmlReport {
 
-	private Integer countIdentityErrors = null,
-			countFinessErrors = null,
-			countNumFactureErrors = null;
+	private Integer countIdentityErrors = 0,
+			countFinessErrors = 0,
+			countNumFactureErrors = 0;
 	
 	private String report;
 		

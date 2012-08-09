@@ -1,8 +1,10 @@
 package aider.org.pmsiadmin.model.xml;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.Callable;
 
+import ru.ispras.sedna.driver.DriverException;
 import ru.ispras.sedna.driver.SednaConnection;
 import ru.ispras.sedna.driver.SednaStatement;
 
@@ -25,7 +27,7 @@ public class SednaXmlStreamRecorder implements Callable<Integer> {
 	}
 	
 	@Override
-	public Integer call() throws Exception {
+	public Integer call() throws DriverException, IOException {
 		SednaStatement st = sednaConnection.createStatement();
 		st.loadDocument(inputStream, docName, collectionName);
 		return null;
