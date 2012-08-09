@@ -27,9 +27,13 @@ public class SednaXmlStreamRecorder implements Callable<Integer> {
 	}
 	
 	@Override
-	public Integer call() throws DriverException, IOException {
+	public Integer call() throws Exception, DriverException, IOException {
 		SednaStatement st = sednaConnection.createStatement();
-		st.loadDocument(inputStream, docName, collectionName);
+		try {
+			st.loadDocument(inputStream, docName, collectionName);
+		} catch (Exception e) {
+			throw e;
+		}
 		return null;
 	}
 

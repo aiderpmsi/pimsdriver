@@ -7,10 +7,13 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import ru.ispras.sedna.driver.SednaConnection;
 
 import aider.org.pmsi.exceptions.PmsiWriterException;
+import aider.org.pmsi.parser.linestypes.PmsiLineType;
 import aider.org.pmsi.writer.PmsiXmlWriter;
 
 /**
@@ -77,6 +80,8 @@ public class PmsiSednaXmlWriter extends PmsiXmlWriter {
 	
 	@Override
 	public void writeStartDocument(String name, String[] attributes, String[] values) throws PmsiWriterException {
+		checkFutureFailed(threadExecuted);
+		
 		String[] newAttributes = new String[attributes.length + 1];
 		String[] newValues = new String[attributes.length + 1];
 		System.arraycopy(attributes, 0, newAttributes, 0, attributes.length);
@@ -86,6 +91,28 @@ public class PmsiSednaXmlWriter extends PmsiXmlWriter {
 		newValues[attributes.length] = date;
 		super.writeStartDocument(name, newAttributes, newValues);
 	}
+	
+	@Override
+	public void writeStartElement(String name) throws PmsiWriterException {
+		checkFutureFailed(threadExecuted);
+		super.writeStartElement(name);
+	}
+
+	public void writeEndElement() throws PmsiWriterException {
+		checkFutureFailed(threadExecuted);
+		super.writeEndElement();
+	}
+
+	public void writeLineElement(PmsiLineType lineType) throws PmsiWriterException {
+		checkFutureFailed(threadExecuted);
+		super.writeLineElement(lineType);
+	}
+
+	public void writeEndDocument() throws PmsiWriterException {
+		checkFutureFailed(threadExecuted);
+		super.writeEndDocument();
+	}
+
 	
 	/**
 	 * Libère toutes les ressources associées à ce writer.
@@ -126,4 +153,15 @@ public class PmsiSednaXmlWriter extends PmsiXmlWriter {
 		}
 	}
 	
+	private void checkFutureFailed(Future<?> future) throws PmsiWriterException {
+		try {
+			future.get(0, TimeUnit.NANOSECONDS);
+		} catch (TimeoutException e) {
+			return;
+		} catch (InterruptedException e) {
+			throw new PmsiWriterException(e);
+		} catch (ExecutionException e) {
+			throw new PmsiWriterException(e);
+		}
+	}
 }

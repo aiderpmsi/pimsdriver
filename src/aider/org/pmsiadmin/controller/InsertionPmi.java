@@ -116,7 +116,10 @@ public class InsertionPmi {
 				sednaConnector.open(configuration);
 				sednaConnector.begin();
 				PmsiDtoSedna pmsiDtoSedna = sednaConnector.getPmsiDto();
-				storeResult = pmsiDtoSedna.storePmsi(re2);
+				storeResult = pmsiDtoSedna.storePmsi(re2,
+						"pmsi-" + pmsiDtoSedna.getNewPmsiDocNumber("PmsiDocIndice"),
+						"Pmsi",
+						pmsiDtoSedna.getSednaTime());
 				
 				if (storeResult.stateSuccess) {
 					xmlReport = new XmlReport(pmsiDtoSedna.getReport("pmsi-" + pmsiDtoSedna.getPmsiDocNumber("PmsiDocIndice"), "Pmsi"));

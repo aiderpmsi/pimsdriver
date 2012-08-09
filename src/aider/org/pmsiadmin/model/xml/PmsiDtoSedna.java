@@ -45,13 +45,13 @@ public class PmsiDtoSedna {
 		this.sednaConnection = sednaConnection;
 	}
 	
-	public StoreResult storePmsi(Reader re) throws IOException, PmsiWriterException, DriverException, MachineStateException {
+	public StoreResult storePmsi(Reader re, String docName, String collectionName, String date) throws IOException, PmsiWriterException, DriverException, MachineStateException {
 		StoreResult storeResult = new StoreResult();
 		
 		for (FileType fileType : FileType.values()) {
         	try {
         		re.reset();
-        		storePmsi(re, fileType);
+        		storePmsi(re, fileType, docName, collectionName, date);
         		storeResult.stateSuccess = true;
             } catch (MachineStateException e) {
             	// Si l'erreur parente est PmsiParserException, c'est que le parseur n'a
@@ -67,25 +67,17 @@ public class PmsiDtoSedna {
 		return storeResult;
 	}
 	
-	private void storePmsi(Reader re, FileType fileType) throws DriverException, MachineStateException, PmsiWriterException  {
+	private void storePmsi(Reader re, FileType fileType, String docName, String collectionName, String date) throws DriverException, MachineStateException, PmsiWriterException  {
 		// Définitions
 		aider.org.pmsi.parser.PmsiParser<?, ?> parser = null;
 		PmsiSednaXmlWriter writer = null;
-		PmsiDtoSedna pmsiDtoSedna = null;
-		String docNumber = null;
-		String date = null;
 	
 		try {	
 			// Instanciations
 			writer = new PmsiSednaXmlWriter();
-			pmsiDtoSedna = new PmsiDtoSedna(sednaConnection);
 			
-			// Récupération d'un nouveau numéro de fichier pmsi
-			docNumber = pmsiDtoSedna.getNewPmsiDocNumber("PmsiDocIndice");
-			// Récupération de la date de sedna
-			date = pmsiDtoSedna.getSednaTime();
 			// Activation du writer de xml dans Sedna
-			writer.open(sednaConnection, "pmsi-" + docNumber, "Pmsi", date);
+			writer.open(sednaConnection, docName, collectionName, date);
 			
 			// Création du parseur
 			switch(fileType) {
@@ -102,19 +94,15 @@ public class PmsiDtoSedna {
 			
 			// lancement du parseur
 			parser.call();
-		} catch (DriverException e) {
-			// il faut tenter un cleanup et un rollback
-			cleanup(parser, writer);
-			rollback(sednaConnection);
-			throw e;
 		} catch (MachineStateException e) {
 			// En cas de cleanup après une exception de MachineState, le parseur a échoué,
 			// ses erreurs ont priorité sur les autres
 			try {
 				cleanup(parser, writer);
 			} catch (Exception e2) {}
-			// Il faut tenter un rollback
+			// Il faut tenter un rollback, puis recommencer la transaction
 			rollback(sednaConnection);
+			sednaConnection.begin();
 			throw e;
 		}
 	
