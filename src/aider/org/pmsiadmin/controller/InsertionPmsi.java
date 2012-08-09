@@ -39,7 +39,7 @@ import aider.org.pmsiadmin.model.xml.XmlReport;
 
 @Controller
 @RequestMapping("/Pmsi/Insert/Form")
-public class InsertionPmi {
+public class InsertionPmsi {
 	
 	@Resource(name="configuration")
 	Configuration configuration = null;
@@ -136,6 +136,7 @@ public class InsertionPmi {
 				
 				model.addAttribute("status", storeResult.stateSuccess);
 				model.addAttribute("parserreport", storeResult.parseErrors);
+				storeResult.parseErrors.get(1).getStackTrace()[0].getClass().getName()
 				model.addAttribute("xmlreport", xmlReport);
 				
 				

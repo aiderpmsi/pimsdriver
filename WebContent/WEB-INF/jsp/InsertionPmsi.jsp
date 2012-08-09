@@ -1,22 +1,28 @@
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
-    pageEncoding="ISO-8859-1"%>
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<jsp:directive.page contentType="application/xml; charset=ISO-8859-1"
+  pageEncoding="ISO-8859-1" 
+  import="org.springframework.web.util.UriUtils"
+  trimDirectiveWhitespaces="true"/>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-    
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html>
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>Insert title here</title>
-</head>
-<body>
-	<c:if test="${status}">
-      <p>Réussite de l'insertion</p>
+<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+
+<insertion type="PMSI">
+  
+  <status value="${status}"/>
+  
+  <listinfos>
+    <c:forEach var="item" items="${parserreport}" varStatus="i">
+      <info>
+        <parser><c:out value="${item.getStackTrace()[0].getClass().getName()}"/></parser>
+        <error><c:out value="${item.getMessage()}"/></error>
+      </info>
+    </c:forEach>
+  </listinfos>
+  
+  <report>
+    <c:if test="${report != null}">
+      <% out.print((String) request.getAttribute("report")); %>
     </c:if>
-	<c:if test="${!status}">
-      <p>Echec de l'insertion</p>
-    </c:if>
-    <p>
-    	<% out.print((String) request.getAttribute("report")); %>
-    </p>
+  </report>
 </body>
 </html>
