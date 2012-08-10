@@ -20,6 +20,26 @@
       </head>
 
      <body>
+     
+       <xsl:variable name="erreur"
+         select="/insertionpmsi/status/@value" />
+         <xsl:choose>
+           <xsl:when test="$erreur = 'true'">
+             <p>Réussite de l'insertion</p>
+           </xsl:when>
+           <xsl:otherwise>
+             <p>Echec de l'insertion</p>
+             <p>Causes de l'échec :
+             <ul>
+               <xsl:for-each select="/insertionpmsi/listinfos/info">
+                 <li>Origine de l'erreur : <xsl:value-of select="./parser" /> message = <xsl:value-of select="./error" />
+                 </li>
+               </xsl:for-each>
+             </ul>
+             </p>
+           </xsl:otherwise>
+         </xsl:choose>
+     
      </body>
 
     </html>

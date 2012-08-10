@@ -18,6 +18,15 @@
         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
 	</listener>
 
+    <servlet>
+      <servlet-name>default-conf</servlet-name>
+      <servlet-class>org.apache.catalina.servlets.DefaultServlet</servlet-class>
+      <init-param>
+        <param-name>fileEncoding</param-name>
+        <param-value>ISO-8859-1</param-value>
+      </init-param>
+    </servlet>
+
 	<servlet>
     	<servlet-name>mvc-dispatcher</servlet-name>
     	<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
@@ -26,6 +35,21 @@
 	<servlet-mapping>
 		<servlet-name>mvc-dispatcher</servlet-name>
 		<url-pattern>/</url-pattern>
+	</servlet-mapping>
+	
+	<servlet-mapping>
+		<servlet-name>default-conf</servlet-name>
+		<url-pattern>*.xsd</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>default-conf</servlet-name>
+		<url-pattern>*.xsl</url-pattern>
+	</servlet-mapping>
+  
+ 	<servlet-mapping>
+		<servlet-name>default-conf</servlet-name>
+		<url-pattern>*.css</url-pattern>
 	</servlet-mapping>
 		
 </web-app>
