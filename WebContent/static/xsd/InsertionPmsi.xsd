@@ -1,49 +1,73 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
 
+<!-- ==== Element racine ==== -->
+
 <xsd:element name="insertionpmsi">
  <xsd:complexType>
   <xsd:sequence>
-   <xsd:element name="identitedemandeur" type="ldapidentite" maxOccurs="1" minOccurs="1"/>
-   <xsd:element name="laboslist" type="laboslist" maxOccurs="1" minOccurs="1"/>
+   <xsd:element name="status" type="xsd:boolean" maxOccurs="1" minOccurs="1"/>
+   <xsd:element name="listinfos" type="listinfos" maxOccurs="1" minOccurs="1"/>
+   <xsd:element name="report" type="report" maxOccurs="1" minOccurs="0"/>
   </xsd:sequence>
   <xsd:attribute name="basedir" type="xsd:anyURI" />
  </xsd:complexType>
 </xsd:element>
+
+<!-- ==== Liste des infos d'insertion ==== -->
  
-<xsd:complexType name="ldapidentite">
+<xsd:complexType name="listinfos">
  <xsd:sequence>
-  <xsd:element name="nom" type="xsd:string" maxOccurs="1" minOccurs="1"/>
-  <xsd:element name="prenom" type="xsd:string" maxOccurs="1" minOccurs="1"/>
-  <xsd:element name="mail" type="xsd:string" maxOccurs="1" minOccurs="1"/>
+  <xsd:element name="info" type="info" maxOccurs="unbounded" minOccurs="1"/>
  </xsd:sequence>
 </xsd:complexType>
 
-<xsd:complexType name="laboslist">
- <xsd:sequence>
-  <xsd:element name="status" type="status" />
-  <xsd:element name="content" type="laboslistcontent" />
- </xsd:sequence>
+  <!-- == information == -->
+  
+  <xsd:complexType name="info">
+    <xsd:sequence>
+      <xsd:element name="parser" type="xsd:string" maxOccurs="1" minOccurs="1"/>
+      <xsd:element name="error" type="xsd:string" maxOccurs="1" minOccurs="1"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+<!-- ==== Rapport sur le contenu de ce qui a été inséré ==== -->
+
+<xsd:complexType name="report">
+  <xsd:sequence>
+    <xsd:element name="parent" type="parent" maxOccurs="1" minOccurs="1"/>
+    <xsd:element name="identityerrors" maxOccurs="1" minOccurs="1">
+      <xsd:complexType>
+        <xsd:attribute name="count" type="xsd:positiveInteger"/>
+      </xsd:complexType>
+    </xsd:element>
+    <xsd:element name="finesserrors" maxOccurs="1" minOccurs="1">
+      <xsd:complexType>
+        <xsd:attribute name="count" type="xsd:positiveInteger"/>
+      </xsd:complexType>
+    </xsd:element>
+    <xsd:element name="numfactureerrors" maxOccurs="1" minOccurs="1">
+      <xsd:complexType>
+        <xsd:attribute name="count" type="xsd:positiveInteger"/>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:sequence>
 </xsd:complexType>
 
-<xsd:complexType name="status">
- <xsd:sequence>
-   <xsd:element name="errorentry" type="xsd:string" maxOccurs="unbounded" minOccurs="0"/>
- </xsd:sequence>
-</xsd:complexType>
-
-<xsd:complexType name="laboslistcontent">
- <xsd:sequence>
-   <xsd:element name="laboentry" type="laboentry" maxOccurs="unbounded" minOccurs="0"/>
- </xsd:sequence>
-</xsd:complexType>
-
-<xsd:complexType name="laboentry">
- <xsd:sequence>
-  <xsd:element name="code" type="xsd:string" maxOccurs="1" minOccurs="1"/>
-  <xsd:element name="nom" type="xsd:string" maxOccurs="1" minOccurs="1"/>
- </xsd:sequence>
- <xsd:attribute name="link" type="xsd:anyURI" />
-</xsd:complexType>
+  <!-- == Element de type parent == -->
+  
+  <xsd:complexType name="parent">
+    <xsd:sequence>
+      <xsd:element name="doc" maxOccurs="1" minOccurs="1">
+        <xsd:complexType>
+          <xsd:attribute name="type" type="xsd:string"/>
+          <xsd:attribute name="headertype" type="xsd:string"/>
+          <xsd:attribute name="finess" type="xsd:positiveInteger"/>
+          <xsd:attribute name="insertion" type="xsd:dateTime"/>
+          <xsd:attribute name="finperiode" type="xsd:date"/>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
 
 </xsd:schema>

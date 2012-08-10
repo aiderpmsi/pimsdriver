@@ -202,7 +202,7 @@ public class PmsiDtoSedna {
 		st.execute("(for $i in fn:doc(\"" + docName + "\", \"" + collectionName + "\")/(*[1])/(*[1])\n" +
 			"return if (name($i/..) = \"RSF2012\" or (name($i/..) = \"RSF2009\"))\n" +
 			"then\n" +
-			"<result>\n" +
+			"<report>\n" +
 			"  <parent>\n" +
 			"    <doc type = \"{name($i/..)}\"\n" +
 			"         headertype = \"{name($i)}\"\n" +
@@ -231,11 +231,11 @@ public class PmsiDtoSedna {
 			"  return <numfactureerrors count=\"{count($rsfchildren)}\"> {\n" +
 			"    for $rsf in $rsfchildren\n" +
 			"    return\n" +
-			"    <rsf type=\"{name($rsf)}\" numFacture=\"{$rsf/@NumFacture}\" lineNumber=\"{$rsf/@lineNumber}\"/>\n" +
+			"    <rsf type=\"{name($rsf)}\" numFacture=\"{$rsf/@NumFacture}\" numFactureRef=\"{$rsf/../@NumFacture}\" lineNumber=\"{$rsf/@lineNumber}\"/>\n" +
 			"  }\n" +
 			"  </numfactureerrors>\n" +
 			"}\n" +
-			"</result>\n" +
+			"</report>\n" +
 			"else\n" +
 			"<toimplement/>)[1]");
 

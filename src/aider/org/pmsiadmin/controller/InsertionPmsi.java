@@ -143,7 +143,6 @@ public class InsertionPmsi {
 				model.addAttribute("parserreport", storeResult.parseErrors);
 				model.addAttribute("xmlreport", xmlReport);
 				
-				
 			} finally {
 				sednaConnector.close();
 			}
