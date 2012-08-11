@@ -1,6 +1,7 @@
 package aider.org.pmsiadmin.connector;
 
 import aider.org.pmsiadmin.config.Configuration;
+import aider.org.pmsiadmin.model.xml.DtoFinessList;
 import aider.org.pmsiadmin.model.xml.PmsiDtoSedna;
 import ru.ispras.sedna.driver.DatabaseManager;
 import ru.ispras.sedna.driver.DriverException;
@@ -11,6 +12,8 @@ public class SednaConnector {
 	public SednaConnection sednaConnection = null;
 	
 	public PmsiDtoSedna pmsiDtoSedna = null;
+	
+	public DtoFinessList dtoFinessList = null;
 	
 	public SednaConnector() {
 	}
@@ -35,13 +38,23 @@ public class SednaConnector {
 		sednaConnection = null;
 	}
 	
-	public PmsiDtoSedna getPmsiDto() throws DriverException {
+	public PmsiDtoSedna getPmsiDtoSedna() throws DriverException {
 		checkIsConnected();
 		
 		if (pmsiDtoSedna == null)
 			pmsiDtoSedna = new PmsiDtoSedna(sednaConnection);
 		
 		return pmsiDtoSedna;
+	}
+	
+	public DtoFinessList getDtoFinessList() throws DriverException {
+		checkIsConnected();
+		
+		if (dtoFinessList == null)
+			dtoFinessList = new DtoFinessList(sednaConnection);
+		
+		return dtoFinessList;
+			
 	}
 	
 	public void begin() throws DriverException {

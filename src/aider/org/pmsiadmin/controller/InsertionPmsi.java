@@ -116,7 +116,7 @@ public class InsertionPmsi {
 			XmlReport xmlReport = null;
 			try {
 				sednaConnector.open(configuration);
-				PmsiDtoSedna pmsiDtoSedna = sednaConnector.getPmsiDto();
+				PmsiDtoSedna pmsiDtoSedna = sednaConnector.getPmsiDtoSedna();
 				
 				sednaConnector.begin();
 				String newDocName = "pmsi-" + pmsiDtoSedna.getNewPmsiDocNumber("PmsiDocIndice");
