@@ -12,6 +12,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.xml.stream.XMLStreamException;
+import javax.xml.xpath.XPathExpressionException;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -23,8 +24,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.view.RedirectView;
-
 import ru.ispras.sedna.driver.DriverException;
 
 import aider.org.machinestate.MachineStateException;
@@ -78,7 +77,7 @@ public class InsertionPmsi {
 		@Valid @ModelAttribute("insertionpmsiform") InsertionPmsiForm insertionPmsiForm,
 		BindingResult result,
 		SessionStatus status,
-		ModelMap model) throws UnsupportedEncodingException, IOException, DriverException, PmsiWriterException, MachineStateException, XMLStreamException {
+		ModelMap model) throws UnsupportedEncodingException, IOException, DriverException, PmsiWriterException, MachineStateException, XMLStreamException, XPathExpressionException {
  
 		if (result.getFieldError("session") != null)
 			return new ModelAndView("redirect:/Authentification/Form");

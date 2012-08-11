@@ -1,116 +1,101 @@
 package aider.org.pmsiadmin.model.xml;
 
-import java.io.StringReader;
+import java.io.ByteArrayInputStream;
 
-import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.events.XMLEvent;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
+
+import org.xml.sax.InputSource;
 
 public class XmlReport {
 
-	private Integer countIdentityErrors = 0,
-			countFinessErrors = 0,
-			countNumFactureErrors = 0;
+	private static XPath xpath;
+
+	private final static String countIdentityXPath = "/report/identityerrors/@count";
+	private final static String countFinessXPath = "/report/finesserrors/@count";
+	private final static String countNumFactureXPath = "/report/numfactureerrors/@count";
+	
+	private static XPathExpression countIdentityXPathE;
+	private static XPathExpression countFinessXPathE;
+	private static XPathExpression countNumFactureXPathE;
+	
+	private static Boolean initialized = false;
+
+	private Integer
+		countIdentityErrors = null,
+		countFinessErrors = null,
+		countNumFactureErrors = null;
 	
 	private String report;
 		
-	public XmlReport(String inputString) throws XMLStreamException {
+	public XmlReport(String inputString) throws XMLStreamException, XPathExpressionException {
 		// Définition du report
 		this.report = inputString;
-		// Création du reader stax
-		XMLInputFactory xmlif = XMLInputFactory.newInstance();
-		XMLStreamReader xmlsr = xmlif.createXMLStreamReader(new StringReader(inputString));
-		// Lecture du xml
-		readMain(xmlsr);
-	}
-	
-	private void readMain(XMLStreamReader xmlsr) throws XMLStreamException {
-		// Type d'évenement
-		int eventType;
 		
-		// Boucle de lecture du xml
-		while (xmlsr.hasNext()) {
-			eventType = xmlsr.next();
-			
-			// Début d'élément
-			if (eventType == XMLEvent.START_ELEMENT) {			
-				// Choix de la méthode à effectuer selon le nom de la balise
-				if (xmlsr.getName().toString().equals("parent"))
-					readParent(xmlsr);
-				else if (xmlsr.getName().toString().equals("identityerrors"))
-					countIdentityErrors = readNumErrors(xmlsr);
-				else if (xmlsr.getName().toString().equals("finesserrors"))
-					countFinessErrors = readNumErrors(xmlsr);
-				else if (xmlsr.getName().toString().equals("numfactureerrors"))
-					countNumFactureErrors = readNumErrors(xmlsr);
+		// Si besoin, initialisation de la lecture de XPath
+		synchronized(initialized) {
+			if (initialized == false) {
+				XPathFactory xPathFactory = XPathFactory.newInstance();
+				xpath = xPathFactory.newXPath();
+				countIdentityXPathE = xpath.compile(countIdentityXPath);
+				countFinessXPathE = xpath.compile(countFinessXPath);
+				countNumFactureXPathE = xpath.compile(countNumFactureXPath);
+				initialized = true;
 			}
 		}
-	}
-	
-	private void readParent(XMLStreamReader xmlsr) throws XMLStreamException {
-		// Type d'évenement
-		int eventType;
-		// Compteur d'entrées dans un élément
-		int nbStart = 0;
-		
-		// Boucle de lecture du xml
-		while (xmlsr.hasNext()) {
-			eventType = xmlsr.next();
-			
-			if (eventType == XMLEvent.START_ELEMENT) {
-				// Prise en compte de l'entrée dans un élément
-				nbStart = nbStart + 1;
-			} else if (eventType == XMLEvent.END_ELEMENT) {
-				nbStart = nbStart - 1;
-				// Si on est sorti de plus d'éléments qu'on est rentré, il faut
-				// retourner à la boucle main
-				if (nbStart < 0)
-					return;
-			}
-		}
-	}
-	
-	private Integer readNumErrors(XMLStreamReader xmlsr) throws XMLStreamException {
-		Integer countNb = null;
-		// Compteur d'entrées dans un élément
-		int nbStart = 0;
-		// Type d'évemenement
-		int eventType;
-		
-		// On est déjà dans l'élément, il faut récupérer l'attribut 'count'
-		int attCount = xmlsr.getAttributeCount();
-		for (int i = 0 ; i < attCount ; i++) {
-			if (xmlsr.getAttributeLocalName(i).equals("count"))
-				countNb =  new Integer(xmlsr.getAttributeValue(i));
-		}
-		
-		// Maintenant il faut sortir de cet élément
-		while (xmlsr.hasNext()) {
-			eventType = xmlsr.next();
-			
-			if (eventType == XMLEvent.START_ELEMENT) {
-				nbStart = nbStart + 1;
-			} else if (eventType == XMLEvent.END_ELEMENT) {
-				nbStart = nbStart - 1;
-				if (nbStart < 0)
-					break;
-			}
-		}
-		
-		return countNb;
 	}
 
 	public Integer getCountIdentityErrors() {
+		// Si le nombre a déjà été parsé,on le renvoie
+		if (countIdentityErrors != null)
+			return countIdentityErrors;
+		
+		countIdentityErrors = getIntegerFromXPathExpression(countIdentityXPathE);
+		if (countIdentityErrors == null)
+			countIdentityErrors = 0;
+		
 		return countIdentityErrors;
 	}
 
 	public Integer getCountFinessErrors() {
+		// Si le nombre a déjà été parsé,on le renvoie
+		if (countFinessErrors != null)
+			return countFinessErrors;
+		
+		countFinessErrors = getIntegerFromXPathExpression(countFinessXPathE);
+		if (countFinessErrors == null)
+			countFinessErrors = 0;
+		
 		return countFinessErrors;
 	}
 
 	public Integer getCountNumFactureErrors() {
+		// Si le nombre a déjà été parsé,on le renvoie
+		if (countNumFactureErrors != null)
+			return countNumFactureErrors;
+		
+		countNumFactureErrors = getIntegerFromXPathExpression(countNumFactureXPathE);
+		if (countNumFactureErrors == null)
+			countNumFactureErrors = 0;
+		
 		return countNumFactureErrors;
+	}
+	
+	private Integer getIntegerFromXPathExpression(XPathExpression xpe) {
+		InputSource inputSource = new InputSource(new ByteArrayInputStream(report.getBytes()));
+		
+		try {
+			String result = (String) xpe.evaluate(inputSource, XPathConstants.STRING);
+			return Integer.parseInt(result);
+		} catch (NumberFormatException e) {
+			return null;
+		} catch (XPathExpressionException e) {
+			return null;
+		}
 	}
 
 	public String getReport() {
