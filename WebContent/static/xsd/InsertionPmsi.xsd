@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
 
 <!-- ==== Element racine ==== -->
@@ -31,7 +31,7 @@
     </xsd:sequence>
   </xsd:complexType>
 
-<!-- ==== Rapport sur le contenu de ce qui a été inséré ==== -->
+<!-- ==== Rapport sur le contenu de ce qui a Ã©tÃ© insÃ©rÃ© ==== -->
 
 <xsd:complexType name="report">
   <xsd:sequence>

@@ -22,6 +22,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.support.SessionStatus;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.view.RedirectView;
 
 import ru.ispras.sedna.driver.DriverException;
 
@@ -35,6 +37,7 @@ import aider.org.pmsiadmin.model.ldap.Session;
 import aider.org.pmsiadmin.model.xml.PmsiDtoSedna;
 import aider.org.pmsiadmin.model.xml.PmsiDtoSedna.StoreResult;
 import aider.org.pmsiadmin.model.xml.XmlReport;
+import aider.org.pmsiadmin.view.InsertionPmsiView;
 
 
 @Controller
@@ -71,17 +74,17 @@ public class InsertionPmsi {
 	}
 
 	@RequestMapping(method = RequestMethod.POST)
-	public String processSubmit(
+	public ModelAndView processSubmit(
 		@Valid @ModelAttribute("insertionpmsiform") InsertionPmsiForm insertionPmsiForm,
 		BindingResult result,
 		SessionStatus status,
 		ModelMap model) throws UnsupportedEncodingException, IOException, DriverException, PmsiWriterException, MachineStateException, XMLStreamException {
  
 		if (result.getFieldError("session") != null)
-			return "redirect:/Authentification/Form";
+			return new ModelAndView("redirect:/Authentification/Form");
 		else if (result.hasErrors()) {
 			//if validator failed
-			return "InsertionPmsiForm";
+			return new ModelAndView("InsertionPmsiForm");
 		} else {
 			status.setComplete();
 			//form success
@@ -147,7 +150,7 @@ public class InsertionPmsi {
 				sednaConnector.close();
 			}
 
-			return "InsertionPmsi";
+			return new ModelAndView(new InsertionPmsiView(), "model", model);
 		}
 	} 
 	
