@@ -24,6 +24,11 @@ import aider.org.pmsiadmin.connector.LdapConfiguration;
 import aider.org.pmsiadmin.model.form.AuthenticationForm;
 import aider.org.pmsiadmin.model.ldap.DtoSession;
 
+/**
+ * Permet de contrôler l'accès à la page d'authentification
+ * @author delabre
+ *
+ */
 @Controller
 @RequestMapping("/Authentification/Form")
 public class AuthenticationFormController {
