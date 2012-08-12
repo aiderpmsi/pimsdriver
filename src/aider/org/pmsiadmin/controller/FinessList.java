@@ -19,7 +19,7 @@ import ru.ispras.sedna.driver.DriverException;
 
 import aider.org.pmsiadmin.config.Configuration;
 import aider.org.pmsiadmin.connector.SednaConnector;
-import aider.org.pmsiadmin.model.get.FinessListModel;
+import aider.org.pmsiadmin.model.get.FinessListGetParamModel;
 import aider.org.pmsiadmin.model.ldap.Session;
 import aider.org.pmsiadmin.model.xml.DtoFinessList;
 import aider.org.pmsiadmin.view.FinessListView;
@@ -29,7 +29,7 @@ import aider.org.pmsiadmin.view.FinessListView;
 public class FinessList {
 	
 	@Resource(name="configuration")
-	Configuration configuration = null;
+	private Configuration configuration = null;
 	
 	@Resource(name="validator")
 	private Validator validator;
@@ -42,15 +42,15 @@ public class FinessList {
 		
 		// Validation de l'autorisation d'acéder à cette méthode Get avec :
 		// numIndex, configuration et Session
-		FinessListModel finessListModel = new FinessListModel(
+		FinessListGetParamModel finessListGetParamModel = new FinessListGetParamModel(
 				numIndex, (Session) request.getSession().getAttribute("session"));
 		
-		Set<ConstraintViolation<FinessListModel>> constraintViolations =
-					validator.validate(finessListModel);
+		Set<ConstraintViolation<FinessListGetParamModel>> constraintViolations =
+					validator.validate(finessListGetParamModel);
 				
 		if (constraintViolations.size() > 0 ) {
 			String violations = "";
-			for (ConstraintViolation<FinessListModel> contraintes : constraintViolations) {
+			for (ConstraintViolation<FinessListGetParamModel> contraintes : constraintViolations) {
 				if (contraintes.getPropertyPath().toString().equals("session"))
 					return new ModelAndView("redirect:/Authentification/Form");
 					violations += contraintes.getRootBeanClass().getSimpleName() + "." +
@@ -69,8 +69,8 @@ public class FinessList {
 			DtoFinessList dtoFinessList = sednaConnector.getDtoFinessList();
 			// 3 - Récupération de la liste de finess demandés
 			model.addAttribute("finess", dtoFinessList.getFinessList(
-					finessListModel.getNumIndexI() * 10 + 1,
-					(finessListModel.getNumIndexI() + 1) * 10));
+					finessListGetParamModel.getNumIndexI() * 10 + 1,
+					(finessListGetParamModel.getNumIndexI() + 1) * 10));
 			// Acquittement de la réception des données
 			sednaConnector.commit();
 			// Renvoi de la vue adaptée

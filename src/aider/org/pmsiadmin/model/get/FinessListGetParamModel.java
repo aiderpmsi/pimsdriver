@@ -5,7 +5,7 @@ import aider.org.pmsiadmin.model.ldap.Session;
 import aider.org.pmsiadmin.validator.FinessListModelValid;
 
 @FinessListModelValid
-public class FinessListModel {
+public class FinessListGetParamModel {
 
 	// ==== Définis par l'utilisateur ====
 	@NotNull
@@ -20,7 +20,7 @@ public class FinessListModel {
 	
 	private Integer numIndexI = null;	
 		
-	public FinessListModel(String numIndex, Session session) {
+	public FinessListGetParamModel(String numIndex, Session session) {
 		setNumIndex(numIndex);
 		setSession(session);
 	}

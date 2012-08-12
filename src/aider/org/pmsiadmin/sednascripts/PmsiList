@@ -1,0 +1,40 @@
+<total>
+{
+let $ia:=fn:collection("Pmsi")/RSS116[position() = 1]/*[position() = 1 and @Finess = '340780600']/year-from-date(@FinPeriode)
+let $ib:=fn:collection("Pmsi")/(RSF2009 | RSF2012)[position() = 1]/*[position() = 1 and @Finess = '340780600']/year-from-date(@DateFin)
+let $ii:=distinct-values(($ia, $ib))
+for $i in $ii
+let $ja:=fn:collection("Pmsi")/RSS116[position() = 1]/*[position() = 1 and @Finess = '340780600' and year-from-date(@FinPeriode) = $i]/month-from-date(@FinPeriode)
+let $jb:=fn:collection("Pmsi")/(RSF2009 | RSF2012)[position() = 1]/*[position() = 1 and @Finess = '340780600' and year-from-date(@DateFin) = $i]/month-from-date(@DateFin)
+let $jj:=distinct-values(($ja, $jb))
+for $j in $jj
+order by $i descending, $j descending
+return
+<entries year="{$i}" month="{$j}">
+  {
+    (for $k in fn:collection("Pmsi")/RSS116[position() = 1]/*[position() = 1 and @Finess = '340780600' and year-from-date(@FinPeriode) = $i and month-from-date(@FinPeriode) = $j]/../@insertionTimeStamp
+    order by $k descending
+    return
+    <rss>
+    <year>{$i}</year>
+    <month>{$j}</month>
+    <insertionTimeStamp>{string($k)}</insertionTimeStamp>
+    <type>{name($k/..)}</type>
+    </rss>
+    )[1]
+  }
+  {
+    (for $k in fn:collection("Pmsi")/(RSF2009 | RSF2012)[position() = 1]/*[position() = 1 and @Finess = '340780600' and year-from-date(@DateFin) = $i and month-from-date(@DateFin) = $j]/../@insertionTimeStamp
+    order by $k descending
+    return
+    <rsf>
+    <year>{$i}</year>
+    <month>{$j}</month>
+    <insertionTimeStamp>{string($k)}</insertionTimeStamp>
+    <type>{name($k/..)}</type>
+    </rsf>
+    )[1]
+  }
+</entries>
+}
+</total>

@@ -172,7 +172,7 @@ then
   }
   </finesserrors> 
 } {
-  let $rsfchildren:=$i/RsfA/(RsfB | RsfC | RsfH | RsfM)[@NumFacture != ../@NumFacture]
+  let $rsfchildren:=$i/RsfA/(RsfB | RsfC | RsfH | RsfM)[xs:decimal(@NumFacture) != xs:decimal(../@NumFacture)]
   return <numfactureerrors count="{count($rsfchildren)}"> {
     for $rsf in $rsfchildren
     return

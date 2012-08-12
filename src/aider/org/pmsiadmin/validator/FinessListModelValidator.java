@@ -5,21 +5,21 @@ import java.lang.reflect.Field;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-import aider.org.pmsiadmin.model.get.FinessListModel;
+import aider.org.pmsiadmin.model.get.FinessListGetParamModel;
 
 /**
  * Validation de l'annotation {@link MultipartNotEmpty}
  * @author delabre
  *
  */
-public class FinessListModelValidator implements ConstraintValidator<FinessListModelValid, FinessListModel>{
+public class FinessListModelValidator implements ConstraintValidator<FinessListModelValid, FinessListGetParamModel>{
 	
 	@Override
 	 public void initialize(FinessListModelValid finessListModelValid) {
 	 }
 	 
 	 @Override
-	 public boolean isValid(FinessListModel value, ConstraintValidatorContext context) {
+	 public boolean isValid(FinessListGetParamModel value, ConstraintValidatorContext context) {
 		 if (value.getNumIndex() == null)
 			 return false;
 		 

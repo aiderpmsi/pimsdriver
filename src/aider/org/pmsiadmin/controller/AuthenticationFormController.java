@@ -34,7 +34,7 @@ import aider.org.pmsiadmin.model.ldap.DtoSession;
 public class AuthenticationFormController {
 	
 	@Resource(name="configuration")
-	Configuration configuration = null;
+	private Configuration configuration = null;
 	
 	@InitBinder
     public void initBinder(WebDataBinder binder) throws SQLException {

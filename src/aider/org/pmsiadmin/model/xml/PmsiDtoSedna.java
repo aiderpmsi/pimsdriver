@@ -227,7 +227,7 @@ public class PmsiDtoSedna {
 			"  }\n" +
 			"  </finesserrors> \n" +
 			"} {\n" +
-			"  let $rsfchildren:=$i/RsfA/(RsfB | RsfC | RsfH | RsfM)[@NumFacture != ../@NumFacture]\n" +
+			"  let $rsfchildren:=$i/RsfA/(RsfB | RsfC | RsfH | RsfM)[xs:decimal(@NumFacture) != xs:decimal(../@NumFacture)]\n" +
 			"  return <numfactureerrors count=\"{count($rsfchildren)}\"> {\n" +
 			"    for $rsf in $rsfchildren\n" +
 			"    return\n" +

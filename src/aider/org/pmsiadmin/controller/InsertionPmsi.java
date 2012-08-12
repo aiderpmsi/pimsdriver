@@ -44,7 +44,7 @@ import aider.org.pmsiadmin.view.InsertionPmsiView;
 public class InsertionPmsi {
 	
 	@Resource(name="configuration")
-	Configuration configuration = null;
+	private Configuration configuration = null;
 	
 	@InitBinder
 	public void initBinder(HttpServletRequest request, WebDataBinder binder) throws SQLException {
