@@ -12,20 +12,24 @@ import javax.validation.Constraint;
 import javax.validation.Payload;
 
 /**
- * Crée une annotation {@link FinessListModelValid} pour valider qu'un élément
+ * Crée une annotation {@link IsIntegerTransformer} pour valider qu'un élément
  * de fichier de Multipart est bien défini. L'annotation est une contrainte
  * validée par {@link MultipartNotEmptyValidator}
  * @author delabre
  *
  */
 @Documented
-@Constraint(validatedBy = FinessListModelValidator.class)
-@Target( {TYPE})
+@Constraint(validatedBy = IsIntegerTransformerValidator.class)
+@Target({TYPE})
 @Retention(value = RUNTIME)
-public @interface FinessListModelValid {
- String message() default "{aider.org.bio.biomanager.validator.IntegerValidator.message}";
+public @interface IsIntegerTransformer {
+ String message() default "{aider.org.bio.biomanager.validator.IsIntegerTransformerValidator.message}";
  
  Class<?>[] groups() default {};
+ 
+ String source();
+ 
+ String destination();
  
  Class<? extends Payload>[] payload() default {};
 }

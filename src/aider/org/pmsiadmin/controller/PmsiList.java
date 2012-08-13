@@ -11,9 +11,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
 import aider.org.pmsiadmin.config.Configuration;
+import aider.org.pmsiadmin.model.get.PmsiListGetParamModel;
 
 @RequestMapping("/Finess/{numFiness}/PmsiList")
-public class PmsiList {
+public class PmsiList extends UtilsController<PmsiListGetParamModel> {
 	
 	@Resource(name="configuration")
 	private Configuration configuration = null;

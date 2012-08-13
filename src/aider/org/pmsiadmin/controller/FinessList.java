@@ -1,11 +1,8 @@
 package aider.org.pmsiadmin.controller;
 
-import java.util.Set;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.ConstraintViolation;
-import javax.validation.ValidationException;
 import javax.validation.Validator;
 
 import org.springframework.stereotype.Controller;
@@ -26,7 +23,7 @@ import aider.org.pmsiadmin.view.FinessListView;
 
 @Controller
 @RequestMapping("/FinessList")
-public class FinessList {
+public class FinessList extends UtilsController<FinessListGetParamModel> {
 	
 	@Resource(name="configuration")
 	private Configuration configuration = null;
@@ -44,20 +41,9 @@ public class FinessList {
 		// numIndex, configuration et Session
 		FinessListGetParamModel finessListGetParamModel = new FinessListGetParamModel(
 				numIndex, (Session) request.getSession().getAttribute("session"));
-		
-		Set<ConstraintViolation<FinessListGetParamModel>> constraintViolations =
-					validator.validate(finessListGetParamModel);
-				
-		if (constraintViolations.size() > 0 ) {
-			String violations = "";
-			for (ConstraintViolation<FinessListGetParamModel> contraintes : constraintViolations) {
-				if (contraintes.getPropertyPath().toString().equals("session"))
-					return new ModelAndView("redirect:/Authentification/Form");
-					violations += contraintes.getRootBeanClass().getSimpleName() + "." +
-							contraintes.getPropertyPath() + " " + contraintes.getMessage() + "\n";
-			}
-			throw new ValidationException("Erreurs de validation : " + violations);
-		}
+		ModelAndView redirect = checkGetParams(finessListGetParamModel, validator);
+		if (redirect != null)
+			return redirect;
 		
 		// Les données sont validées, on peut renvoyer ce que le client demande
 		// 1 - Connexion à Sedna
