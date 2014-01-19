@@ -1,4 +1,4 @@
-package com.github.aiderpmsi.pimsdriver;
+package com.github.aiderpmsi.pimsdriver.pmsi;
 
 import java.io.IOException;
 import java.io.Writer;

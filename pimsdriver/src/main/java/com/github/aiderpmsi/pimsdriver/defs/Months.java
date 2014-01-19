@@ -1,4 +1,4 @@
-package com.github.aiderpmsi.pimsdriver;
+package com.github.aiderpmsi.pimsdriver.defs;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,9 +7,9 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.faces.model.SelectItem;
 import javax.inject.Named;
 
-@Named("monthValues")
+@Named("defs.monthValues")
 @ApplicationScoped
-public class MonthValues {
+public class Months {
 
 	private final static String[] months = new String[] {
 		"Janvier", "Février", "Mars", "Avril", "Mai", "Juin",

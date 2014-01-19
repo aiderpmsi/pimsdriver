@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+
 import javax.enterprise.context.ConversationScoped;
 import javax.inject.Named;
 import javax.servlet.http.Part;
@@ -11,8 +12,8 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
-import com.github.aiderpmsi.pimsdriver.DocDbConnectionFactory;
-import com.github.aiderpmsi.pimsdriver.PimsODocumentHelper;
+import com.github.aiderpmsi.pimsdriver.odb.DocDbConnectionFactory;
+import com.github.aiderpmsi.pimsdriver.odb.PimsODocumentHelper;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 

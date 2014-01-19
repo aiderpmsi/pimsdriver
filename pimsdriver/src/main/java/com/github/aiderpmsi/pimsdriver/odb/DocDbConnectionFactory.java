@@ -1,4 +1,4 @@
-package com.github.aiderpmsi.pimsdriver;
+package com.github.aiderpmsi.pimsdriver.odb;
 
 import java.io.IOException;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;

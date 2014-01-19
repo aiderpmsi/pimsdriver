@@ -1,4 +1,4 @@
-package com.github.aiderpmsi.pimsdriver;
+package com.github.aiderpmsi.pimsdriver.odb;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;

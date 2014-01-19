@@ -18,32 +18,32 @@
 
 			<h:outputLabel for="month" value="Mois : " />
 			<h:panelGroup>
-				<p:selectOneMenu id="month" value="#{bean.monthValue}">
-					<f:selectItems value="#{monthValues.items}" />
+				<p:selectOneMenu id="month" value="#{forms.rsfUploadFormModel.monthValue}">
+					<f:selectItems value="#{defs.monthValues.items}" />
 				</p:selectOneMenu>
 				<p:message for="month" />
 			</h:panelGroup>
 
 			<h:outputLabel for="year" value="Année : " />
 			<h:panelGroup>
-				<p:inputText id="year" value="#{bean.yearValue}" />
+				<p:inputText id="year" value="#{forms.rsfUploadFormModel.yearValue}" />
 				<p:message for="year" />
 			</h:panelGroup>
 
 			<h:outputLabel for="finess" value="Finess : " />
 			<h:panelGroup>
-				<p:inputText id="finess" value="#{bean.finessValue}" validator="beanValidator"/>
+				<p:inputText id="finess" value="#{forms.rsfUploadFormModel.finessValue}"/>
 				<p:message for="finess" />
 			</h:panelGroup>
 
 			<h:outputLabel for="file" value="Fichier RSF: " />
 			<h:panelGroup>
-				<h:inputFile id="file" value="#{bean.file}" />
+				<h:inputFile id="file" value="#{forms.rsfUploadFormModel.file}" />
 				<p:message for="file" />
 			</h:panelGroup>
 
 			<f:facet name="footer">
-				<h:commandButton value="Téléverser" action="#{bean.upload}"
+				<h:commandButton value="Téléverser" action="#{forms.rsfUploadFormModel.upload}"
 					ajax="false" />
 			</f:facet>
 
