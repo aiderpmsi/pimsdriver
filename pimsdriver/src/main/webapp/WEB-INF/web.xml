@@ -6,18 +6,6 @@
 
 	<display-name>pimsdriver</display-name>
 
-	<filter>
-		<filter-name>Pretty Filter</filter-name>
-		<filter-class>com.ocpsoft.pretty.PrettyFilter</filter-class>
-	</filter>
-	<filter-mapping>
-		<filter-name>Pretty Filter</filter-name>
-		<url-pattern>/*</url-pattern>
-		<dispatcher>FORWARD</dispatcher>
-		<dispatcher>REQUEST</dispatcher>
-		<dispatcher>ERROR</dispatcher>
-	</filter-mapping>
-
 	<welcome-file-list>
 		<welcome-file>importchoice.xhtml</welcome-file>
 	</welcome-file-list>

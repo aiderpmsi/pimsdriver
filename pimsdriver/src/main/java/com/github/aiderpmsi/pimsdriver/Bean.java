@@ -70,7 +70,7 @@ public class Bean implements Serializable {
 		} catch (IOException e) {
 			// Nothing
 		}
-		return "importchoice";
+		return "importchoice?faces-redirect=true";
 	}
 
 	public Part getFile() {
