@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui">
+
+<f:metadata>
+    <f:viewParam name="filter" value="views.pmsiUploadStatus.filter" />
+</f:metadata>
+
+<h:head>
+	<title>Import rsf seul</title>
+</h:head>
+
+<h:body>
+	<h:form id="uploadedform">
+
+		<p:dataTable var="upload" value="#{views.pmsiUploadStatus.lazyModel}"
+			paginator="true" rows="10"
+			paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+			rowsPerPageTemplate="10,100" selectionMode="single"
+			selection="#{views.uploadedpmsi.selectedCar}" id="carTable" lazy="true">
+
+			<p:column headerText="Finess" sortBy="finess" filterBy="#{upload.finessValue}">
+				<h:outputText value="#{upload.finessValue}" />
+			</p:column>
+
+			<p:column headerText="Année" sortBy="year" filterBy="#{upload.yearValue}">
+				<h:outputText value="#{upload.yearValue}" />
+			</p:column>
+
+			<p:column headerText="Mois" sortBy="month" filterBy="#{upload.monthValue}">
+				<h:outputText value="#{upload.monthValue}" />
+			</p:column>
+
+			<p:column headerText="Date d'envoi" sortBy="dateEnvoi" filterBy="#{upload.dateEnvoi}">
+				<h:outputText value="#{upload.dateEnvoi}" />
+			</p:column>
+
+			<p:column headerText="Statut" sortBy="status" filterBy="#{upload.processed}">
+				<h:outputText value="#{upload.processed}" />
+			</p:column>
+		</p:dataTable>
+
+	</h:form>
+</h:body>
+</html>
