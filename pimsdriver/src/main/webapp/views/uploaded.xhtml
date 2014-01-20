@@ -17,21 +17,22 @@
 <h:body>
 	<h:form id="uploadedform">
 
-		<p:dataTable var="upload" value="#{views.pmsiUploadStatus.lazyModel}"
+		<p:dataTable var="upload" value="#{views.pmsiUploadDatas.lazyModel}"
 			paginator="true" rows="10"
 			paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
 			rowsPerPageTemplate="10,100" selectionMode="single"
-			selection="#{views.uploadedpmsi.selectedCar}" id="carTable" lazy="true">
+			selection="#{views.pmsiUploadDatas.selectedElement}" id="elementTable" lazy="true"
+			sortBy="finessValue" sortMode="multiple" >
 
-			<p:column headerText="Finess" sortBy="finess" filterBy="#{upload.finessValue}">
+			<p:column headerText="Finess" sortBy="finessValue" filterBy="#{upload.finessValue}">
 				<h:outputText value="#{upload.finessValue}" />
 			</p:column>
 
-			<p:column headerText="Année" sortBy="year" filterBy="#{upload.yearValue}">
+			<p:column headerText="Année" sortBy="yearValue" filterBy="#{upload.yearValue}">
 				<h:outputText value="#{upload.yearValue}" />
 			</p:column>
 
-			<p:column headerText="Mois" sortBy="month" filterBy="#{upload.monthValue}">
+			<p:column headerText="Mois" sortBy="monthValue" filterBy="#{upload.monthValue}">
 				<h:outputText value="#{upload.monthValue}" />
 			</p:column>
 

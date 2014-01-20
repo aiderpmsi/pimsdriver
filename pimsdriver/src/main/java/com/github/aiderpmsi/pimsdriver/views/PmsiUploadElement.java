@@ -17,6 +17,8 @@ public class PmsiUploadElement {
 	private String finessValue;
 	
 	private Boolean processed;
+	
+	private String comment;
 
 	public Date getDateEnvoi() {
 		return dateEnvoi;
@@ -64,6 +66,14 @@ public class PmsiUploadElement {
 
 	public void setRecordId(ORID recordId) {
 		this.recordId = recordId;
+	}
+
+	public String getComment() {
+		return comment;
+	}
+
+	public void setComment(String comment) {
+		this.comment = comment;
 	}
 
 }
