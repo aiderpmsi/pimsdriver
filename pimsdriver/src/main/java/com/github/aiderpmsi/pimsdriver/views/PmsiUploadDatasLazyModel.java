@@ -41,10 +41,11 @@ public class PmsiUploadDatasLazyModel extends LazyDataModel<PmsiUploadElement> {
 	@Override
 	public List<PmsiUploadElement> load(int first, int pageSize,
 			String sortField, SortOrder sortOrder, Map<String, String> filters) {
-		List<SortMeta> multiSortMeta = new ArrayList<SortMeta>();
+		List<SortMeta> multiSortMeta = new ArrayList<SortMeta>(1);
 		SortMeta sort = new SortMeta();
 		sort.setSortField(sortField);
 		sort.setSortOrder(sortOrder);
+		multiSortMeta.add(sort);
 		return load(first, pageSize, multiSortMeta, filters);
 	}
 	
