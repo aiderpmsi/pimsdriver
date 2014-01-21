@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.primefaces.model.LazyDataModel;
+import org.primefaces.model.SortMeta;
 import org.primefaces.model.SortOrder;
 
 import com.github.aiderpmsi.pimsdriver.odb.DocDbConnectionFactory;
@@ -40,6 +41,16 @@ public class PmsiUploadDatasLazyModel extends LazyDataModel<PmsiUploadElement> {
 	@Override
 	public List<PmsiUploadElement> load(int first, int pageSize,
 			String sortField, SortOrder sortOrder, Map<String, String> filters) {
+		List<SortMeta> multiSortMeta = new ArrayList<SortMeta>();
+		SortMeta sort = new SortMeta();
+		sort.setSortField(sortField);
+		sort.setSortOrder(sortOrder);
+		return load(first, pageSize, multiSortMeta, filters);
+	}
+	
+	@Override
+    public List<PmsiUploadElement> load(int first, int pageSize, List<SortMeta> multiSortMeta, Map<String,String> filters) {
+
 		List<PmsiUploadElement> data = new ArrayList<PmsiUploadElement>(
 				pageSize);
 
@@ -66,11 +77,16 @@ public class PmsiUploadDatasLazyModel extends LazyDataModel<PmsiUploadElement> {
 			}
 		}
 
-		query.append("order by ").append(sortField).append(" ");
-		if (sortOrder == SortOrder.ASCENDING)
-			query.append("ASC ");
-		else
-			query.append("DESC ");
+		if (multiSortMeta !=null && !multiSortMeta.isEmpty()) {
+			query.append("order by ");
+			for (SortMeta sort : multiSortMeta) {
+				query.append(sort.getSortField()).append(" ");
+				if (sort.getSortOrder() == SortOrder.ASCENDING)
+					query.append("ASC ");
+				else
+					query.append("DESC ");
+			}
+		}
 
 		query.append("offset ").append(first).append(" limit ")
 				.append(pageSize);
@@ -112,7 +128,7 @@ public class PmsiUploadDatasLazyModel extends LazyDataModel<PmsiUploadElement> {
 		}
 
 		// rowCount
-		this.setRowCount((Integer) countresult.get(0).field("COUNT"));
+		this.setRowCount(((Long) countresult.get(0).field("count")).intValue());
 
 		return data;
 	}  

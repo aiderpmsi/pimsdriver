@@ -1,17 +1,25 @@
 package com.github.aiderpmsi.pimsdriver.views;
 
-import javax.annotation.PostConstruct;
+import java.io.Serializable;
+
 import javax.enterprise.context.SessionScoped;
 import javax.inject.Named;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
 import org.primefaces.model.LazyDataModel;
 
 @Named("views.pmsiUploadDatas")
 @SessionScoped
-public class PmsiUploadDatas {
+public class PmsiUploadDatas implements Serializable {
+
+	/**
+	 * Generated serialid
+	 */
+	private static final long serialVersionUID = 712160288095075205L;
 
 	@Pattern(regexp="(notprocessed)|(processed)|(all)")
+	@NotNull
 	private String filter;
 	
 	private LazyDataModel<PmsiUploadElement> lazyModel;  
@@ -24,6 +32,7 @@ public class PmsiUploadDatas {
 
 	public void setFilter(String filter) {
 		this.filter = filter;
+		lazyModel = new PmsiUploadDatasLazyModel(filter);
 	}
 
 	public LazyDataModel<PmsiUploadElement> getLazyModel() {
@@ -40,11 +49,6 @@ public class PmsiUploadDatas {
 
 	public void setSelectedElement(PmsiUploadElement selectedElement) {
 		this.selectedElement = selectedElement;
-	}
-	
-	@PostConstruct
-	public void init() {
-		lazyModel = new PmsiUploadDatasLazyModel(filter);
 	}
 	
 }
