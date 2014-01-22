@@ -1,20 +1,15 @@
 package com.github.aiderpmsi.pimsdriver.views;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.enterprise.context.SessionScoped;
+import javax.enterprise.context.ConversationScoped;
 import javax.inject.Named;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
 import org.primefaces.model.LazyDataModel;
-import org.primefaces.model.SortMeta;
-import org.primefaces.model.SortOrder;
 
 @Named("views.pmsiUploadDatas")
-@SessionScoped
+@ConversationScoped
 public class PmsiUploadDatas implements Serializable {
 
 	/**
@@ -29,16 +24,7 @@ public class PmsiUploadDatas implements Serializable {
 	private LazyDataModel<PmsiUploadElement> lazyModel;  
 	
 	private PmsiUploadElement selectedElement;
-	
-	private final List<SortMeta> defaultSort = new ArrayList<>(1);
-
-	public PmsiUploadDatas() {
-		SortMeta sort = new SortMeta();
-		sort.setSortField("finessValue");
-		sort.setSortOrder(SortOrder.ASCENDING);
-		defaultSort.add(sort);
-	}
-	
+		
 	public String getFilter() {
 		return filter;
 	}
@@ -63,8 +49,5 @@ public class PmsiUploadDatas implements Serializable {
 	public void setSelectedElement(PmsiUploadElement selectedElement) {
 		this.selectedElement = selectedElement;
 	}
-	
-	public List<SortMeta> getDefaultSort() {
-		return defaultSort;
-	}
+
 }

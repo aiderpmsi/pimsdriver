@@ -23,25 +23,25 @@
 			rowsPerPageTemplate="10,100" selectionMode="single"
 			selection="#{views.pmsiUploadDatas.selectedElement}"
 			id="elementTable" lazy="true"
-			sortBy="{views.pmsiUploadDatas.defaultSort}" sortMode="multiple" >
+			sortMode="multiple" >
 
-			<p:column headerText="Finess" sortBy="finessValue" filterBy="#{upload.finessValue}">
+			<p:column headerText="Finess" sortBy="finessValue" filterBy="#{upload.finessValue}" id="finessValue">
 				<h:outputText value="#{upload.finessValue}" />
 			</p:column>
 
-			<p:column headerText="Année" sortBy="yearValue" filterBy="#{upload.yearValue}">
+			<p:column headerText="Année" sortBy="yearValue" filterBy="#{upload.yearValue}" id="yearValue">
 				<h:outputText value="#{upload.yearValue}" />
 			</p:column>
 
-			<p:column headerText="Mois" sortBy="monthValue" filterBy="#{upload.monthValue}">
+			<p:column headerText="Mois" sortBy="monthValue" filterBy="#{upload.monthValue}" id="monthValue">
 				<h:outputText value="#{upload.monthValue}" />
 			</p:column>
 
-			<p:column headerText="Date d'envoi" sortBy="dateEnvoi" filterBy="#{upload.dateEnvoi}">
+			<p:column headerText="Date d'envoi" sortBy="dateEnvoi" filterBy="#{upload.dateEnvoi}" id="dateEnvoi">
 				<h:outputText value="#{upload.dateEnvoi}" />
 			</p:column>
 
-			<p:column headerText="Statut" sortBy="status" filterBy="#{upload.processed}">
+			<p:column headerText="Statut" sortBy="processed" filterBy="#{upload.processed}"  id="processed">
 				<h:outputText value="#{upload.processed}" />
 			</p:column>
 		</p:dataTable>

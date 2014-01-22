@@ -78,8 +78,8 @@ public class PmsiUploadDatasLazyModel extends LazyDataModel<PmsiUploadElement> {
 			}
 		}
 
-		if (multiSortMeta !=null && !multiSortMeta.isEmpty()) {
-			query.append("order by ");
+		query.append("order by ");
+		if (multiSortMeta != null && !multiSortMeta.isEmpty()) {
 			for (SortMeta sort : multiSortMeta) {
 				query.append(sort.getSortField()).append(" ");
 				if (sort.getSortOrder() == SortOrder.ASCENDING)
@@ -87,6 +87,8 @@ public class PmsiUploadDatasLazyModel extends LazyDataModel<PmsiUploadElement> {
 				else
 					query.append("DESC ");
 			}
+		} else {
+			query.append("finessValue ASC, yearValue DESC, monthValue DESC, dateEnvoi DESC, processed ASC ");
 		}
 
 		query.append("offset ").append(first).append(" limit ")
