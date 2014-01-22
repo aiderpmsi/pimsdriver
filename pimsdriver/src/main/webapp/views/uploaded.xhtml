@@ -23,7 +23,8 @@
 			rowsPerPageTemplate="10,100" selectionMode="single"
 			selection="#{views.pmsiUploadDatas.selectedElement}"
 			id="elementTable" lazy="true"
-			sortMode="multiple" >
+			sortOrder="ASCENDING"
+			sortBy="${views.pmsiUploadDatas.initialSort}" sortMode="multiple" >
 
 			<p:column headerText="Finess" sortBy="finessValue" filterBy="#{upload.finessValue}" id="finessValue">
 				<h:outputText value="#{upload.finessValue}" />
