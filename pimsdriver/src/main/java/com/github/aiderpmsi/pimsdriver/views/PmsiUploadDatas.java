@@ -1,24 +1,16 @@
 package com.github.aiderpmsi.pimsdriver.views;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
-import javax.enterprise.context.ConversationScoped;
-import javax.faces.component.UIComponent;
-import javax.faces.component.UIViewRoot;
-import javax.faces.context.FacesContext;
+import javax.enterprise.context.SessionScoped;
 import javax.inject.Named;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
-import org.primefaces.component.api.UIColumn;
 import org.primefaces.model.LazyDataModel;
-import org.primefaces.model.SortMeta;
-import org.primefaces.model.SortOrder;
 
 @Named("views.pmsiUploadDatas")
-@ConversationScoped
+@SessionScoped
 public class PmsiUploadDatas implements Serializable {
 
 	/**
@@ -57,21 +49,6 @@ public class PmsiUploadDatas implements Serializable {
 
 	public void setSelectedElement(PmsiUploadElement selectedElement) {
 		this.selectedElement = selectedElement;
-	}
-
-	public List<SortMeta> getInitialSort() {
-		List<SortMeta> initialSort = new ArrayList<>(1);
-
-		UIViewRoot viewRoot =  FacesContext.getCurrentInstance().getViewRoot();
-		UIComponent column = viewRoot.findComponent("uploadedform:elementTable:finessValue"); 
-
-		SortMeta sm1 = new SortMeta();	
-		sm1.setSortBy((UIColumn)column);
-		sm1.setSortField("finessValue");
-		sm1.setSortOrder(SortOrder.DESCENDING);
-		initialSort.add(sm1);
-		
-		return initialSort;
 	}
 
 }

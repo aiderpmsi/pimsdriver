@@ -22,9 +22,7 @@
 			paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
 			rowsPerPageTemplate="10,100" selectionMode="single"
 			selection="#{views.pmsiUploadDatas.selectedElement}"
-			id="elementTable" lazy="true"
-			sortOrder="ASCENDING"
-			sortBy="${views.pmsiUploadDatas.initialSort}" sortMode="multiple" >
+			id="elementTable" lazy="true" sortMode="multiple">
 
 			<p:column headerText="Finess" sortBy="finessValue" filterBy="#{upload.finessValue}" id="finessValue">
 				<h:outputText value="#{upload.finessValue}" />

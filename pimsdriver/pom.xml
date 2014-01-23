@@ -27,6 +27,12 @@
 			<version>4.0</version>
 		</dependency>
 		<dependency>
+			<groupId>org.openfaces</groupId>
+			<artifactId>openfaces</artifactId>
+			<version>3.0</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
 			<groupId>com.orientechnologies</groupId>
 			<artifactId>orientdb-core</artifactId>
 			<version>1.6.3</version>

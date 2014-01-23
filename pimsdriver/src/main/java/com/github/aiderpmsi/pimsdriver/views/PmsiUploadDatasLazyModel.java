@@ -133,6 +133,11 @@ public class PmsiUploadDatasLazyModel extends LazyDataModel<PmsiUploadElement> {
 		// rowCount
 		this.setRowCount(((Long) countresult.get(0).field("count")).intValue());
 
+		// Wrapped datas
+		this.setWrappedData(data);
+		
 		return data;
-	}  
+	}
+	
+	
 }
