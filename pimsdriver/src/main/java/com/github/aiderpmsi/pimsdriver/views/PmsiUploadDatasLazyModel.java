@@ -1,7 +1,6 @@
 package com.github.aiderpmsi.pimsdriver.views;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -14,6 +13,12 @@ import org.ajax4jsf.model.DataVisitor;
 import org.ajax4jsf.model.ExtendedDataModel;
 import org.ajax4jsf.model.Range;
 import org.ajax4jsf.model.SequenceRange;
+import org.richfaces.component.SortOrder;
+import org.richfaces.model.Arrangeable;
+import org.richfaces.model.ArrangeableState;
+import org.richfaces.model.FilterField;
+import org.richfaces.model.SortField;
+
 import com.github.aiderpmsi.pimsdriver.odb.DocDbConnectionFactory;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.id.ORID;
@@ -21,12 +26,7 @@ import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 
 public class PmsiUploadDatasLazyModel extends
-		ExtendedDataModel<PmsiUploadElement> implements Serializable {
-
-	/**
-	 * Serial id
-	 */
-	private static final long serialVersionUID = 6974017202125075776L;
+		ExtendedDataModel<PmsiUploadElement> implements Arrangeable {
 
 	private String generalFilter;
 
@@ -99,9 +99,44 @@ public class PmsiUploadDatasLazyModel extends
 			} else if (generalFilter.equals("processed")) {
 				query.append("processed=true ");
 				countquery.append("processed=true ");
+			} else {
+				query.append("1 = 1 ");
+				countquery.append("1 = 1 ");
+			}
+		}
+		
+		List<FilterField> filterFields = arrangeableState.getFilterFields();
+		if (filterFields != null && !filterFields.isEmpty()) {
+			FacesContext facesContext = FacesContext.getCurrentInstance();
+			for (FilterField filterField : filterFields) {
+				String propertyName = (String) filterField.getFilterExpression().getValue(facesContext.getELContext());
+				query.append("AND ").append(propertyName).append(" = ").append((String)filterField.getFilterValue());
+				countquery.append("AND ").append(propertyName).append(" = ").append((String)filterField.getFilterValue());
 			}
 		}
 
+		List<SortField> sortFields = arrangeableState.getSortFields();
+		boolean firstSort = true;
+		if (sortFields != null && !sortFields.isEmpty()) {
+			query.append(" order by ");
+			FacesContext facesContext = FacesContext.getCurrentInstance();
+			for (SortField sortField : sortFields) {
+				if (!firstSort)
+					query.append(", ");
+				firstSort = false;
+				String propertyName = (String) sortField.getSortBy().getValue(facesContext.getELContext());
+				query.append(propertyName).append(" ");
+				SortOrder sortOrder = sortField.getSortOrder();
+				if (sortOrder == SortOrder.ascending) {
+					query.append("ASC ");
+				} else if (sortOrder == SortOrder.descending) {
+					query.append("DESC ");
+				} else {
+					throw new IllegalArgumentException(sortOrder.toString());
+				}
+			}
+		}
+		
 		query.append("offset ").append(first).append(" limit ").append(numrows);
 
 		// EXECUTES THE QUERY
@@ -180,6 +215,15 @@ public class PmsiUploadDatasLazyModel extends
 	public void setWrappedData(Object data) {
 		// Unused
 		throw new UnsupportedOperationException();
+	}
+
+	// ===== Arrangeable =====
+	
+	private ArrangeableState arrangeableState;
+	
+	@Override
+	public void arrange(FacesContext fc, ArrangeableState aState) {
+		arrangeableState = aState;		
 	}
 
 }
