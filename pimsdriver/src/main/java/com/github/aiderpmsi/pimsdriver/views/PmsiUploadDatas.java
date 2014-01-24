@@ -7,7 +7,7 @@ import javax.inject.Named;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
-import org.primefaces.model.LazyDataModel;
+import org.ajax4jsf.model.ExtendedDataModel;
 
 @Named("views.pmsiUploadDatas")
 @SessionScoped
@@ -22,7 +22,7 @@ public class PmsiUploadDatas implements Serializable {
 	@NotNull
 	private String filter;
 	
-	private LazyDataModel<PmsiUploadElement> lazyModel;  
+	private ExtendedDataModel<PmsiUploadElement> lazyModel;  
 	
 	private PmsiUploadElement selectedElement;
 		
@@ -35,11 +35,11 @@ public class PmsiUploadDatas implements Serializable {
 		lazyModel = new PmsiUploadDatasLazyModel(filter);
 	}
 
-	public LazyDataModel<PmsiUploadElement> getLazyModel() {
+	public ExtendedDataModel<PmsiUploadElement> getLazyModel() {
 		return lazyModel;
 	}
 
-	public void setLazyModel(LazyDataModel<PmsiUploadElement> lazyModel) {
+	public void setLazyModel(ExtendedDataModel<PmsiUploadElement> lazyModel) {
 		this.lazyModel = lazyModel;
 	}
 

@@ -24,12 +24,10 @@ public class DefaultContentHandler implements ContentHandler {
     }
 
     // ======== Méthodes pour ContentHandler =======
-    @Override
     public void setDocumentLocator(Locator locator) {
             // Do nothing
     }
 
-    @Override
     public void startDocument() throws SAXException {
             try {
                     out.write("<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>");
@@ -39,7 +37,6 @@ public class DefaultContentHandler implements ContentHandler {
             }
     }
 
-    @Override
     public void endDocument() throws SAXException {
             try {
                     out.flush();
@@ -48,18 +45,15 @@ public class DefaultContentHandler implements ContentHandler {
             }
     }
 
-    @Override
     public void startPrefixMapping(String prefix, String uri)
                     throws SAXException {
             // Do nothing
     }
 
-    @Override
     public void endPrefixMapping(String prefix) throws SAXException {
             // Do nothing
     }
 
-    @Override
     public void startElement(String uri, String localName, String qName,
                     Attributes atts) throws SAXException {
             StringBuilder builder = new StringBuilder();
@@ -85,7 +79,6 @@ public class DefaultContentHandler implements ContentHandler {
             }
     }
 
-    @Override
     public void endElement(String uri, String localName, String qName)
                     throws SAXException {
             StringBuilder builder = new StringBuilder();
@@ -99,7 +92,6 @@ public class DefaultContentHandler implements ContentHandler {
             }
     }
 
-    @Override
     public void characters(char[] ch, int start, int length)
                     throws SAXException {
             try {
@@ -112,19 +104,16 @@ public class DefaultContentHandler implements ContentHandler {
     }
 
     
-    @Override
     public void ignorableWhitespace(char[] ch, int start, int length)
                     throws SAXException {
             // Do nothing
     }
 
-    @Override
     public void processingInstruction(String target, String data)
                     throws SAXException {
             // Do nothing
     }
 
-    @Override
     public void skippedEntity(String name) throws SAXException {
             // Do nothing
     }

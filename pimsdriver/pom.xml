@@ -27,10 +27,14 @@
 			<version>4.0</version>
 		</dependency>
 		<dependency>
-			<groupId>org.openfaces</groupId>
-			<artifactId>openfaces</artifactId>
-			<version>3.0</version>
-			<scope>compile</scope>
+			<groupId>org.richfaces.ui</groupId>
+			<artifactId>richfaces-components-ui</artifactId>
+			<version>4.3.4.Final</version>
+		</dependency>
+		<dependency>
+			<groupId>org.richfaces.core</groupId>
+			<artifactId>richfaces-core-impl</artifactId>
+			<version>4.3.4.Final</version>
 		</dependency>
 		<dependency>
 			<groupId>com.orientechnologies</groupId>
@@ -51,6 +55,28 @@
 	</dependencies>
 
 	<build>
+
+		<plugins>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.0</version>
+				<configuration>
+					<fork>true</fork>
+					<source>7</source>
+					<target>7</target>
+					<showWarnings>true</showWarnings>
+					<showDeprecation>true</showDeprecation>
+					<compilerArguments>
+						<Xlint />
+					</compilerArguments>
+				</configuration>
+			</plugin>
+
+
+		</plugins>
+
 		<finalName>pimsdriver</finalName>
 	</build>
 

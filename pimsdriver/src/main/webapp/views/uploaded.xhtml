@@ -4,7 +4,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
 	xmlns:f="http://java.sun.com/jsf/core"
 	xmlns:h="http://java.sun.com/jsf/html"
-	xmlns:p="http://primefaces.org/ui">
+	xmlns:a4j="http://richfaces.org/a4j"
+    xmlns:rich="http://richfaces.org/rich">
 
 <f:metadata>
     <f:viewParam name="filter" value="#{views.pmsiUploadDatas.filter}" />
@@ -17,33 +18,50 @@
 <h:body>
 	<h:form id="uploadedform">
 
-		<p:dataTable var="upload" value="#{views.pmsiUploadDatas.lazyModel}"
-			paginator="true" rows="10"
-			paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
-			rowsPerPageTemplate="10,100" selectionMode="single"
-			selection="#{views.pmsiUploadDatas.selectedElement}"
-			id="elementTable" lazy="true" sortMode="multiple">
+       <rich:extendedDataTable
+       		value="#{views.pmsiUploadDatas.lazyModel}"
+	           var="upload" id="elementsTable">
 
-			<p:column headerText="Finess" sortBy="finessValue" filterBy="#{upload.finessValue}" id="finessValue">
+            <f:facet name="header">
+                <h:outputText value="Fichiers téléversés"/>
+            </f:facet>
+
+			<rich:column>
+				<f:facet name="header">
+					<h:outputText value="Finess" />
+				</f:facet>
 				<h:outputText value="#{upload.finessValue}" />
-			</p:column>
+			</rich:column>
 
-			<p:column headerText="Année" sortBy="yearValue" filterBy="#{upload.yearValue}" id="yearValue">
+			<rich:column>
+				<f:facet name="header">
+					<h:outputText value="Année" />
+				</f:facet>
 				<h:outputText value="#{upload.yearValue}" />
-			</p:column>
+			</rich:column>
 
-			<p:column headerText="Mois" sortBy="monthValue" filterBy="#{upload.monthValue}" id="monthValue">
+			<rich:column>
+				<f:facet name="header">
+					<h:outputText value="Mois" />
+				</f:facet>
 				<h:outputText value="#{upload.monthValue}" />
-			</p:column>
+			</rich:column>
 
-			<p:column headerText="Date d'envoi" sortBy="dateEnvoi" filterBy="#{upload.dateEnvoi}" id="dateEnvoi">
+			<rich:column>
+				<f:facet name="header">
+					<h:outputText value="Date d'envoi" />
+				</f:facet>
 				<h:outputText value="#{upload.dateEnvoi}" />
-			</p:column>
+			</rich:column>
 
-			<p:column headerText="Statut" sortBy="processed" filterBy="#{upload.processed}"  id="processed">
+			<rich:column>
+				<f:facet name="header">
+					<h:outputText value="Statut" />
+				</f:facet>
 				<h:outputText value="#{upload.processed}" />
-			</p:column>
-		</p:dataTable>
+			</rich:column>
+
+		</rich:extendedDataTable>
 
 	</h:form>
 </h:body>
