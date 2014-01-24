@@ -8,7 +8,7 @@
 	xmlns:rich="http://richfaces.org/rich">
 
 <f:metadata>
-	<f:viewParam name="filter" value="#{views.pmsiUploadDatas.filter}" />
+	<f:viewParam name="filter" value="#{views.pmsiUploadsBean.filter}" />
 </f:metadata>
 
 <h:head>
@@ -18,52 +18,37 @@
 <h:body>
 	<h:form id="uploadedform">
 
-		<rich:dataTable value="#{views.pmsiUploadDatas.lazyModel}"
+		<rich:dataTable value="#{views.pmsiUploadsBean.lazyModel}"
 			var="upload" id="elementsTable" rows="20">
 
 			<f:facet name="header">
 				<h:outputText value="Fichiers téléversés" />
 			</f:facet>
 
-<f:include src="uploadedcol.xhtml">
-                <f:param name="bean" value="upload" />
-                <f:param name="property" value="finessValue" />
-            </f:include>
-            
-            			<rich:column>
-				<f:facet name="header">
-					<h:outputText value="Finess" />
-				</f:facet>
-				<h:outputText value="#{upload.finessValue}" />
-			</rich:column>
+			<f:include src="uploadedcol.xhtml">
+				<f:param name="bean" value="#{views.pmsiUploadsBean}" />
+				<f:param name="property" value="finessValue" />
+			</f:include>
 
-			<rich:column>
-				<f:facet name="header">
-					<h:outputText value="Année" />
-				</f:facet>
-				<h:outputText value="#{upload.yearValue}" />
-			</rich:column>
+			<f:include src="uploadedcol.xhtml">
+				<f:param name="bean" value="#{views.pmsiUploadsBean}" />
+				<f:param name="property" value="yearValue" />
+			</f:include>
 
-			<rich:column>
-				<f:facet name="header">
-					<h:outputText value="Mois" />
-				</f:facet>
-				<h:outputText value="#{upload.monthValue}" />
-			</rich:column>
+			<f:include src="uploadedcol.xhtml">
+				<f:param name="bean" value="#{views.pmsiUploadsBean}" />
+				<f:param name="property" value="monthValue" />
+			</f:include>
 
-			<rich:column>
-				<f:facet name="header">
-					<h:outputText value="Date d'envoi" />
-				</f:facet>
-				<h:outputText value="#{upload.dateEnvoi}" />
-			</rich:column>
+			<f:include src="uploadedcol.xhtml">
+				<f:param name="bean" value="#{views.pmsiUploadsBean}" />
+				<f:param name="property" value="dateEnvoi" />
+			</f:include>
 
-			<rich:column>
-				<f:facet name="header">
-					<h:outputText value="Statut" />
-				</f:facet>
-				<h:outputText value="#{upload.processed}" />
-			</rich:column>
+			<f:include src="uploadedcol.xhtml">
+				<f:param name="bean" value="#{views.pmsiUploadsBean}" />
+				<f:param name="property" value="processed" />
+			</f:include>
 
 			<f:facet name="footer">
 				<rich:dataScroller id="scroller" />
