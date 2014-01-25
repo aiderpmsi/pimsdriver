@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.enterprise.context.SessionScoped;
+import javax.enterprise.context.ConversationScoped;
 import javax.inject.Named;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
@@ -14,7 +14,7 @@ import org.ajax4jsf.model.ExtendedDataModel;
 import org.richfaces.component.SortOrder;
 
 @Named("views.pmsiUploadsBean")
-@SessionScoped
+@ConversationScoped
 public class PmsiUploadsBean implements Serializable {
 
 	/**

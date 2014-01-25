@@ -27,33 +27,43 @@
 				<h:outputText value="Fichiers téléversés" />
 			</f:facet>
 
-			<ui:include src="uploadedcol.xhtml">
-				<ui:param name="bean" value="#{views.pmsiUploadsBean}" />
-				<ui:param name="property" value="finessValue" />
-			</ui:include>
+			<rich:column>
+				<f:facet name="header">
+					<h:outputText value="Finess" />
+				</f:facet>
+				<h:outputText value="#{upload.finessValue}" />
+			</rich:column>
 
-			<ui:include src="uploadedcol.xhtml">
-				<ui:param name="bean" value="#{views.pmsiUploadsBean}" />
-				<ui:param name="property" value="yearValue" />
-			</ui:include>
+			<rich:column>
+				<f:facet name="header">
+					<h:outputText value="Année" />
+				</f:facet>
+				<h:outputText value="#{upload.yearValue}" />
+			</rich:column>
 
-			<ui:include src="uploadedcol.xhtml">
-				<ui:param name="bean" value="#{views.pmsiUploadsBean}" />
-				<ui:param name="property" value="monthValue" />
-			</ui:include>
+			<rich:column>
+				<f:facet name="header">
+					<h:outputText value="Mois" />
+				</f:facet>
+				<h:outputText value="#{upload.monthValue}" />
+			</rich:column>
 
-			<ui:include src="uploadedcol.xhtml">
-				<ui:param name="bean" value="#{views.pmsiUploadsBean}" />
-				<ui:param name="property" value="dateEnvoi" />
-			</ui:include>
+			<rich:column>
+				<f:facet name="header">
+					<h:outputText value="Date d'envoi" />
+				</f:facet>
+				<h:outputText value="#{upload.dateEnvoi}" />
+			</rich:column>
 
-			<ui:include src="uploadedcol.xhtml">
-				<ui:param name="bean" value="#{views.pmsiUploadsBean}" />
-				<ui:param name="property" value="processed" />
-			</ui:include>
+			<rich:column>
+				<f:facet name="header">
+					<h:outputText value="Statut" />
+				</f:facet>
+				<h:outputText value="#{upload.processed}" />
+			</rich:column>
 
 			<f:facet name="footer">
-				<rich:dataScroller id="scroller" />
+				<rich:dataScroller for="elementsTable" renderIfSinglePage="false" id="scroller" />
 			</f:facet>
 
 		</rich:extendedDataTable>
