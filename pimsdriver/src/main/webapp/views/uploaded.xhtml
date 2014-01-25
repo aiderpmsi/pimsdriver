@@ -3,6 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
 	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
 	xmlns:h="http://java.sun.com/jsf/html"
 	xmlns:a4j="http://richfaces.org/a4j"
 	xmlns:rich="http://richfaces.org/rich">
@@ -18,43 +19,44 @@
 <h:body>
 	<h:form id="uploadedform">
 
-		<rich:dataTable value="#{views.pmsiUploadsBean.lazyModel}"
+		<rich:extendedDataTable keepSaved="true" 
+			value="#{views.pmsiUploadsBean.lazyModel}"
 			var="upload" id="elementsTable" rows="20">
 
 			<f:facet name="header">
 				<h:outputText value="Fichiers téléversés" />
 			</f:facet>
 
-			<f:include src="uploadedcol.xhtml">
-				<f:param name="bean" value="#{views.pmsiUploadsBean}" />
-				<f:param name="property" value="finessValue" />
-			</f:include>
+			<ui:include src="uploadedcol.xhtml">
+				<ui:param name="bean" value="#{views.pmsiUploadsBean}" />
+				<ui:param name="property" value="finessValue" />
+			</ui:include>
 
-			<f:include src="uploadedcol.xhtml">
-				<f:param name="bean" value="#{views.pmsiUploadsBean}" />
-				<f:param name="property" value="yearValue" />
-			</f:include>
+			<ui:include src="uploadedcol.xhtml">
+				<ui:param name="bean" value="#{views.pmsiUploadsBean}" />
+				<ui:param name="property" value="yearValue" />
+			</ui:include>
 
-			<f:include src="uploadedcol.xhtml">
-				<f:param name="bean" value="#{views.pmsiUploadsBean}" />
-				<f:param name="property" value="monthValue" />
-			</f:include>
+			<ui:include src="uploadedcol.xhtml">
+				<ui:param name="bean" value="#{views.pmsiUploadsBean}" />
+				<ui:param name="property" value="monthValue" />
+			</ui:include>
 
-			<f:include src="uploadedcol.xhtml">
-				<f:param name="bean" value="#{views.pmsiUploadsBean}" />
-				<f:param name="property" value="dateEnvoi" />
-			</f:include>
+			<ui:include src="uploadedcol.xhtml">
+				<ui:param name="bean" value="#{views.pmsiUploadsBean}" />
+				<ui:param name="property" value="dateEnvoi" />
+			</ui:include>
 
-			<f:include src="uploadedcol.xhtml">
-				<f:param name="bean" value="#{views.pmsiUploadsBean}" />
-				<f:param name="property" value="processed" />
-			</f:include>
+			<ui:include src="uploadedcol.xhtml">
+				<ui:param name="bean" value="#{views.pmsiUploadsBean}" />
+				<ui:param name="property" value="processed" />
+			</ui:include>
 
 			<f:facet name="footer">
 				<rich:dataScroller id="scroller" />
 			</f:facet>
 
-		</rich:dataTable>
+		</rich:extendedDataTable>
 
 	</h:form>
 </h:body>

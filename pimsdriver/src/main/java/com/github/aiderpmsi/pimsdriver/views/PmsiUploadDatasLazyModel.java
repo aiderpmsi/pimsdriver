@@ -109,9 +109,11 @@ public class PmsiUploadDatasLazyModel extends
 		if (filterFields != null && !filterFields.isEmpty()) {
 			FacesContext facesContext = FacesContext.getCurrentInstance();
 			for (FilterField filterField : filterFields) {
-				String propertyName = (String) filterField.getFilterExpression().getValue(facesContext.getELContext());
-				query.append("AND ").append(propertyName).append(" = ").append((String)filterField.getFilterValue());
-				countquery.append("AND ").append(propertyName).append(" = ").append((String)filterField.getFilterValue());
+				if (filterField.getFilterValue() != null && ((String) filterField.getFilterValue()).length() != 0) {
+					String propertyName = (String) filterField.getFilterExpression().getValue(facesContext.getELContext());
+					query.append("AND ").append(propertyName).append(" = ").append((String)filterField.getFilterValue());
+					countquery.append("AND ").append(propertyName).append(" = ").append((String)filterField.getFilterValue());
+				}
 			}
 		}
 
