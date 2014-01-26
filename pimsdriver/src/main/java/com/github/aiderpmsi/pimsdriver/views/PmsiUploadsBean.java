@@ -1,17 +1,12 @@
 package com.github.aiderpmsi.pimsdriver.views;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import javax.enterprise.context.ConversationScoped;
 import javax.inject.Named;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
-import org.ajax4jsf.model.ExtendedDataModel;
-import org.richfaces.component.SortOrder;
+import org.icefaces.ace.model.table.LazyDataModel;
 
 @Named("views.pmsiUploadsBean")
 @ConversationScoped
@@ -37,60 +32,14 @@ public class PmsiUploadsBean implements Serializable {
 	}
 	
 	// ===== Model, for reading from database =====
-	private ExtendedDataModel<PmsiUploadElement> lazyModel;  
+	private LazyDataModel<PmsiUploadElement> lazyModel;  
 
-	public ExtendedDataModel<PmsiUploadElement> getLazyModel() {
+	public LazyDataModel<PmsiUploadElement> getLazyModel() {
 		return lazyModel;
 	}
 
-	public void setLazyModel(ExtendedDataModel<PmsiUploadElement> lazyModel) {
+	public void setLazyModel(LazyDataModel<PmsiUploadElement> lazyModel) {
 		this.lazyModel = lazyModel;
 	}
 
-	// ===== Sorting and Filter ===== 
-		
-	private Map<String, SortOrder> sortOrders = new HashMap<>();
-	
-    private Map<String, String> filterValues = new HashMap<>();
-    
-    private String sortProperty;
-    
-    public PmsiUploadsBean() {
-    	// sortOrders.put("name", SortOrder.unsorted);
-
-    }
-
-    public Map<String, SortOrder> getSortOrders() {
-        return sortOrders;
-    }
- 
-    public Map<String, String> getFilterValues() {
-        return filterValues;
-    }
- 
-    public String getSortProperty() {
-        return sortProperty;
-    }
- 
-    public void setSortProperty(String sortPropety) {
-        this.sortProperty = sortPropety;
-    }
- 
-    public void toggleSort() {
-        for (Entry<String, SortOrder> entry : sortOrders.entrySet()) {
-            SortOrder newOrder;
- 
-            if (entry.getKey().equals(sortProperty)) {
-                if (entry.getValue() == SortOrder.ascending) {
-                    newOrder = SortOrder.descending;
-                } else {
-                    newOrder = SortOrder.ascending;
-                }
-            } else {
-                newOrder = SortOrder.unsorted;
-            }
- 
-            entry.setValue(newOrder);
-        }
-    }
 }

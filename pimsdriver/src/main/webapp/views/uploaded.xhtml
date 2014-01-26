@@ -5,8 +5,8 @@
 	xmlns:f="http://java.sun.com/jsf/core"
 	xmlns:ui="http://java.sun.com/jsf/facelets"
 	xmlns:h="http://java.sun.com/jsf/html"
-	xmlns:a4j="http://richfaces.org/a4j"
-	xmlns:rich="http://richfaces.org/rich">
+	xmlns:ace="http://www.icefaces.org/icefaces/components"
+	xmlns:icecore="http://www.icefaces.org/icefaces/core">
 
 <f:metadata>
 	<f:viewParam name="filter" value="#{views.pmsiUploadsBean.filter}" />
@@ -19,54 +19,34 @@
 <h:body>
 	<h:form id="uploadedform">
 
-		<rich:extendedDataTable keepSaved="true" 
-			value="#{views.pmsiUploadsBean.lazyModel}"
-			var="upload" id="elementsTable" rows="20">
+		<ace:dataTable lazy="true" value="#{views.pmsiUploadsBean.lazyModel}"
+			var="upload" id="elementsTable" rows="20" paginator="true">
 
 			<f:facet name="header">
 				<h:outputText value="Fichiers téléversés" />
 			</f:facet>
 
-			<rich:column>
-				<f:facet name="header">
-					<h:outputText value="Finess" />
-				</f:facet>
-				<h:outputText value="#{upload.finessValue}" />
-			</rich:column>
+			<ace:column id="finessValue" headerText="Finess" footerText="Finess">
+				<h:outputText id="finessValueTxt" value="#{upload.finessValue}" />
+			</ace:column>
 
-			<rich:column>
-				<f:facet name="header">
-					<h:outputText value="Année" />
-				</f:facet>
-				<h:outputText value="#{upload.yearValue}" />
-			</rich:column>
+			<ace:column id="yearValue" headerText="Année" footerText="Année">
+				<h:outputText id="yearValueTxt" value="#{upload.yearValue}" />
+			</ace:column>
 
-			<rich:column>
-				<f:facet name="header">
-					<h:outputText value="Mois" />
-				</f:facet>
-				<h:outputText value="#{upload.monthValue}" />
-			</rich:column>
+			<ace:column id="monthValue" headerText="Mois" footerText="Mois">
+				<h:outputText id="monthValueTxt" value="#{upload.monthValue}" />
+			</ace:column>
 
-			<rich:column>
-				<f:facet name="header">
-					<h:outputText value="Date d'envoi" />
-				</f:facet>
-				<h:outputText value="#{upload.dateEnvoi}" />
-			</rich:column>
+			<ace:column id="dateEnvoi" headerText="Date envoi" footerText="Date envoi">
+				<h:outputText id="dateEnvoiTxt" value="#{upload.dateEnvoi}" />
+			</ace:column>
 
-			<rich:column>
-				<f:facet name="header">
-					<h:outputText value="Statut" />
-				</f:facet>
-				<h:outputText value="#{upload.processed}" />
-			</rich:column>
+			<ace:column id="processed" headerText="Statut" footerText="Statut">
+				<h:outputText id="processedTxt" value="#{upload.processed}" />
+			</ace:column>
 
-			<f:facet name="footer">
-				<rich:dataScroller for="elementsTable" renderIfSinglePage="false" id="scroller" />
-			</f:facet>
-
-		</rich:extendedDataTable>
+		</ace:dataTable>
 
 	</h:form>
 </h:body>

@@ -3,87 +3,39 @@ package com.github.aiderpmsi.pimsdriver.views;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.faces.context.FacesContext;
 
-import org.ajax4jsf.model.DataVisitor;
-import org.ajax4jsf.model.ExtendedDataModel;
-import org.ajax4jsf.model.Range;
-import org.ajax4jsf.model.SequenceRange;
-import org.richfaces.component.SortOrder;
-import org.richfaces.model.Arrangeable;
-import org.richfaces.model.ArrangeableState;
-import org.richfaces.model.FilterField;
-import org.richfaces.model.SortField;
+import org.icefaces.ace.model.table.LazyDataModel;
+import org.icefaces.ace.model.table.SortCriteria;
 
 import com.github.aiderpmsi.pimsdriver.odb.DocDbConnectionFactory;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
-import com.orientechnologies.orient.core.id.ORID;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 
 public class PmsiUploadDatasLazyModel extends
-		ExtendedDataModel<PmsiUploadElement> implements Arrangeable {
+	LazyDataModel<PmsiUploadElement> {
 
+	/**
+	 * Generated serial id
+	 */
+	private static final long serialVersionUID = 7736732108849412677L;
+	
 	private String generalFilter;
-
-	private ORID currentPk;
-
-	private Map<ORID, PmsiUploadElement> cachedElements = new HashMap<ORID, PmsiUploadElement>();
-
-	private List<ORID> keyList = null;
-
-	private int rowCount;
 
 	public PmsiUploadDatasLazyModel(String generalFilter) {
 		this.generalFilter = generalFilter;
 	}
 
 	@Override
-	public Object getRowKey() {
-		return currentPk;
-	}
+	public List<PmsiUploadElement> load(int first, int pageSize,
+			SortCriteria[] sortCrit, Map<String, String> filters) {
 
-	@Override
-	public void setRowKey(Object key) {
-		this.currentPk = (ORID) key;
-	}
-
-	@Override
-	public int getRowCount() {
-		return rowCount;
-	}
-
-	@Override
-	public void walk(FacesContext ctx, DataVisitor dv, Range range,
-			Object argument) {
-		SequenceRange rg = (SequenceRange) range;
-		keyList = new ArrayList<ORID>(rg.getRows());
-
-		for (PmsiUploadElement element : getItemsByRange(rg.getFirstRow(),
-				rg.getRows())) {
-			keyList.add(element.getRecordId());
-			cachedElements.put(element.getRecordId(), element);
-			dv.process(ctx, element.getRecordId(), argument);
-		}
-
-	}
-
-	@Override
-	public PmsiUploadElement getRowData() {
-		if (currentPk == null) {
-			return null;
-		} else {
-			return cachedElements.get(currentPk);
-		}
-	}
-
-	private List<PmsiUploadElement> getItemsByRange(int first, int numrows) {
-
-		List<PmsiUploadElement> data = new ArrayList<PmsiUploadElement>(numrows);
+		List<PmsiUploadElement> data = new ArrayList<PmsiUploadElement>(pageSize);
 
 		// Create Query
 		StringBuilder query = new StringBuilder("select * from PmsiUpload ");
@@ -105,41 +57,26 @@ public class PmsiUploadDatasLazyModel extends
 			}
 		}
 		
-		List<FilterField> filterFields = arrangeableState.getFilterFields();
-		if (filterFields != null && !filterFields.isEmpty()) {
-			FacesContext facesContext = FacesContext.getCurrentInstance();
-			for (FilterField filterField : filterFields) {
-				if (filterField.getFilterValue() != null && ((String) filterField.getFilterValue()).length() != 0) {
-					String propertyName = (String) filterField.getFilterExpression().getValue(facesContext.getELContext());
-					query.append("AND ").append(propertyName).append(" = ").append((String)filterField.getFilterValue());
-					countquery.append("AND ").append(propertyName).append(" = ").append((String)filterField.getFilterValue());
-				}
+		if (filters != null && !filters.isEmpty()) {
+			for (Entry<String, String> filter : filters.entrySet()) {
+				query.append("AND ").append(filter.getKey()).append(" = ").append(filter.getValue()).append(" ");
+				countquery.append("AND ").append(filter.getKey()).append(" = ").append(filter.getValue()).append(" ");
 			}
 		}
 
-		List<SortField> sortFields = arrangeableState.getSortFields();
 		boolean firstSort = true;
-		if (sortFields != null && !sortFields.isEmpty()) {
-			query.append(" order by ");
-			FacesContext facesContext = FacesContext.getCurrentInstance();
-			for (SortField sortField : sortFields) {
-				if (!firstSort)
-					query.append(", ");
+		for (SortCriteria crit : sortCrit) {
+			if (!firstSort) {
+				query.append(", ");
 				firstSort = false;
-				String propertyName = (String) sortField.getSortBy().getValue(facesContext.getELContext());
-				query.append(propertyName).append(" ");
-				SortOrder sortOrder = sortField.getSortOrder();
-				if (sortOrder == SortOrder.ascending) {
-					query.append("ASC ");
-				} else if (sortOrder == SortOrder.descending) {
-					query.append("DESC ");
-				} else {
-					throw new IllegalArgumentException(sortOrder.toString());
-				}
 			}
+			FacesContext facesContext = FacesContext.getCurrentInstance();
+			String criteria = (String) crit.getExpression().getValue(facesContext.getELContext());
+			String value = crit.getPropertyName();
+			query.append(criteria).append(" ").append(value);
 		}
-		
-		query.append("offset ").append(first).append(" limit ").append(numrows);
+
+		query.append("offset ").append(first).append(" limit ").append(pageSize);
 
 		// EXECUTES THE QUERY
 		OSQLSynchQuery<ODocument> oquery = new OSQLSynchQuery<ODocument>(
@@ -179,53 +116,12 @@ public class PmsiUploadDatasLazyModel extends
 		}
 
 		// rowCount
-		this.rowCount = ((Long) countresult.get(0).field("count")).intValue();
+		setRowCount(((Long) countresult.get(0).field("count")).intValue());
 
 		// Wrapped datas
-		this.setWrappedData(data);
+		setWrappedData(data);
 
 		return data;
-	}
-
-	@Override
-	public boolean isRowAvailable() {
-		// Never used
-		if (currentPk == null)
-			return false;
-		else
-			return true;
-	}
-
-	@Override
-	public int getRowIndex() {
-		// Unused
-		return 0;
-	}
-
-	@Override
-	public void setRowIndex(int rowIndex) {
-		// Unused, ignore
-	}
-
-	@Override
-	public Object getWrappedData() {
-		// Unused
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public void setWrappedData(Object data) {
-		// Unused
-		throw new UnsupportedOperationException();
-	}
-
-	// ===== Arrangeable =====
-	
-	private ArrangeableState arrangeableState;
-	
-	@Override
-	public void arrange(FacesContext fc, ArrangeableState aState) {
-		arrangeableState = aState;		
 	}
 
 }
