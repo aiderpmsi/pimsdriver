@@ -4,9 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
 	xmlns:f="http://java.sun.com/jsf/core"
 	xmlns:ui="http://java.sun.com/jsf/facelets"
-	xmlns:h="http://java.sun.com/jsf/html"
-	xmlns:ace="http://www.icefaces.org/icefaces/components"
-	xmlns:icecore="http://www.icefaces.org/icefaces/core">
+	xmlns:h="http://java.sun.com/jsf/html">
 
 <f:metadata>
 	<f:viewParam name="filter" value="#{views.pmsiUploadsBean.filter}" />
@@ -19,30 +17,36 @@
 <h:body>
 	<h:form id="uploadedform">
 
-		<ace:dataTable lazy="true" value="#{views.pmsiUploadsBean.lazyModel}"
+
+		<h:dataTable lazy="true" value="#{views.pmsiUploadsBean.lazyModel}"
 			var="upload" id="elementsTable" rows="20" paginator="true">
 
 			<f:facet name="header">
 				<h:outputText value="Fichiers téléversés" />
 			</f:facet>
 
-			<ace:column id="finessValue" headerText="Finess" footerText="Finess">
+			<ace:column id="finessValue" headerText="Finess" footerText="Finess"
+				sortBy="#{upload.finessValue}" filterBy="#{upload.finessValue}">
 				<h:outputText id="finessValueTxt" value="#{upload.finessValue}" />
 			</ace:column>
 
-			<ace:column id="yearValue" headerText="Année" footerText="Année">
+			<ace:column id="yearValue" headerText="Année" footerText="Année"
+				sortBy="#{upload.yearValue}" filterBy="#{upload.yearValue}">
 				<h:outputText id="yearValueTxt" value="#{upload.yearValue}" />
 			</ace:column>
 
-			<ace:column id="monthValue" headerText="Mois" footerText="Mois">
+			<ace:column id="monthValue" headerText="Mois" footerText="Mois"
+				sortBy="#{upload.monthValue}" filterBy="#{upload.monthValue}">
 				<h:outputText id="monthValueTxt" value="#{upload.monthValue}" />
 			</ace:column>
 
-			<ace:column id="dateEnvoi" headerText="Date envoi" footerText="Date envoi">
+			<ace:column id="dateEnvoi" headerText="Date envoi" footerText="Date envoi"
+				sortBy="#{upload.dateEnvoi}" filterBy="#{upload.dateEnvoi}">
 				<h:outputText id="dateEnvoiTxt" value="#{upload.dateEnvoi}" />
 			</ace:column>
 
-			<ace:column id="processed" headerText="Statut" footerText="Statut">
+			<ace:column id="processed" headerText="Statut" footerText="Statut"
+				sortBy="#{upload.processed}" filterBy="#{upload.processed}">
 				<h:outputText id="processedTxt" value="#{upload.processed}" />
 			</ace:column>
 
