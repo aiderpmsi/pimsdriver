@@ -2,12 +2,15 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
-	xmlns:f="http://java.sun.com/jsf/core"
-	xmlns:ui="http://java.sun.com/jsf/facelets"
-	xmlns:h="http://java.sun.com/jsf/html">
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core">
 
 <f:metadata>
 	<f:viewParam name="filter" value="#{views.pmsiUploadsBean.filter}" />
+	<f:viewParam name="first" value="#{views.pmsiUploadsBean.first}" />
+	<f:viewParam name="numrows" value="#{views.pmsiUploadsBean.numrows}" />
+	<f:event type="preRenderView"
+		listener="#{views.pmsiUploadsBean.validate}" />
 </f:metadata>
 
 <h:head>
@@ -15,43 +18,46 @@
 </h:head>
 
 <h:body>
-	<h:form id="uploadedform">
 
+	<h:dataTable value="#{views.pmsiUploadsBean.elements}" var="element">
 
-		<h:dataTable lazy="true" value="#{views.pmsiUploadsBean.lazyModel}"
-			var="upload" id="elementsTable" rows="20" paginator="true">
+		<f:facet name="header">Liste des fichiers téléversés</f:facet>
 
-			<f:facet name="header">
-				<h:outputText value="Fichiers téléversés" />
-			</f:facet>
+		<h:column>
+			<f:facet name="header">Finess</f:facet>
+			<h:outputText value="#{element.finessValue}" />
+		</h:column>
 
-			<ace:column id="finessValue" headerText="Finess" footerText="Finess"
-				sortBy="#{upload.finessValue}" filterBy="#{upload.finessValue}">
-				<h:outputText id="finessValueTxt" value="#{upload.finessValue}" />
-			</ace:column>
+		<h:column>
+			<f:facet name="header">Année PMSI</f:facet>
+			<h:outputText value="#{element.yearValue}" />
+		</h:column>
 
-			<ace:column id="yearValue" headerText="Année" footerText="Année"
-				sortBy="#{upload.yearValue}" filterBy="#{upload.yearValue}">
-				<h:outputText id="yearValueTxt" value="#{upload.yearValue}" />
-			</ace:column>
+		<h:column>
+			<f:facet name="header">Mois PMSI</f:facet>
+			<h:outputText value="#{element.monthValue}" />
+		</h:column>
 
-			<ace:column id="monthValue" headerText="Mois" footerText="Mois"
-				sortBy="#{upload.monthValue}" filterBy="#{upload.monthValue}">
-				<h:outputText id="monthValueTxt" value="#{upload.monthValue}" />
-			</ace:column>
+		<h:column>
+			<f:facet name="header">Date de téléversement</f:facet>
+			<h:outputText value="#{element.dateEnvoi}" />
+		</h:column>
 
-			<ace:column id="dateEnvoi" headerText="Date envoi" footerText="Date envoi"
-				sortBy="#{upload.dateEnvoi}" filterBy="#{upload.dateEnvoi}">
-				<h:outputText id="dateEnvoiTxt" value="#{upload.dateEnvoi}" />
-			</ace:column>
+		<h:column>
+			<f:facet name="header">Commentaire</f:facet>
+			<h:outputText value="#{element.comment}" />
+		</h:column>
 
-			<ace:column id="processed" headerText="Statut" footerText="Statut"
-				sortBy="#{upload.processed}" filterBy="#{upload.processed}">
-				<h:outputText id="processedTxt" value="#{upload.processed}" />
-			</ace:column>
+		<h:column>
+			<f:facet name="header">Statut</f:facet>
+			<h:outputText value="#{element.processed}" />
+		</h:column>
 
-		</ace:dataTable>
+		<f:facet name="footer">
+			test1test2
+		</f:facet>
 
-	</h:form>
+	</h:dataTable>
+
 </h:body>
 </html>
