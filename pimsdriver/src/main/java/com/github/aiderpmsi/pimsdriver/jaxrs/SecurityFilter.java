@@ -2,9 +2,10 @@ package com.github.aiderpmsi.pimsdriver.jaxrs;
 
 import java.io.IOException;
 
+import javax.annotation.Priority;
+import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
-import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.ext.Provider;
 
@@ -12,7 +13,7 @@ import com.github.aiderpmsi.pimsdriver.security.ExternalUser;
 import com.github.aiderpmsi.pimsdriver.security.SecurityContextImpl;
 
 @Provider
-@PreMatching
+@Priority(Priorities.AUTHENTICATION)
 public class SecurityFilter implements ContainerRequestFilter {
 	 
     @Override

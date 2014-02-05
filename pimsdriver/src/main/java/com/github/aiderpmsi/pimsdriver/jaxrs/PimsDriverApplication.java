@@ -6,16 +6,21 @@ import java.util.Set;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 
+import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
+
 @ApplicationPath("/")
 public class PimsDriverApplication extends Application {
-    @Override
+
+	@Override
     public Set<Class<?>> getClasses() {
-        final Set<Class<?>> classes = new HashSet<>(1);
+        final Set<Class<?>> classes = new HashSet<>();
         // register jax-rs resources
         classes.add(Root.class);
         classes.add(CssDispatcher.class);
         // register filters
+        classes.add(RolesAllowedDynamicFeature.class);
         classes.add(SecurityFilter.class);
         return classes;
     }
+
 }
