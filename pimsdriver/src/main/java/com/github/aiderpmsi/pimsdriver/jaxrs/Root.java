@@ -15,9 +15,13 @@ public class Root {
 	@GET
     @Path("/root")
     @Produces({MediaType.APPLICATION_XML})
-	@XmlHeader("<?xml-stylesheet type=\"text/xsl\" href=\"\">")
+	@XmlHeader("<?xml-stylesheet type=\"text/xsl\" href=\"\"?>")
     public RootElement ping() {
 		
-        return new RootElement();
+		RootElement element = new RootElement();
+		element.setElement("coucou");
+		
+        return element;
     }
+
 }

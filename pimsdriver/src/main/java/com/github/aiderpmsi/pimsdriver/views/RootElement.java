@@ -1,12 +1,15 @@
 package com.github.aiderpmsi.pimsdriver.views;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-@XmlRootElement
+@XmlAccessorType(XmlAccessType.NONE)
+@XmlRootElement(name="rootelement")
 public class RootElement {
 
-	@XmlElement
+	@XmlElement(name="element")
 	private String element = "Test";
 
 	public String getElement() {
