@@ -1,4 +1,4 @@
-package com.github.aiderpmsi.pimsdriver.jaxrs;
+package com.github.aiderpmsi.pimsdriver.security;
 
 import java.io.IOException;
 
@@ -8,9 +8,6 @@ import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.ext.Provider;
-
-import com.github.aiderpmsi.pimsdriver.security.ExternalUser;
-import com.github.aiderpmsi.pimsdriver.security.SecurityContextImpl;
 
 @Provider
 @Priority(Priorities.AUTHENTICATION)

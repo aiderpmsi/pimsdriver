@@ -7,7 +7,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlAccessorType(XmlAccessType.NONE)
 @XmlRootElement(name="rootelement")
-public class RootElement {
+public class WelcomeElement {
 
 	@XmlElement(name="element")
 	private String element = "Test";

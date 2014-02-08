@@ -1,20 +1,26 @@
 package com.github.aiderpmsi.pimsdriver.security;
 
 import java.security.Principal;
+import java.util.HashSet;
+import java.util.Set;
 
 public class ExternalUser implements Principal {
 
-	private String name = "Test";
+	private String name;
 	
-	private String role = "Test2";
+	private HashSet<String> roles = new HashSet<>();
 	
-	public String getRole() {
-		return role;
-	}
-
 	@Override
 	public String getName() {
 		return name;
 	}
 
+	public void setName(String name) {
+		this.name = name;
+	}
+	
+	public Set<String> getRoles() {
+		return roles;
+	}
+	
 }
