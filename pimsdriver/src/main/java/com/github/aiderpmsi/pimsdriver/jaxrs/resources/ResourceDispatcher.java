@@ -15,14 +15,23 @@ import javax.ws.rs.core.StreamingOutput;
 public class ResourceDispatcher {
 	
 	@GET
-    @Path("/{resource : [a-zA-Z]{1,15}}.{extension : (css)|(xslt)}")
-    @Produces({MediaType.TEXT_PLAIN})
-    public StreamingOutput resource(
+    @Path("/xslt/{resource : [a-zA-Z]{1,15}}.xslt")
+    @Produces({MediaType.APPLICATION_XML})
+    public StreamingOutput resourceXslt(
     		@PathParam("resource") final String resource,
-    		@PathParam("extension") final String extension,
     		@Context ServletContext context) {
 				
-		return new ResourceStreamingOutput(resource, extension, context);
+		return new ResourceStreamingOutput(resource, "xslt", context);
     }
 	
+	@GET
+    @Path("/css/{resource : [a-zA-Z]{1,15}}.css")
+    @Produces({MediaType.APPLICATION_XML})
+    public StreamingOutput resourceCss(
+    		@PathParam("resource") final String resource,
+    		@Context ServletContext context) {
+				
+		return new ResourceStreamingOutput(resource, "css", context);
+    }
+
 }

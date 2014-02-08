@@ -16,7 +16,7 @@ public class Welcome {
 	@GET
     @Path("/main")
     @Produces({MediaType.APPLICATION_XML})
-	@XmlHeader("<?xml-stylesheet type=\"text/xsl\" href=\"../resources/welcome.xslt\"?>")
+	@XmlHeader("<?xml-stylesheet type=\"text/xsl\" href=\"../resources/xslt/welcome.xslt\"?>")
     public WelcomeElement ping() {
 		
 		WelcomeElement element = new WelcomeElement();
