@@ -10,7 +10,9 @@ div.iconswall div.icon {
 	div.iconswall div.icon {
 		height: 40px;
 		width: 40px;
-		background-image: url('../../resources/images/import.import_48.png');
+		background-image: url('../../resources/images/import.import48.png');
+		background-size: 40px 40px;
+		background-repeat:no-repeat;
 		padding: 1px;
 		margin: 1px;
 	}
@@ -22,7 +24,9 @@ div.iconswall div.icon {
 	div.iconswall div.icon {
 		height: 80px;
 		width: 80px;
-		background-image: url('../../resources/images/import.import_256.png');
+		background-image: url('../../resources/images/import.import256.png');
+		background-size: 80px 80px;
+		background-repeat:no-repeat;
 		border-width: 2px;
 		margin: 2px;
 	}
@@ -34,7 +38,9 @@ div.iconswall div.icon {
 	div.iconswall div.icon {
 		height: 160px;
 		width: 160px;
-		background-image: url('../../resources/images/import.import_256.png');
+		background-image: url('../../resources/images/import.import256.png');
+		background-size: 160px 160px;
+		background-repeat:no-repeat;
 		border-width: 4px;
 		margin: 4px
 	}
@@ -46,7 +52,9 @@ div.iconswall div.icon {
 	div.iconswall div.icon {
 		height: 256px;
 		width: 256px;
-		background-image: url('../../resources/images/import.import_256.png');
+		background-image: url('../../resources/images/import.import256.png');
+		background-size: 256px 256px;
+		background-repeat:no-repeat;
 		border-width: 8px;
 		margin: 8px;
 	}

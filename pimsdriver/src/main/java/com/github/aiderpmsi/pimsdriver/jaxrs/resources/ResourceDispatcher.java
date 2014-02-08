@@ -35,7 +35,7 @@ public class ResourceDispatcher {
     }
 
 	@GET
-    @Path("/images/{folder : [a-zA-Z]{1,15}}.{resource : [a-zA-Z]{1,15}}.png")
+    @Path("/images/{folder : [a-zA-Z]{1,15}}.{resource : [a-zA-Z0-9]{1,15}}.png")
     @Produces({"image/png"})
     public StreamingOutput resourceImage(
     		@PathParam("folder") final String folder,
