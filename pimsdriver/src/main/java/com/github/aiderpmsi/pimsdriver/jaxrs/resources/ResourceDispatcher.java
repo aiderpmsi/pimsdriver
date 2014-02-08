@@ -26,12 +26,23 @@ public class ResourceDispatcher {
 	
 	@GET
     @Path("/css/{resource : [a-zA-Z]{1,15}}.css")
-    @Produces({MediaType.APPLICATION_XML})
+    @Produces({"text/css"})
     public StreamingOutput resourceCss(
     		@PathParam("resource") final String resource,
     		@Context ServletContext context) {
 				
 		return new ResourceStreamingOutput(resource, "css", context);
+    }
+
+	@GET
+    @Path("/images/{folder : [a-zA-Z]{1,15}}.{resource : [a-zA-Z]{1,15}}.png")
+    @Produces({"image/png"})
+    public StreamingOutput resourceImage(
+    		@PathParam("folder") final String folder,
+    		@PathParam("resource") final String resource,
+    		@Context ServletContext context) {
+				
+		return new ResourceStreamingOutput(folder + "/" + resource, "png", context);
     }
 
 }
