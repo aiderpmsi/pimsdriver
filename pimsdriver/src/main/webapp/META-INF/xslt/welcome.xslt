@@ -12,19 +12,19 @@
 
 			<head>
 				<title>NPIMSDRIVER</title>
-				<link rel="stylesheet" href="../resources/css/welcome.css" /> 
+				<link rel="stylesheet" href="../resources/css/welcome.css" />
 			</head>
 
-			<div class="iconswall">
-				<div class="icon">1</div>
-				<div class="icon">2</div>
-				<div class="icon">3</div>
-				<div class="icon">4</div>
-				<div class="icon">5</div>
-				<div class="icon">6</div>
-				<div class="icon">7</div>
-				<div class="icon">8</div>
-			</div>
+			<nav class="iconswall">
+				<a class="icon" href="/">
+					<div class="iconimport iconimage" />
+					<div class="icontext">import</div>
+				</a>
+				<a class="icon" href="/">
+					<div class="iconprocess iconimage" />
+					<div class="icontext">process</div>
+				</a>
+			</nav>
 
 		</html>
 	</xsl:template>
