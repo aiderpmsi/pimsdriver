@@ -1,6 +1,5 @@
-package com.github.aiderpmsi.pimsdriver.forms;
+package com.github.aiderpmsi.pimsdriver.jaxrs.importpmsi;
 
-import java.io.Serializable;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
@@ -9,12 +8,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-public class SimpleRsfUploadForm implements Serializable {
-
-	/**
-	 * Generated SerialId
-	 */
-	private static final long serialVersionUID = -7997783695638054703L;
+public class ImportPmsiBaseModel extends FormModel {
 
 	/**
 	 * Pmsi Month. Must be between 1 and 12
@@ -34,13 +28,13 @@ public class SimpleRsfUploadForm implements Serializable {
 	 */
 	@NotNull
 	@Size(min = 1)
-	private String finessValue;
+	private String finessValue = "";
 
 	/**
 	 * Creates the Form with default values : - month = current month - year =
 	 * current year
 	 */
-	public SimpleRsfUploadForm() {
+	public ImportPmsiBaseModel() {
 		// Gets the current Calendar (Gregorian calendar)
 		Calendar cal = GregorianCalendar.getInstance();
 

@@ -7,7 +7,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import org.glassfish.jersey.message.XmlHeader;
 
-import com.github.aiderpmsi.pimsdriver.views.WelcomeElement;
+import com.github.aiderpmsi.pimsdriver.views.VoidElement;
 
 @Path("/welcome") 
 @PermitAll
@@ -17,10 +17,9 @@ public class Welcome {
     @Path("/main")
     @Produces({MediaType.APPLICATION_XML})
 	@XmlHeader("<?xml-stylesheet type=\"text/xsl\" href=\"../resources/xslt/welcome.xslt\"?>")
-    public WelcomeElement ping() {
+    public VoidElement main() {
 		
-		WelcomeElement element = new WelcomeElement();
-		element.setElement("coucou");
+		VoidElement element = new VoidElement();
 		
         return element;
     }

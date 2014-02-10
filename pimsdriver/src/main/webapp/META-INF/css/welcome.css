@@ -1,11 +1,18 @@
+nav.iconswall {
+	display: block;
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+	text-align: center;
+}
+
 nav.iconswall a.icon {
-	display:block;
-	float: left;
-	background-color: black;
+	display: inline-block;
+	background-color: gray;
 }
 
 nav.iconswall a.icon:hover {
-	background-color: gray;
+	background-color: white;
 }
 
 nav.iconswall a.icon div.icontext {
@@ -32,7 +39,7 @@ nav.iconswall a.icon div.icontext {
 		background-image: url('../../resources/images/import.import48.png');
 	}
 
-	nav.iconswall a.icon div.iconimport {
+	nav.iconswall a.icon div.iconprocess {
 		background-image: url('../../resources/images/import.import48.png');
 	}
 	
@@ -62,7 +69,7 @@ nav.iconswall a.icon div.icontext {
 		background-image: url('../../resources/images/import.import256.png');
 	}
 
-	nav.iconswall a.icon div.iconimport {
+	nav.iconswall a.icon div.iconprocess {
 		background-image: url('../../resources/images/import.import256.png');
 	}
 	
@@ -88,7 +95,7 @@ nav.iconswall a.icon div.icontext {
 		background-repeat: no-repeat;
 	}
 
-	nav.iconswall a.icon div.iconimport {
+	nav.iconswall a.icon div.iconprocess {
 		background-image: url('../../resources/images/import.import256.png');
 	}
 
@@ -123,7 +130,7 @@ nav.iconswall a.icon div.icontext {
 		background-image: url('../../resources/images/import.import256.png');
 	}
 
-	nav.iconswall a.icon div.iconimport {
+	nav.iconswall a.icon div.iconprocess {
 		background-image: url('../../resources/images/import.import256.png');
 	}
 	

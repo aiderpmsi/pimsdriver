@@ -16,13 +16,13 @@
 			</head>
 
 				<nav class="iconswall">
-					<a class="icon" href="../import/welcome">
+					<a class="icon" href="../import/singlersf">
 						<div class="iconimport iconimage" />
-						<div class="icontext">import</div>
+						<div class="icontext">RSF seul</div>
 					</a>
-					<a class="icon" href="/">
+					<a class="icon" href="../import/rsfrss">
 						<div class="iconprocess iconimage" />
-						<div class="icontext">process</div>
+						<div class="icontext">RSS + RSF</div>
 					</a>
 				</nav>
 
