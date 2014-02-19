@@ -17,9 +17,11 @@ public class DocDbConnectionFactory {
 
 	public static ODatabaseDocumentTx getConnection() throws IOException {
 		ODatabaseDocumentTx db = new ODatabaseDocumentTx(location);
-		// If it is not existing, create it
 		if (!db.exists()) {
+			// IF IT IS NOT EXISTING, CREATE IT
 			db.create();
+			// POPULATE THE CLASSES TYPES
+			db.getMetadata().getSchema().createClass("PmsiUpload");
 		} else {
 			db.open(user, pwd);
 		}

@@ -28,20 +28,7 @@ public class ImportPmsiBaseModel extends FormModel {
 	 */
 	@NotNull
 	@Size(min = 1)
-	private String finessValue = "";
-
-	/**
-	 * Creates the Form with default values : - month = current month - year =
-	 * current year
-	 */
-	public ImportPmsiBaseModel() {
-		// Gets the current Calendar (Gregorian calendar)
-		Calendar cal = GregorianCalendar.getInstance();
-
-		// Sets the current month and current year
-		setMonthValue(cal.get(Calendar.MONTH) + 1);
-		setYearValue(cal.get(Calendar.YEAR));
-	}
+	private String finessValue;
 
 	public Integer getMonthValue() {
 		return monthValue;
@@ -65,6 +52,19 @@ public class ImportPmsiBaseModel extends FormModel {
 
 	public void setFinessValue(String finessValue) {
 		this.finessValue = finessValue;
+	}
+
+	/**
+	 * Creates the Form with default values : - month = current month - year =
+	 * current year
+	 */
+	public void setDefaultValues() {
+		// Gets the current Calendar (Gregorian calendar)
+		Calendar cal = GregorianCalendar.getInstance();
+		
+		// Sets the current month and current year
+		setMonthValue(cal.get(Calendar.MONTH) + 1);
+		setYearValue(cal.get(Calendar.YEAR));
 	}
 
 }
