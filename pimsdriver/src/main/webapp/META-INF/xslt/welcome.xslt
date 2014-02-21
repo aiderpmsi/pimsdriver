@@ -20,7 +20,7 @@
 						<div class="iconimport iconimage" />
 						<div class="icontext">import</div>
 					</a>
-					<a class="icon" href="/">
+					<a class="icon" href="../process/list">
 						<div class="iconprocess iconimage" />
 						<div class="icontext">process</div>
 					</a>

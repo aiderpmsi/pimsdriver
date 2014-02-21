@@ -10,6 +10,7 @@ import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
 
 import com.github.aiderpmsi.pimsdriver.jaxrs.importpmsi.ImportRsf;
+import com.github.aiderpmsi.pimsdriver.jaxrs.processpmsi.ProcessPmsi;
 import com.github.aiderpmsi.pimsdriver.jaxrs.resources.ResourceDispatcher;
 import com.github.aiderpmsi.pimsdriver.security.SecurityFilter;
 
@@ -23,6 +24,7 @@ public class PimsDriverApplication extends Application {
         classes.add(Welcome.class);
         classes.add(ResourceDispatcher.class);
         classes.add(ImportRsf.class);
+        classes.add(ProcessPmsi.class);
         // register filters
         classes.add(RolesAllowedDynamicFeature.class);
         classes.add(SecurityFilter.class);

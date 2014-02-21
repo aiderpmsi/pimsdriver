@@ -2,8 +2,12 @@ package com.github.aiderpmsi.pimsdriver.jaxrs.processpmsi;
 
 import java.util.Date;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+
 import com.orientechnologies.orient.core.id.ORID;
 
+@XmlAccessorType(XmlAccessType.PUBLIC_MEMBER)
 public class UploadedElement {
 
 	private ORID recordId;

@@ -111,12 +111,13 @@ public class ProcessPmsi {
 			ODocument result = results.get(i);
 			UploadedElement element = new UploadedElement();
 			element.setRecordId(result.getIdentity());
-			element.setDateEnvoi((Date) result.field("dateEnvoi"));
-			element.setFiness((String) result.field("finessValue"));
-			element.setMonth((Integer) result.field("monthValue"));
+			element.setDateEnvoi((Date) result.field("dateenvoi"));
+			element.setFiness((String) result.field("finess"));
+			element.setMonth((Integer) result.field("month"));
 			element.setProcessed((Boolean) result.field("processed"));
-			element.setYear((Integer) result.field("yearValue"));
+			element.setYear((Integer) result.field("year"));
 			element.setSuccess((Boolean) result.field("success"));
+			element.setRowNumber(new Long(first + i));
 			if (result.field("rss") == null)
 				element.setComment("RSF");
 			else
