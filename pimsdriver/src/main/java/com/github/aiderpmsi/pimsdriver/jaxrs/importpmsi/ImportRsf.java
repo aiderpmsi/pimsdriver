@@ -2,6 +2,7 @@ package com.github.aiderpmsi.pimsdriver.jaxrs.importpmsi;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -28,9 +29,9 @@ import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.glassfish.jersey.message.XmlHeader;
 
+import com.github.aiderpmsi.pimsdriver.jaxrs.VoidElement;
 import com.github.aiderpmsi.pimsdriver.odb.DocDbConnectionFactory;
 import com.github.aiderpmsi.pimsdriver.odb.PimsODocumentHelper;
-import com.github.aiderpmsi.pimsdriver.views.VoidElement;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 
@@ -130,6 +131,7 @@ public class ImportRsf {
 			try {
 				// TX BEGIN
 				db.begin();
+				Date now = new Date();
 				// CREATES THE ENTRY IN THE RIGHT CLASS
 				ODocument odoc = db.newInstance("PmsiUpload");
 				// HERLPER FOR THIS DOCUMENT (STORE FILE)
@@ -139,6 +141,7 @@ public class ImportRsf {
 				odoc.field("year", year);
 				odoc.field("finess", finess);
 				odoc.field("processed", false);
+				odoc.field("dateenvoi", now);
 				// SAVE THIS ENTRY
 				db.save(odoc);
 				// TX END

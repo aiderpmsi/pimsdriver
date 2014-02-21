@@ -15,7 +15,7 @@ import javax.ws.rs.core.StreamingOutput;
 public class ResourceDispatcher {
 	
 	@GET
-    @Path("/xslt/{resource : [a-zA-Z]{1,15}}.xslt")
+    @Path("/xslt/{resource : [a-zA-Z]{1,50}}.xslt")
     @Produces({MediaType.APPLICATION_XML})
     public StreamingOutput resourceXslt(
     		@PathParam("resource") final String resource,
@@ -25,7 +25,7 @@ public class ResourceDispatcher {
     }
 	
 	@GET
-    @Path("/css/{resource : [a-zA-Z]{1,15}}.css")
+    @Path("/css/{resource : [a-zA-Z]{1,50}}.css")
     @Produces({"text/css"})
     public StreamingOutput resourceCss(
     		@PathParam("resource") final String resource,
@@ -35,7 +35,7 @@ public class ResourceDispatcher {
     }
 
 	@GET
-    @Path("/images/{folder : [a-zA-Z]{1,15}}.{resource : [a-zA-Z0-9]{1,15}}.png")
+    @Path("/images/{folder : [a-zA-Z]{1,50}}.{resource : [a-zA-Z0-9]{1,50}}.png")
     @Produces({"image/png"})
     public StreamingOutput resourceImage(
     		@PathParam("folder") final String folder,
