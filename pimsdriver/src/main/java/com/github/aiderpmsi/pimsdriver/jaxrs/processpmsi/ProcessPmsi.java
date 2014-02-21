@@ -15,8 +15,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
-import org.glassfish.jersey.message.XmlHeader;
-
 import com.github.aiderpmsi.pimsdriver.odb.DocDbConnectionFactory;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.record.impl.ODocument;
@@ -38,7 +36,6 @@ public class ProcessPmsi {
 	@GET
     @Path("/list")
     @Produces({MediaType.APPLICATION_XML})
-	@XmlHeader("<?xml-stylesheet type=\"text/xsl\" href=\"../resources/xslt/processlist.xslt\"?>")
 	public UploadedElements getElements(
 			@DefaultValue("0") @QueryParam("first") Integer first,
 			@DefaultValue("20") @QueryParam("rows") Integer rows,

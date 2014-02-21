@@ -4,7 +4,9 @@ import java.util.Date;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import com.github.aiderpmsi.pimsdriver.odb.ORIDJaxbAdapter;
 import com.orientechnologies.orient.core.id.ORID;
 
 @XmlAccessorType(XmlAccessType.PUBLIC_MEMBER)
@@ -28,13 +30,14 @@ public class UploadedElement {
 	
 	private String comment;
 
+	@XmlJavaTypeAdapter(ORIDJaxbAdapter.class)
 	public ORID getRecordId() {
 		return recordId;
 	}
 
 	public void setRecordId(ORID recordId) {
 		this.recordId = recordId;
-	}
+	} 
 
 	public Long getRowNumber() {
 		return rowNumber;
