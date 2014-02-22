@@ -15,6 +15,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
+import org.glassfish.jersey.message.XmlHeader;
+
 import com.github.aiderpmsi.pimsdriver.odb.DocDbConnectionFactory;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.record.impl.ODocument;
@@ -35,6 +37,7 @@ public class ProcessPmsi {
 
 	@GET
     @Path("/list")
+	@XmlHeader("<?xml-stylesheet type=\"text/xsl\" href=\"../resources/xslt/processlist.xslt\"?>")
     @Produces({MediaType.APPLICATION_XML})
 	public UploadedElements getElements(
 			@DefaultValue("0") @QueryParam("first") Integer first,
@@ -97,9 +100,14 @@ public class ProcessPmsi {
 		// ENTERS THE ELEMENTS IN THE RESULTS LIST
 		UploadedElements upelts = new UploadedElements();
 		upelts.setLastChunk(true);
+		upelts.setOnlyPending(allUploads);
+		upelts.setOrder(orderelts);
+		upelts.setOrderdir(order);
+		upelts.setAskedFirst(first);
+		upelts.setAskedRows(rows);
 		// LIST OF THE ELEMENTS
 		List<UploadedElement> upeltslist = new LinkedList<>();
-		upelts.setElements(upeltslist);
+		upelts.setElement(upeltslist);
 		for (int i = 0 ; i < results.size() ; i++) {
 			if (i > rows) {
 				upelts.setLastChunk(false);

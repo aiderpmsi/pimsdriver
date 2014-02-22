@@ -13,17 +13,27 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 @XmlSeeAlso({UploadedElement.class})
 public class UploadedElements {
 
-	private List<UploadedElement> elements;
+	private List<UploadedElement> element;
 
 	private Boolean lastChunk;
 	
-	@XmlElementWrapper
-	public List<UploadedElement> getElements() {
-		return elements;
+	private Boolean onlyPending;
+	
+	private List<String> order;
+	
+	private List<Boolean> orderdir;
+	
+	private Integer askedFirst;
+	
+	private Integer askedRows;
+	
+	@XmlElementWrapper(name="elements")
+	public List<UploadedElement> getElement() {
+		return element;
 	}
 
-	public void setElements(List<UploadedElement> elements) {
-		this.elements = elements;
+	public void setElement(List<UploadedElement> element) {
+		this.element = element;
 	}
 
 	public Boolean getLastChunk() {
@@ -33,5 +43,48 @@ public class UploadedElements {
 	public void setLastChunk(Boolean lastChunk) {
 		this.lastChunk = lastChunk;
 	}
+
+	public Boolean getOnlyPending() {
+		return onlyPending;
+	}
+
+	public void setOnlyPending(Boolean onlyPending) {
+		this.onlyPending = onlyPending;
+	}
+
+	@XmlElementWrapper(name="order")
+	public List<String> getOrder() {
+		return order;
+	}
+
+	public void setOrder(List<String> order) {
+		this.order = order;
+	}
+
+	@XmlElementWrapper(name="orderdirection")
+	public List<Boolean> getOrderdir() {
+		return orderdir;
+	}
+
+	public void setOrderdir(List<Boolean> orderdir) {
+		this.orderdir = orderdir;
+	}
+
+	public Integer getAskedFirst() {
+		return askedFirst;
+	}
+
+	public void setAskedFirst(Integer askedFirst) {
+		this.askedFirst = askedFirst;
+	}
+
+	public Integer getAskedRows() {
+		return askedRows;
+	}
+
+	public void setAskedRows(Integer askedRows) {
+		this.askedRows = askedRows;
+	}
+
 	
 }
