@@ -52,7 +52,7 @@ public class UploadedElements {
 		this.onlyPending = onlyPending;
 	}
 
-	@XmlElementWrapper(name="order")
+	@XmlElementWrapper(name="orders")
 	public List<String> getOrder() {
 		return order;
 	}
@@ -61,7 +61,7 @@ public class UploadedElements {
 		this.order = order;
 	}
 
-	@XmlElementWrapper(name="orderdirection")
+	@XmlElementWrapper(name="orderdirs")
 	public List<Boolean> getOrderdir() {
 		return orderdir;
 	}

@@ -2,10 +2,10 @@ package com.github.aiderpmsi.pimsdriver.jaxrs.processpmsi;
 
 import java.io.IOException;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.security.PermitAll;
 import javax.ws.rs.DefaultValue;
@@ -27,12 +27,12 @@ import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 public class ProcessPmsi {
 	
 	@SuppressWarnings("serial")
-	public static final Map<Integer, String> orderindex = new HashMap<Integer, String>(){{
-		put(1, "dateenvoi");
-		put(2, "month");
-		put(3, "year");
-		put(4, "finess");
-		put(5, "processed");
+	public static final Set<String> orderindex = new HashSet<String>(5){{
+		add("dateenvoi");
+		add("month");
+		add("year");
+		add("finess");
+		add("processed");
 	}};
 
 	@GET
@@ -58,8 +58,8 @@ public class ProcessPmsi {
 		if (order != null && order.size() != 0) {
 			for (int i = 0 ; i < orderelts.size() ; i++) {
 				// SEARCHES IF THIS INDEX IS DEFINED IN orderindex
-				String orderfield = orderindex.get(orderelts.get(i));
-				if (orderfield != null) {
+				String orderfield = orderelts.get(i);
+				if (orderindex.contains(orderfield)) {
 					// THIS FIELD IS KNOWN, WE HAVE TO KNOW IF THE ORDER IS ASCENDING OR DESCENDING
 					if (order != null && order.size() >= i && order.get(i)) {
 						orderquery.add(orderfield + " DESC ");
