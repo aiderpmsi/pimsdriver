@@ -24,7 +24,7 @@ public class UploadedElement {
 	
 	private String finess;
 	
-	private Boolean processed;
+	private String processed;
 	
 	private Boolean success;
 	
@@ -79,11 +79,11 @@ public class UploadedElement {
 		this.finess = finess;
 	}
 
-	public Boolean getProcessed() {
+	public String getProcessed() {
 		return processed;
 	}
 
-	public void setProcessed(Boolean processed) {
+	public void setProcessed(String processed) {
 		this.processed = processed;
 	}
 

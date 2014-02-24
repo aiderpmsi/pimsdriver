@@ -140,7 +140,7 @@ public class ImportRsf {
 				odoc.field("month", month);
 				odoc.field("year", year);
 				odoc.field("finess", finess);
-				odoc.field("processed", false);
+				odoc.field("processed", "waiting");
 				odoc.field("dateenvoi", now);
 				// SAVE THIS ENTRY
 				db.save(odoc);

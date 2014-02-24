@@ -15,6 +15,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
+import org.apache.commons.lang3.StringUtils;
 import org.glassfish.jersey.message.XmlHeader;
 
 import com.github.aiderpmsi.pimsdriver.odb.DocDbConnectionFactory;
@@ -44,13 +45,13 @@ public class ProcessPmsi {
 			@DefaultValue("20") @QueryParam("rows") Integer rows,
 			@QueryParam("orderelts") List<String> orderelts,
 			@QueryParam("order") List<Boolean> order,
-			@DefaultValue("false") @QueryParam("all") Boolean allUploads) {
+			@DefaultValue("true") @QueryParam("onlyPending") Boolean onlyPending) {
 		// CREATE QUERY
 		StringBuilder query = new StringBuilder("select * from PmsiUpload ");
 
 		// DETECTS IF WE HAVE TO SEE ONLY PENDING UPLOADS
-		if (allUploads != null && allUploads)
-			query.append("where processed=false ");
+		if (onlyPending != null && onlyPending)
+			query.append("where processed='waiting' ");
 		
 		// ORDER RESULTS
 		List<String> orderquery = new LinkedList<>();
@@ -62,9 +63,9 @@ public class ProcessPmsi {
 				if (orderindex.contains(orderfield)) {
 					// THIS FIELD IS KNOWN, WE HAVE TO KNOW IF THE ORDER IS ASCENDING OR DESCENDING
 					if (order != null && order.size() >= i && order.get(i)) {
-						orderquery.add(orderfield + " DESC ");
+						orderquery.add(orderfield + " DESC");
 					} else {
-						orderquery.add(orderfield + " ASC ");
+						orderquery.add(orderfield + " ASC");
 					}
 
 				}
@@ -73,9 +74,8 @@ public class ProcessPmsi {
 		// IF THE DEFINED ORDERS HAVE TO BE TRANSCRIPTED IN QUERY
 		if (orderquery.size() != 0) {
 			query.append("order by ");
-			for (String element : orderquery) {
-				query.append(element);
-			}
+			query.append(StringUtils.join(orderquery, ", "));
+			query.append(" ");
 		}
 
 		// DEFINES THE WINDOW
@@ -100,7 +100,7 @@ public class ProcessPmsi {
 		// ENTERS THE ELEMENTS IN THE RESULTS LIST
 		UploadedElements upelts = new UploadedElements();
 		upelts.setLastChunk(true);
-		upelts.setOnlyPending(allUploads);
+		upelts.setOnlyPending(onlyPending);
 		upelts.setOrder(orderelts);
 		upelts.setOrderdir(order);
 		upelts.setAskedFirst(first);
@@ -119,12 +119,12 @@ public class ProcessPmsi {
 			element.setDateEnvoi((Date) result.field("dateenvoi"));
 			element.setFiness((String) result.field("finess"));
 			element.setMonth((Integer) result.field("month"));
-			element.setProcessed((Boolean) result.field("processed"));
+			element.setProcessed((String) result.field("processed"));
 			element.setYear((Integer) result.field("year"));
 			element.setSuccess((Boolean) result.field("success"));
 			element.setRowNumber(new Long(first + i));
 			if (result.field("rss") == null)
-				element.setComment("RSF");
+				element.setComment("RSF seul");
 			else
 				element.setComment("RSF et RSS");
 			upeltslist.add(element);

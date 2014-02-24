@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.orientechnologies.orient.core.db.record.OIdentifiable;
 import com.orientechnologies.orient.core.id.ORID;
 import com.orientechnologies.orient.core.intent.OIntentMassiveInsert;
 import com.orientechnologies.orient.core.record.impl.ODocument;
@@ -52,5 +54,51 @@ public class PimsODocumentHelper {
 		
 		// RETURN THE FIELD ODocument
 		return ret;
+	}
+
+	private class HInputStream extends InputStream {
+		
+		private List<OIdentifiable> chunksId;
+		
+		private ODocument odoc;
+		
+		private byte[] chunk = new byte[0];
+		
+		private int mark = 0;
+		
+		public HInputStream(List<OIdentifiable> chunksId, ODocument odoc) {
+			this.chunksId = chunksId;
+			this.odoc = odoc;
+		}
+
+		@Override
+		public int read() throws IOException {
+			// IF THE CHUNK IS COMPLETELY READED, TRY TO FILL IT
+			if (mark > chunk.length) {
+				// IF REMAINING CHUNKS EXIST :
+				if (chunksId.size() != 0) {
+					odoc.setLazyLoad(false);
+					OIdentifiable id = chunksId.remove(0);
+					chunk = ((ORecordBytes) id.getRecord()).toStream();
+					mark = 0;
+				}
+				// IF NO CHUNK REMAINS, RETURN END OF FILE
+				else {
+					return -1;
+				}
+			}
+			
+			// TAKE THE MARKED ELEMENT
+			return chunk[mark++];
+		}
+		
+		
+	}
+	
+	public InputStream getInputStream(String field) {
+		// GET THE LIST OF CHUNKS ID
+		List<OIdentifiable> chunksId = odoc.field(field);
+
+		return new HInputStream(chunksId, odoc);
 	}
 }

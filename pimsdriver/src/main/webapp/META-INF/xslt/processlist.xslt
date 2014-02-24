@@ -27,6 +27,7 @@
 								<xsl:with-param name="firstrow" select="$firstrow" />
 								<xsl:with-param name="numrows" select="$numrows" />
 								<xsl:with-param name="ordername" select="'finess'" />
+								<xsl:with-param name="addorder" select="'true'" />
 								<xsl:with-param name="orderdesclist" select="/uploaded/orders" />
 								<xsl:with-param name="orderlist" select="/uploaded/orderdirs" />
 							</xsl:call-template>
@@ -39,6 +40,7 @@
 								<xsl:with-param name="firstrow" select="$firstrow" />
 								<xsl:with-param name="numrows" select="$numrows" />
 								<xsl:with-param name="ordername" select="'year'" />
+								<xsl:with-param name="addorder" select="'true'" />
 								<xsl:with-param name="orderdesclist" select="/uploaded/orders" />
 								<xsl:with-param name="orderlist" select="/uploaded/orderdirs" />
 							</xsl:call-template>
@@ -51,6 +53,7 @@
 								<xsl:with-param name="firstrow" select="$firstrow" />
 								<xsl:with-param name="numrows" select="$numrows" />
 								<xsl:with-param name="ordername" select="'month'" />
+								<xsl:with-param name="addorder" select="'true'" />
 								<xsl:with-param name="orderdesclist" select="/uploaded/orders" />
 								<xsl:with-param name="orderlist" select="/uploaded/orderdirs" />
 							</xsl:call-template>
@@ -63,6 +66,7 @@
 								<xsl:with-param name="firstrow" select="$firstrow" />
 								<xsl:with-param name="numrows" select="$numrows" />
 								<xsl:with-param name="ordername" select="'dateenvoi'" />
+								<xsl:with-param name="addorder" select="'true'" />
 								<xsl:with-param name="orderdesclist" select="/uploaded/orders" />
 								<xsl:with-param name="orderlist" select="/uploaded/orderdirs" />
 							</xsl:call-template>
@@ -70,6 +74,7 @@
 						<div class="headercontent">Date d'envoi</div>
 					</a>
 					<div class="headercontent">Commentaire</div>
+					<div class="headercontent">Action</div>
 				</div>
 				<div class="content">
 					<xsl:for-each select="/uploaded/elements/element">
@@ -89,48 +94,110 @@
 							<div>
 								<xsl:value-of select="comment/text()" />
 							</div>
+							<div>
+								<xsl:choose>
+									<xsl:when test="processed/text() = 'waiting'">
+										<a>
+											<xsl:attribute name="href">
+												<xsl:value-of select="concat('process/', recordId/text())" />
+											</xsl:attribute>
+											Traiter
+										</a>
+									</xsl:when>
+									<xsl:otherwise>
+										Déjà traité
+									</xsl:otherwise>
+								</xsl:choose>
+							</div>
 						</div>
 					</xsl:for-each>
 				</div>
 			</div>
+
+
+			<div class="filter">
+				<xsl:choose>
+					<xsl:when test="/uploaded/onlyPending/text() = 'true'">
+						<a>
+							<xsl:attribute name="href">
+							<xsl:call-template name="createtableurl">
+								<xsl:with-param name="firstrow" select="$firstrow" />
+								<xsl:with-param name="numrows" select="$numrows" />
+								<xsl:with-param name="ordername" select="''" />
+								<xsl:with-param name="addorder" select="'false'" />
+								<xsl:with-param name="orderdesclist" select="/uploaded/orders" />
+								<xsl:with-param name="orderlist" select="/uploaded/orderdirs" />
+							</xsl:call-template>
+							<xsl:value-of select="'onlyPending=false&amp;'" />
+						</xsl:attribute>
+							<input type="checkbox" name="onlyPending" checked="checked" />
+							Uniquement les envois en attente de traitement
+						</a>
+					</xsl:when>
+					<xsl:otherwise>
+						<a>
+							<xsl:attribute name="href">
+							<xsl:call-template name="createtableurl">
+								<xsl:with-param name="firstrow" select="$firstrow" />
+								<xsl:with-param name="numrows" select="$numrows" />
+								<xsl:with-param name="ordername" select="''" />
+								<xsl:with-param name="addorder" select="'false'" />
+								<xsl:with-param name="orderdesclist" select="/uploaded/orders" />
+								<xsl:with-param name="orderlist" select="/uploaded/orderdirs" />
+							</xsl:call-template>
+							<xsl:value-of select="'onlyPending=true&amp;'" />
+						</xsl:attribute>
+							<input type="checkbox" name="onlyPending" />
+							Uniquement les envois en attente de traitement
+						</a>
+					</xsl:otherwise>
+				</xsl:choose>
+
+			</div>
+
 		</html>
 	</xsl:template>
 
 	<xsl:template name="createtableurl">
-		
+
 		<xsl:param name="firstrow" />
 		<xsl:param name="numrows" />
 		<xsl:param name="ordername" />
+		<xsl:param name="addorder" />
 		<xsl:param name="orderdesclist" />
 		<xsl:param name="orderlist" />
-		
+
 		<xsl:value-of
 			select="concat('./list?first=', $firstrow, '&amp;rows=', $numrows, '&amp;')" />
 		<xsl:for-each select="$orderdesclist/order">
 			<!-- Remember the position of this node -->
-			<xsl:variable name="count"
-				select="count(preceding-sibling::*) + 1" />
+			<xsl:variable name="count" select="count(preceding-sibling::*) + 1" />
 			<xsl:choose>
 				<!-- if order elements is already defined for this element and order 
 					is true, we have to change this ordering to false -->
-				<xsl:when test="text() = $ordername and $orderlist/orderdir[$count]/text() = 'true'">
-					<xsl:value-of select="concat('orderelts=', text(), '&amp;order=false&amp;')" />
+				<xsl:when
+					test="text() = $ordername and $orderlist/orderdir[$count]/text() = 'true'">
+					<xsl:value-of
+						select="concat('orderelts=', text(), '&amp;order=false&amp;')" />
 				</xsl:when>
 				<!-- if order elements is already defined for this element and order 
 					is false, we have to remove this ordering -->
-				<xsl:when test="text() = $ordername and $orderlist/orderdir[$count]/text() = 'false'" />
+				<xsl:when
+					test="text() = $ordername and $orderlist/orderdir[$count]/text() = 'false'" />
 
 				<!-- if order elements is not for this element, we have just to copy -->
 				<xsl:otherwise>
-					<xsl:value-of select="concat('orderelts=', text(), '&amp;order=',
+					<xsl:value-of
+						select="concat('orderelts=', text(), '&amp;order=',
 											$orderlist/orderdir[$count]/text(), '&amp;')" />
 				</xsl:otherwise>
 			</xsl:choose>
 		</xsl:for-each>
 		<!-- If no ordering was defined for this element, create one more -->
 		<xsl:choose>
-			<xsl:when test="not($orderdesclist/order[text() = $ordername])">
-				<xsl:value-of select="concat('orderelts=', $ordername, '&amp;order=true&amp;')" />
+			<xsl:when test="$addorder = 'true' and not($orderdesclist/order[text() = $ordername])">
+				<xsl:value-of
+					select="concat('orderelts=', $ordername, '&amp;order=true&amp;')" />
 			</xsl:when>
 		</xsl:choose>
 	</xsl:template>
