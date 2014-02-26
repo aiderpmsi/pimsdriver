@@ -24,7 +24,7 @@
 					<a>
 						<xsl:attribute name="href">
 							<xsl:value-of
-								select="concat('./list?first=', $firstrow, '&amp;rows=', $numrows, '&amp;')" />
+							select="concat('./list?first=', $firstrow, '&amp;rows=', $numrows, '&amp;')" />
 							<xsl:call-template name="createtableurl">
 								<xsl:with-param name="ordername" select="'finess'" />
 								<xsl:with-param name="addorder" select="'true'" />
@@ -37,7 +37,7 @@
 					<a>
 						<xsl:attribute name="href">
 							<xsl:value-of
-								select="concat('./list?first=', $firstrow, '&amp;rows=', $numrows, '&amp;')" />
+							select="concat('./list?first=', $firstrow, '&amp;rows=', $numrows, '&amp;')" />
 							<xsl:call-template name="createtableurl">
 								<xsl:with-param name="ordername" select="'year'" />
 								<xsl:with-param name="addorder" select="'true'" />
@@ -50,7 +50,7 @@
 					<a>
 						<xsl:attribute name="href">
 							<xsl:value-of
-								select="concat('./list?first=', $firstrow, '&amp;rows=', $numrows, '&amp;')" />
+							select="concat('./list?first=', $firstrow, '&amp;rows=', $numrows, '&amp;')" />
 							<xsl:call-template name="createtableurl">
 								<xsl:with-param name="ordername" select="'month'" />
 								<xsl:with-param name="addorder" select="'true'" />
@@ -63,7 +63,7 @@
 					<a>
 						<xsl:attribute name="href">
 							<xsl:value-of
-								select="concat('./list?first=', $firstrow, '&amp;rows=', $numrows, '&amp;')" />
+							select="concat('./list?first=', $firstrow, '&amp;rows=', $numrows, '&amp;')" />
 							<xsl:call-template name="createtableurl">
 								<xsl:with-param name="ordername" select="'dateenvoi'" />
 								<xsl:with-param name="addorder" select="'true'" />
@@ -101,10 +101,9 @@
 											<xsl:attribute name="href">
 												<xsl:value-of select="concat('./process/', recordId/text(), '?')" />
 												<xsl:call-template name="createtableurl">
-													<xsl:with-param name="ordername" select="'dateenvoi'" />
-													<xsl:with-param name="addorder" select="'true'" />
-													<xsl:with-param name="orderdesclist"
-												select="/uploaded/orders" />
+													<xsl:with-param name="ordername" select="''" />
+													<xsl:with-param name="addorder" select="'false'" />
+													<xsl:with-param name="orderdesclist" select="/uploaded/orders" />
 													<xsl:with-param name="orderlist" select="/uploaded/orderdirs" />
 													</xsl:call-template>
 											</xsl:attribute>
@@ -130,9 +129,9 @@
 					<xsl:when test="/uploaded/onlyPending/text() = 'true'">
 						<a>
 							<xsl:attribute name="href">
+							<xsl:value-of
+								select="concat('./list?first=', $firstrow, '&amp;rows=', $numrows, '&amp;')" />
 							<xsl:call-template name="createtableurl">
-								<xsl:with-param name="firstrow" select="$firstrow" />
-								<xsl:with-param name="numrows" select="$numrows" />
 								<xsl:with-param name="ordername" select="''" />
 								<xsl:with-param name="addorder" select="'false'" />
 								<xsl:with-param name="orderdesclist" select="/uploaded/orders" />
@@ -147,9 +146,9 @@
 					<xsl:otherwise>
 						<a>
 							<xsl:attribute name="href">
+							<xsl:value-of
+								select="concat('./list?first=', $firstrow, '&amp;rows=', $numrows, '&amp;')" />
 							<xsl:call-template name="createtableurl">
-								<xsl:with-param name="firstrow" select="$firstrow" />
-								<xsl:with-param name="numrows" select="$numrows" />
 								<xsl:with-param name="ordername" select="''" />
 								<xsl:with-param name="addorder" select="'false'" />
 								<xsl:with-param name="orderdesclist" select="/uploaded/orders" />
@@ -199,7 +198,7 @@
 				</xsl:otherwise>
 			</xsl:choose>
 		</xsl:for-each>
-		<!-- If no ordering was defined for this element, create one more -->
+		<!-- If no ordering was defined for this element, and if addorder is true, create one more -->
 		<xsl:choose>
 			<xsl:when
 				test="$addorder = 'true' and not($orderdesclist/order[text() = $ordername])">

@@ -8,7 +8,6 @@ import com.github.aiderpmsi.pimsdriver.odb.PimsODocumentHelper;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.sql.OCommandSQL;
-import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 
 public class ProcessImpl implements Callable<Boolean> {
 
@@ -26,10 +25,13 @@ public class ProcessImpl implements Callable<Boolean> {
 			tx.begin();
 			// IF RSF IS DEFINED, GET ITS CONTENT
 			PimsODocumentHelper odocHelper = new PimsODocumentHelper(odoc);
-			@SuppressWarnings("unused")
 			InputStream rsf = null;
 			if (odoc.field("rsf") != null)
 				rsf = odocHelper.getInputStream("rsf");
+			int readed;
+			while((readed = rsf.read()) != -1) {
+				System.out.print((char) readed);
+			}
 			// IF RSS IS DEFINED, GET ITS CONTENT
 			@SuppressWarnings("unused")
 			InputStream rss = null;

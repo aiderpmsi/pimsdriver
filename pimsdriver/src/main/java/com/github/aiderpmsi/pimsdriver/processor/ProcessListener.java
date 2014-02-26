@@ -34,11 +34,11 @@ public class ProcessListener implements ContainerLifecycleListener {
 
 	@Override
 	public void onShutdown(Container container) {
+		threadResult.cancel(true);
 		try {
 			threadResult.get();
 		} catch (InterruptedException | ExecutionException e) {
 			log.warning(e.getMessage());
 		}
-		threadResult.cancel(true);
 	}
 }

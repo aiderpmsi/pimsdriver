@@ -45,7 +45,7 @@ public class ProcessPmsi {
 	}};
 
 	@GET
-    @Path("/process/{recordId : #(\\+|-)?[0-9]+\\:(\\+|-)?[0-9]+}")
+    @Path("/process/{recordId : [+-]?[0-9]+:[+-]?[0-9]+}")
 	public Response setProcessable(
 			@PathParam("recordId") String recordId,
 			@DefaultValue("0") @QueryParam("first") Integer first,
@@ -62,7 +62,7 @@ public class ProcessPmsi {
 			tx.begin();
 			OCommandSQL command =
 					new OCommandSQL("update PmsiUpload set processed = 'pending' WHERE @RID=?");
-			tx.command(command).execute(new ORecordId(recordId));
+			tx.command(command).execute(new ORecordId("#" + recordId));
 			tx.commit();
 		} finally {
 			if (tx != null) {
