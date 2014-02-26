@@ -70,7 +70,7 @@ public class PimsODocumentHelper {
 		@Override
 		public int read() throws IOException {
 			// IF THE CHUNK IS COMPLETELY READED, TRY TO FILL IT
-			if (mark > chunk.length) {
+			if (mark >= chunk.length) {
 				// IF REMAINING CHUNKS EXIST :
 				if (chunksId.size() != 0) {
 					odoc.setLazyLoad(false);

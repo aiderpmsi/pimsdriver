@@ -61,7 +61,7 @@ public class ProcessPmsi {
 			tx = DocDbConnectionFactory.getInstance().getConnection();
 			tx.begin();
 			OCommandSQL command =
-					new OCommandSQL("update PmsiUpload set processed = 'pending' WHERE @RID=?");
+					new OCommandSQL("update PmsiUpload set processed = 'pending' WHERE @RID=? AND processed='waiting'");
 			tx.command(command).execute(new ORecordId("#" + recordId));
 			tx.commit();
 		} finally {
@@ -76,8 +76,16 @@ public class ProcessPmsi {
 				path(ProcessPmsi.class, "getElements");
 		if (first != null) redirectionBuilder.queryParam("first", first);
 		if (rows != null) redirectionBuilder.queryParam("rows", rows);
-		if (orderelts != null) redirectionBuilder.queryParam("orderelts", orderelts);
-		if (order != null) redirectionBuilder.queryParam("order", order);
+		if (orderelts != null) {
+			for (String orderelt : orderelts) {
+				redirectionBuilder.queryParam("orderelts", orderelt);
+			}
+		}
+		if (order != null) {
+			for (Boolean orde : order) {
+				redirectionBuilder.queryParam("order", orde);
+			}
+		}
 		if (onlyPending != null) redirectionBuilder.queryParam("onlyPending", onlyPending);
 
 		ResponseBuilder resp = Response.seeOther(redirectionBuilder.build());

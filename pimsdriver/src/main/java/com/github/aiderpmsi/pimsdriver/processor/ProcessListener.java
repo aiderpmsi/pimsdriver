@@ -14,7 +14,7 @@ import org.glassfish.jersey.server.spi.ContainerLifecycleListener;
 @Provider
 public class ProcessListener implements ContainerLifecycleListener {
 
-	Logger log = Logger.getLogger(ProcessListener.class.toString());
+	static final Logger log = Logger.getLogger(ProcessListener.class.toString());
 	
 	Future<Boolean> threadResult = null;
 	

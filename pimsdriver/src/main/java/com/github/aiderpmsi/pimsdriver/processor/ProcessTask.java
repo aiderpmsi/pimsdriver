@@ -2,9 +2,11 @@ package com.github.aiderpmsi.pimsdriver.processor;
 
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.logging.Logger;
 
 import com.github.aiderpmsi.pimsdriver.odb.DocDbConnectionFactory;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
@@ -14,6 +16,7 @@ import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 
 public class ProcessTask implements Callable<Boolean> {
 
+	static final Logger log = Logger.getLogger(ProcessTask.class.toString());
 
 	@Override
 	public Boolean call() throws Exception {
@@ -37,7 +40,7 @@ public class ProcessTask implements Callable<Boolean> {
 		ExecutorService execute = Executors.newSingleThreadExecutor();
 		while (true) {
 			// RECUPERATION DES PMSI A TRAITER :
-			OSQLSynchQuery<ODocument> oquery = new OSQLSynchQuery<ODocument>("select rsf, rss from PmsiUpload where processed='pending'");
+			OSQLSynchQuery<ODocument> oquery = new OSQLSynchQuery<ODocument>("select @RID, rsf, rss from PmsiUpload where processed='pending'");
 			List<ODocument> results = null;
 			try {
 				tx = DocDbConnectionFactory.getInstance().getConnection();
@@ -60,6 +63,8 @@ public class ProcessTask implements Callable<Boolean> {
 					futureResult.get();
 				} catch (InterruptedException e) {
 					break;
+				} catch (ExecutionException e) {
+					log.warning("Erreur dans ProcessImpl : " + e.getMessage());
 				}
 			}
 			
