@@ -40,7 +40,7 @@ public class ProcessImpl implements Callable<Boolean> {
 				rss = odocHelper.getInputStream("rss");
 			OCommandSQL ocommand =
 					new OCommandSQL("update PmsiUpload set processed = 'processed' WHERE @RID=?");
-			tx.command(ocommand).execute((ORID)odoc.field("@RID"));
+			tx.command(ocommand).execute((ORID)odoc.field("RID"));
 			tx.commit();
 		} finally {
 			if (tx != null) {

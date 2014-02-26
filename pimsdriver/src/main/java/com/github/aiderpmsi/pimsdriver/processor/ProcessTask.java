@@ -66,6 +66,9 @@ public class ProcessTask implements Callable<Boolean> {
 				} catch (ExecutionException e) {
 					log.warning("Erreur dans ProcessImpl : " + e.getMessage());
 				}
+				
+				if (Thread.interrupted())
+					break;
 			}
 			
 			// ATTENTE DE 30 SECONDES
