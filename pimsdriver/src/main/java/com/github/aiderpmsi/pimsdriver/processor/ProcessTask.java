@@ -9,6 +9,7 @@ import java.util.concurrent.Future;
 import com.github.aiderpmsi.pimsdriver.odb.DocDbConnectionFactory;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.record.impl.ODocument;
+import com.orientechnologies.orient.core.sql.OCommandSQL;
 import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 
 public class ProcessTask implements Callable<Boolean> {
@@ -18,12 +19,12 @@ public class ProcessTask implements Callable<Boolean> {
 	public Boolean call() throws Exception {
 		// AT STARTING, TRANSFORM THE PENDING ACTION TO WAITING ACTION
 		// (THEY WERE ABORTED)
-		OSQLSynchQuery<ODocument> oquery = new OSQLSynchQuery<ODocument>("update PmsiUpload set processed = 'waiting' WHERE processed='pending'");
+		OCommandSQL ocommand = new OCommandSQL("update PmsiUpload set processed = 'waiting' WHERE processed='pending'");
 		ODatabaseDocumentTx tx = null;
 		try {
-			tx = DocDbConnectionFactory.getConnection();
+			tx = DocDbConnectionFactory.getInstance().getConnection();
 			tx.begin();
-			tx.command(oquery).execute();
+			tx.command(ocommand).execute();
 			tx.commit();
 		} finally {
 			if (tx != null) {
@@ -36,12 +37,12 @@ public class ProcessTask implements Callable<Boolean> {
 		ExecutorService execute = Executors.newSingleThreadExecutor();
 		while (true) {
 			// RECUPERATION DES PMSI A TRAITER :
-			oquery = new OSQLSynchQuery<ODocument>("select rsf, rss from PmsiUpload where processed='pending'");
+			OSQLSynchQuery<ODocument> oquery = new OSQLSynchQuery<ODocument>("select rsf, rss from PmsiUpload where processed='pending'");
 			List<ODocument> results = null;
 			try {
-				tx = DocDbConnectionFactory.getConnection();
+				tx = DocDbConnectionFactory.getInstance().getConnection();
 				tx.begin();
-				results = tx.command(oquery).execute();
+				results = tx.query(oquery);
 				tx.commit();
 			} finally {
 				if (tx != null) {
@@ -56,16 +57,23 @@ public class ProcessTask implements Callable<Boolean> {
 				Future<Boolean> futureResult = execute.submit(processImpl);
 				// WAIT THE RESULT OF THE COMPUTATION
 				try {
-					Boolean realResult = futureResult.get();
+					futureResult.get();
 				} catch (InterruptedException e) {
 					break;
 				}
 			}
 			
+			// ATTENTE DE 30 SECONDES
+			try {
+				Thread.sleep(30000);
+			} catch (InterruptedException e) {
+				break;
+			}
+			
 			// IF THIS THREAD HAS BEEN INTERRUPTED, GO AWAY
 			if (Thread.interrupted())
 				break;
-		}		
+		}	
 		
 		return true;
 	}

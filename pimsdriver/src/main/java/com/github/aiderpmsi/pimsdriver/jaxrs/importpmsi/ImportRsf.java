@@ -126,7 +126,7 @@ public class ImportRsf {
 			return resp.build();
 		} else {
 			// IF NO ERROR IN THE FORM, STORE THE FORM CONTENT IN THE DATABASE
-			ODatabaseDocumentTx db = DocDbConnectionFactory.getConnection();
+			ODatabaseDocumentTx db = DocDbConnectionFactory.getInstance().getConnection();
 		
 			try {
 				// TX BEGIN

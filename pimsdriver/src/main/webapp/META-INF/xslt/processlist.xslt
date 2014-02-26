@@ -23,9 +23,9 @@
 				<div class="header">
 					<a>
 						<xsl:attribute name="href">
+							<xsl:value-of
+								select="concat('./list?first=', $firstrow, '&amp;rows=', $numrows, '&amp;')" />
 							<xsl:call-template name="createtableurl">
-								<xsl:with-param name="firstrow" select="$firstrow" />
-								<xsl:with-param name="numrows" select="$numrows" />
 								<xsl:with-param name="ordername" select="'finess'" />
 								<xsl:with-param name="addorder" select="'true'" />
 								<xsl:with-param name="orderdesclist" select="/uploaded/orders" />
@@ -36,9 +36,9 @@
 					</a>
 					<a>
 						<xsl:attribute name="href">
+							<xsl:value-of
+								select="concat('./list?first=', $firstrow, '&amp;rows=', $numrows, '&amp;')" />
 							<xsl:call-template name="createtableurl">
-								<xsl:with-param name="firstrow" select="$firstrow" />
-								<xsl:with-param name="numrows" select="$numrows" />
 								<xsl:with-param name="ordername" select="'year'" />
 								<xsl:with-param name="addorder" select="'true'" />
 								<xsl:with-param name="orderdesclist" select="/uploaded/orders" />
@@ -49,9 +49,9 @@
 					</a>
 					<a>
 						<xsl:attribute name="href">
+							<xsl:value-of
+								select="concat('./list?first=', $firstrow, '&amp;rows=', $numrows, '&amp;')" />
 							<xsl:call-template name="createtableurl">
-								<xsl:with-param name="firstrow" select="$firstrow" />
-								<xsl:with-param name="numrows" select="$numrows" />
 								<xsl:with-param name="ordername" select="'month'" />
 								<xsl:with-param name="addorder" select="'true'" />
 								<xsl:with-param name="orderdesclist" select="/uploaded/orders" />
@@ -62,9 +62,9 @@
 					</a>
 					<a>
 						<xsl:attribute name="href">
+							<xsl:value-of
+								select="concat('./list?first=', $firstrow, '&amp;rows=', $numrows, '&amp;')" />
 							<xsl:call-template name="createtableurl">
-								<xsl:with-param name="firstrow" select="$firstrow" />
-								<xsl:with-param name="numrows" select="$numrows" />
 								<xsl:with-param name="ordername" select="'dateenvoi'" />
 								<xsl:with-param name="addorder" select="'true'" />
 								<xsl:with-param name="orderdesclist" select="/uploaded/orders" />
@@ -99,10 +99,20 @@
 									<xsl:when test="processed/text() = 'waiting'">
 										<a>
 											<xsl:attribute name="href">
-												<xsl:value-of select="concat('process/', recordId/text())" />
+												<xsl:value-of select="concat('./process/', recordId/text(), '?')" />
+												<xsl:call-template name="createtableurl">
+													<xsl:with-param name="ordername" select="'dateenvoi'" />
+													<xsl:with-param name="addorder" select="'true'" />
+													<xsl:with-param name="orderdesclist"
+												select="/uploaded/orders" />
+													<xsl:with-param name="orderlist" select="/uploaded/orderdirs" />
+													</xsl:call-template>
 											</xsl:attribute>
 											Traiter
 										</a>
+									</xsl:when>
+									<xsl:when test="processed/text() = 'pending'">
+										En cours de traitement
 									</xsl:when>
 									<xsl:otherwise>
 										Déjà traité
@@ -160,15 +170,11 @@
 
 	<xsl:template name="createtableurl">
 
-		<xsl:param name="firstrow" />
-		<xsl:param name="numrows" />
 		<xsl:param name="ordername" />
 		<xsl:param name="addorder" />
 		<xsl:param name="orderdesclist" />
 		<xsl:param name="orderlist" />
 
-		<xsl:value-of
-			select="concat('./list?first=', $firstrow, '&amp;rows=', $numrows, '&amp;')" />
 		<xsl:for-each select="$orderdesclist/order">
 			<!-- Remember the position of this node -->
 			<xsl:variable name="count" select="count(preceding-sibling::*) + 1" />
@@ -195,7 +201,8 @@
 		</xsl:for-each>
 		<!-- If no ordering was defined for this element, create one more -->
 		<xsl:choose>
-			<xsl:when test="$addorder = 'true' and not($orderdesclist/order[text() = $ordername])">
+			<xsl:when
+				test="$addorder = 'true' and not($orderdesclist/order[text() = $ordername])">
 				<xsl:value-of
 					select="concat('orderelts=', $ordername, '&amp;order=true&amp;')" />
 			</xsl:when>

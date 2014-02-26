@@ -11,16 +11,24 @@ import javax.annotation.security.PermitAll;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.Response.ResponseBuilder;
 
 import org.apache.commons.lang3.StringUtils;
 import org.glassfish.jersey.message.XmlHeader;
 
 import com.github.aiderpmsi.pimsdriver.odb.DocDbConnectionFactory;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
+import com.orientechnologies.orient.core.id.ORecordId;
 import com.orientechnologies.orient.core.record.impl.ODocument;
+import com.orientechnologies.orient.core.sql.OCommandSQL;
 import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 
 @Path("/process") 
@@ -35,6 +43,47 @@ public class ProcessPmsi {
 		add("finess");
 		add("processed");
 	}};
+
+	@GET
+    @Path("/process/{recordId : #(\\+|-)?[0-9]+\\:(\\+|-)?[0-9]+}")
+	public Response setProcessable(
+			@PathParam("recordId") String recordId,
+			@DefaultValue("0") @QueryParam("first") Integer first,
+			@DefaultValue("20") @QueryParam("rows") Integer rows,
+			@QueryParam("orderelts") List<String> orderelts,
+			@QueryParam("order") List<Boolean> order,
+			@DefaultValue("true") @QueryParam("onlyPending") Boolean onlyPending,
+			@Context UriInfo uriInfo) throws IOException {
+
+		// SETS THE RECORD AS PROCESSABLE
+		ODatabaseDocumentTx tx = null;
+		try {
+			tx = DocDbConnectionFactory.getInstance().getConnection();
+			tx.begin();
+			OCommandSQL command =
+					new OCommandSQL("update PmsiUpload set processed = 'pending' WHERE @RID=?");
+			tx.command(command).execute(new ORecordId(recordId));
+			tx.commit();
+		} finally {
+			if (tx != null) {
+				tx.close();
+				tx = null;
+			}
+		}
+
+		UriBuilder redirectionBuilder = uriInfo.getBaseUriBuilder().
+				path(ProcessPmsi.class).
+				path(ProcessPmsi.class, "getElements");
+		if (first != null) redirectionBuilder.queryParam("first", first);
+		if (rows != null) redirectionBuilder.queryParam("rows", rows);
+		if (orderelts != null) redirectionBuilder.queryParam("orderelts", orderelts);
+		if (order != null) redirectionBuilder.queryParam("order", order);
+		if (onlyPending != null) redirectionBuilder.queryParam("onlyPending", onlyPending);
+
+		ResponseBuilder resp = Response.seeOther(redirectionBuilder.build());
+
+		return resp.build();
+	}
 
 	@GET
     @Path("/list")
@@ -86,12 +135,10 @@ public class ProcessPmsi {
 		ODatabaseDocumentTx tx = null;
 		List<ODocument> results = null;
 		try {
-			tx = DocDbConnectionFactory.getConnection();
+			tx = DocDbConnectionFactory.getInstance().getConnection();
 			tx.begin();
 			results = tx.command(oquery).execute();
 			tx.commit();
-		} catch (IOException e) {
-			throw new UnsupportedOperationException(e);
 		} finally {
 			if (tx != null)
 				tx.close();

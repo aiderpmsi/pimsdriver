@@ -1,9 +1,9 @@
 package com.github.aiderpmsi.pimsdriver.odb;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.orientechnologies.orient.core.db.record.OIdentifiable;
@@ -28,17 +28,13 @@ public class PimsODocumentHelper {
 		// LIST OF IDS IN ORIENTDB FOR THIS FILE (IN MEMORY)
 		List<ORID> chunks = new ArrayList<ORID>();
 	
-		// OPEN FILE
-		BufferedInputStream bstream = 
-				new BufferedInputStream(stream);
-
-		while (bstream.available() > 0) {
+		// BUFFER BYTEARRAY
+		byte[] buf = new byte[8192];
+		int sizeReaded;
+		while ((sizeReaded = stream.read(buf)) != -1) {
 			// PREPARE THE RECORD WE WILL INSERT
-			final ORecordBytes chunk = new ORecordBytes();
-
-			// READ REMAINING DATA, BUT NOT MORE THAN 8K
-			chunk.fromInputStream(bstream, 8192);
-
+			final ORecordBytes chunk = new ORecordBytes(Arrays.copyOf(buf, sizeReaded));
+			
 			// SAVE THE CHUNK TO GET THE REFERENCE (IDENTITY) AND FREE FROM THE MEMORY
 			odoc.getDatabase().save(chunk);
 
