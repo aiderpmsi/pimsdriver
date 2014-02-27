@@ -149,7 +149,7 @@
 					<a>
 						<xsl:attribute name="href">
 							<xsl:value-of
-								select="concat('./list?first=', $pre_firstrow, '&amp;rows=', $numrows, '&amp;')" />
+								select="concat('./list?first=', $prev_firstrow, '&amp;rows=', $numrows, '&amp;')" />
 							<xsl:call-template name="createtableurl">
 								<xsl:with-param name="ordername" select="''" />
 								<xsl:with-param name="addorder" select="'false'" />
