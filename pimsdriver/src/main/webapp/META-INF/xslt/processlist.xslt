@@ -132,6 +132,58 @@
 					</xsl:for-each>
 				</div>
 			</div>
+			
+			<div class="paginator">
+				<xsl:variable name="prev_firstrow" >
+					<xsl:choose>
+						<xsl:when test="($firstrow - $numrows) &lt; 0">
+							<xsl:value-of select="0" />
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select="$firstrow - $numrows" />
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:variable>
+
+				<div class="pre">
+					<a>
+						<xsl:attribute name="href">
+							<xsl:value-of
+								select="concat('./list?first=', $pre_firstrow, '&amp;rows=', $numrows, '&amp;')" />
+							<xsl:call-template name="createtableurl">
+								<xsl:with-param name="ordername" select="''" />
+								<xsl:with-param name="addorder" select="'false'" />
+								<xsl:with-param name="orderdesclist" select="/uploaded/orders" />
+								<xsl:with-param name="orderlist" select="/uploaded/orderdirs" />
+								<xsl:with-param name="filtermanage" select="'copy'" />
+								<xsl:with-param name="onlyPendingValue" select="/uploaded/onlyPending/text()" />
+							</xsl:call-template>
+						</xsl:attribute>
+						Precedent
+					</a>
+				</div>
+				<div class="post">
+					<xsl:choose>
+						<xsl:when test="/uploaded/lastChunk[text() = 'false']">
+							<a>
+								<xsl:attribute name="href">
+									<xsl:value-of
+										select="concat('./list?first=', $firstrow + $numrows, '&amp;rows=', $numrows, '&amp;')" />
+									<xsl:call-template name="createtableurl">
+										<xsl:with-param name="ordername" select="''" />
+										<xsl:with-param name="addorder" select="'false'" />
+										<xsl:with-param name="orderdesclist" select="/uploaded/orders" />
+										<xsl:with-param name="orderlist" select="/uploaded/orderdirs" />
+										<xsl:with-param name="filtermanage" select="'copy'" />
+										<xsl:with-param name="onlyPendingValue" select="/uploaded/onlyPending/text()" />
+									</xsl:call-template>
+								</xsl:attribute>
+								Suivant
+							</a>
+						</xsl:when>
+					</xsl:choose>
+				</div>
+			</div>
 
 
 			<div class="filter">

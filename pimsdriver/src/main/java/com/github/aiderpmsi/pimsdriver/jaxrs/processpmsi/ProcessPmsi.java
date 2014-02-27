@@ -154,7 +154,7 @@ public class ProcessPmsi {
 
 		// ENTERS THE ELEMENTS IN THE RESULTS LIST
 		UploadedElements upelts = new UploadedElements();
-		upelts.setLastChunk(true);
+		upelts.setLastChunk(!(results.size() > rows));
 		upelts.setOnlyPending(onlyPending);
 		upelts.setOrder(orderelts);
 		upelts.setOrderdir(order);
