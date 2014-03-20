@@ -14,7 +14,6 @@ import com.github.aiderpmsi.pimsdriver.jaxrs.processpmsi.ProcessPmsi;
 import com.github.aiderpmsi.pimsdriver.jaxrs.resources.ResourceDispatcher;
 import com.github.aiderpmsi.pimsdriver.processor.ProcessListener;
 import com.github.aiderpmsi.pimsdriver.security.SecurityFilter;
-import com.github.aiderpmsi.pismdriver.xsltfilter.XsltFilter;
 
 @ApplicationPath("/")
 public class PimsDriverApplication extends Application {
@@ -31,7 +30,6 @@ public class PimsDriverApplication extends Application {
         // register filters
         classes.add(RolesAllowedDynamicFeature.class);
         classes.add(SecurityFilter.class);
-        classes.add(XsltFilter.class);
         // register multipart
         classes.add(MultiPartFeature.class);
         // register listeners

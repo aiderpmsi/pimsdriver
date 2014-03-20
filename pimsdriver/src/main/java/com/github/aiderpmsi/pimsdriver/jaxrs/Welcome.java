@@ -12,8 +12,6 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.StreamingOutput;
-import javax.ws.rs.ext.ContextResolver;
-import javax.ws.rs.ext.Providers;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.util.JAXBSource;
@@ -54,7 +52,7 @@ public class Welcome {
 		JAXBContext jaxbContext = JAXBContext.newInstance(VoidElement.class);
 		
 		// CREATE THE SAXON TRANSFORMATION
-		TransformerFactory tfactory = TransformerFactory.newInstance();
+		TransformerFactory tfactory = net.sf.saxon.TransformerFactoryImpl.newInstance();
 		final Transformer transformer = tfactory.newTransformer(
 				new StreamSource((new ResourceStreamingOutput("welcome", "xslt", context)).getAsInputStream()));
 		
@@ -67,7 +65,10 @@ public class Welcome {
 			public void write(OutputStream output) throws IOException,
 					WebApplicationException {
 				StreamResult str = new StreamResult(output);
+				StreamResult str2 = new StreamResult(System.out);
+				
 				try {
+					transformer.transform(source, str2);
 					transformer.transform(source, str);
 				} catch (TransformerException e) {
 					throw new IOException(e);
