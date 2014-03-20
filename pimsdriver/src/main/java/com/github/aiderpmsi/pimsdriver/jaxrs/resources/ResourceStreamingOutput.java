@@ -27,15 +27,20 @@ public class ResourceStreamingOutput implements StreamingOutput {
 	@Override
 	public void write(OutputStream output) throws IOException,
 			WebApplicationException {
-		// GET THE RESOURCE FROM META-INF CLASSPATH
-		String resourceloc = "/META-INF/" + extension + "/" + resource + "." + extension;
-		final InputStream is = context.getResourceAsStream(resourceloc);
+		final InputStream is = getAsInputStream();
 		// DEFINE THIS INPUTSTREAM AS RESULT
 		byte[] buf = new byte[BUF_SIZE];
 		int size;
 		while ((size = is.read(buf)) != -1) {
 			output.write(buf, 0, size);
 		}
+	}
+	
+	public InputStream getAsInputStream() throws IOException {
+		// GET THE RESOURCE FROM META-INF CLASSPATH
+		String resourceloc = "/META-INF/" + extension + "/" + resource + "." + extension;
+		final InputStream is = context.getResourceAsStream(resourceloc);
+		return is;
 	}
 
 }

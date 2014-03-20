@@ -1,0 +1,19 @@
+div.simpletable {
+	display: table;
+}
+
+div.simpletable div.header {
+	display: table-row;
+}
+
+div.simpletable div.header div.content {
+	display: table-cell;
+}
+
+div.simpletable div.element {
+	display: table-row;
+}
+
+div.simpletable div.element div {
+	display: table-cell;
+}

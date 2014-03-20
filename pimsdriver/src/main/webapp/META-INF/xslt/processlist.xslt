@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <xsl:stylesheet version="1.0"
-	xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+	xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:date="http://exslt.org/dates-and-times">
 
 	<xsl:output method="html" doctype-system="about:legacy-compat"
 		encoding="UTF-8" indent="yes" />
@@ -21,120 +21,135 @@
 
 			<div class="simpletable">
 				<div class="header">
-					<a>
-						<xsl:attribute name="href">
+					<div class="content">
+						<a>
+							<xsl:attribute name="href">
 							<xsl:value-of
-							select="concat('./list?first=', $firstrow, '&amp;rows=', $numrows, '&amp;')" />
+								select="concat('./list?first=', $firstrow, '&amp;rows=', $numrows, '&amp;')" />
 							<xsl:call-template name="createtableurl">
 								<xsl:with-param name="ordername" select="'finess'" />
 								<xsl:with-param name="addorder" select="'true'" />
 								<xsl:with-param name="orderdesclist" select="/uploaded/orders" />
 								<xsl:with-param name="orderlist" select="/uploaded/orderdirs" />
 								<xsl:with-param name="filtermanage" select="'copy'" />
-								<xsl:with-param name="onlyPendingValue" select="/uploaded/onlyPending/text()" />
+								<xsl:with-param name="onlyPendingValue"
+								select="/uploaded/onlyPending/text()" />
 							</xsl:call-template>
 						</xsl:attribute>
-						<div class="headercontent">Finess</div>
-					</a>
-					<a>
-						<xsl:attribute name="href">
+							<div class="headercontent">Finess</div>
+						</a>
+					</div>
+					<div class="content">
+						<a>
+							<xsl:attribute name="href">
 							<xsl:value-of
-							select="concat('./list?first=', $firstrow, '&amp;rows=', $numrows, '&amp;')" />
+								select="concat('./list?first=', $firstrow, '&amp;rows=', $numrows, '&amp;')" />
 							<xsl:call-template name="createtableurl">
 								<xsl:with-param name="ordername" select="'year'" />
 								<xsl:with-param name="addorder" select="'true'" />
 								<xsl:with-param name="orderdesclist" select="/uploaded/orders" />
 								<xsl:with-param name="orderlist" select="/uploaded/orderdirs" />
 								<xsl:with-param name="filtermanage" select="'copy'" />
-								<xsl:with-param name="onlyPendingValue" select="/uploaded/onlyPending/text()" />
+								<xsl:with-param name="onlyPendingValue"
+								select="/uploaded/onlyPending/text()" />
 							</xsl:call-template>
 						</xsl:attribute>
-						<div class="headercontent">Année PMSI</div>
-					</a>
-					<a>
-						<xsl:attribute name="href">
+							<div class="headercontent">Année PMSI</div>
+						</a>
+					</div>
+					<div class="content">
+						<a>
+							<xsl:attribute name="href">
 							<xsl:value-of
-							select="concat('./list?first=', $firstrow, '&amp;rows=', $numrows, '&amp;')" />
+								select="concat('./list?first=', $firstrow, '&amp;rows=', $numrows, '&amp;')" />
 							<xsl:call-template name="createtableurl">
 								<xsl:with-param name="ordername" select="'month'" />
 								<xsl:with-param name="addorder" select="'true'" />
 								<xsl:with-param name="orderdesclist" select="/uploaded/orders" />
 								<xsl:with-param name="orderlist" select="/uploaded/orderdirs" />
 								<xsl:with-param name="filtermanage" select="'copy'" />
-								<xsl:with-param name="onlyPendingValue" select="/uploaded/onlyPending/text()" />
+								<xsl:with-param name="onlyPendingValue"
+								select="/uploaded/onlyPending/text()" />
 							</xsl:call-template>
 						</xsl:attribute>
-						<div class="headercontent">Mois PMSI</div>
-					</a>
-					<a>
-						<xsl:attribute name="href">
+							<div class="headercontent">Mois PMSI</div>
+						</a>
+					</div>
+					<div class="content">
+						<a>
+							<xsl:attribute name="href">
 							<xsl:value-of
-							select="concat('./list?first=', $firstrow, '&amp;rows=', $numrows, '&amp;')" />
+								select="concat('./list?first=', $firstrow, '&amp;rows=', $numrows, '&amp;')" />
 							<xsl:call-template name="createtableurl">
 								<xsl:with-param name="ordername" select="'dateenvoi'" />
 								<xsl:with-param name="addorder" select="'true'" />
 								<xsl:with-param name="orderdesclist" select="/uploaded/orders" />
 								<xsl:with-param name="orderlist" select="/uploaded/orderdirs" />
 								<xsl:with-param name="filtermanage" select="'copy'" />
-								<xsl:with-param name="onlyPendingValue" select="/uploaded/onlyPending/text()" />
+								<xsl:with-param name="onlyPendingValue"
+								select="/uploaded/onlyPending/text()" />
 							</xsl:call-template>
 						</xsl:attribute>
-						<div class="headercontent">Date d'envoi</div>
-					</a>
+							<div class="headercontent">Date d'envoi</div>
+						</a>
+					</div>
 					<div class="headercontent">Commentaire</div>
 					<div class="headercontent">Action</div>
 				</div>
-				<div class="content">
-					<xsl:for-each select="/uploaded/elements/element">
-						<div class="element">
-							<div>
-								<xsl:value-of select="finess/text()" />
-							</div>
-							<div>
-								<xsl:value-of select="year/text()" />
-							</div>
-							<div>
-								<xsl:value-of select="month/text()" />
-							</div>
-							<div>
-								<xsl:value-of select="dateEnvoi/text()" />
-							</div>
-							<div>
-								<xsl:value-of select="comment/text()" />
-							</div>
-							<div>
-								<xsl:choose>
-									<xsl:when test="processed/text() = 'waiting'">
-										<a>
-											<xsl:attribute name="href">
+				<xsl:for-each select="/uploaded/elements/element">
+					<div class="element">
+						<div>
+							<xsl:value-of select="finess/text()" />
+						</div>
+						<div>
+							<xsl:value-of select="year/text()" />
+						</div>
+						<div>
+							<xsl:value-of select="month/text()" />
+						</div>
+						<div>
+							<xsl:call-template name="date:format-date">
+								<xsl:with-param name="date-time" select="dateEnvoi/text()" />
+								<xsl:with-param name="pattern" select="'DD/MM/YYYY'" />
+							</xsl:call-template>
+						</div>
+						<div>
+							<xsl:value-of select="comment/text()" />
+						</div>
+						<div>
+							<xsl:choose>
+								<xsl:when test="processed/text() = 'waiting'">
+									<a>
+										<xsl:attribute name="href">
 												<xsl:value-of select="concat('./process/', recordId/text(), '?')" />
 												<xsl:call-template name="createtableurl">
 													<xsl:with-param name="ordername" select="''" />
 													<xsl:with-param name="addorder" select="'false'" />
-													<xsl:with-param name="orderdesclist" select="/uploaded/orders" />
+													<xsl:with-param name="orderdesclist"
+											select="/uploaded/orders" />
 													<xsl:with-param name="orderlist" select="/uploaded/orderdirs" />
 													<xsl:with-param name="filtermanage" select="'copy'" />
-													<xsl:with-param name="onlyPendingValue" select="/uploaded/onlyPending/text()" />
+													<xsl:with-param name="onlyPendingValue"
+											select="/uploaded/onlyPending/text()" />
 												</xsl:call-template>
 											</xsl:attribute>
-											Traiter
-										</a>
-									</xsl:when>
-									<xsl:when test="processed/text() = 'pending'">
-										En cours de traitement
-									</xsl:when>
-									<xsl:otherwise>
-										Déjà traité
-									</xsl:otherwise>
-								</xsl:choose>
-							</div>
+										Traiter
+									</a>
+								</xsl:when>
+								<xsl:when test="processed/text() = 'pending'">
+									En cours de traitement
+								</xsl:when>
+								<xsl:otherwise>
+									Déjà traité
+								</xsl:otherwise>
+							</xsl:choose>
 						</div>
-					</xsl:for-each>
-				</div>
+					</div>
+				</xsl:for-each>
 			</div>
-			
+
 			<div class="paginator">
-				<xsl:variable name="prev_firstrow" >
+				<xsl:variable name="prev_firstrow">
 					<xsl:choose>
 						<xsl:when test="($firstrow - $numrows) &lt; 0">
 							<xsl:value-of select="0" />
@@ -149,14 +164,15 @@
 					<a>
 						<xsl:attribute name="href">
 							<xsl:value-of
-								select="concat('./list?first=', $prev_firstrow, '&amp;rows=', $numrows, '&amp;')" />
+							select="concat('./list?first=', $prev_firstrow, '&amp;rows=', $numrows, '&amp;')" />
 							<xsl:call-template name="createtableurl">
 								<xsl:with-param name="ordername" select="''" />
 								<xsl:with-param name="addorder" select="'false'" />
 								<xsl:with-param name="orderdesclist" select="/uploaded/orders" />
 								<xsl:with-param name="orderlist" select="/uploaded/orderdirs" />
 								<xsl:with-param name="filtermanage" select="'copy'" />
-								<xsl:with-param name="onlyPendingValue" select="/uploaded/onlyPending/text()" />
+								<xsl:with-param name="onlyPendingValue"
+							select="/uploaded/onlyPending/text()" />
 							</xsl:call-template>
 						</xsl:attribute>
 						Precedent
@@ -168,14 +184,15 @@
 							<a>
 								<xsl:attribute name="href">
 									<xsl:value-of
-										select="concat('./list?first=', $firstrow + $numrows, '&amp;rows=', $numrows, '&amp;')" />
+									select="concat('./list?first=', $firstrow + $numrows, '&amp;rows=', $numrows, '&amp;')" />
 									<xsl:call-template name="createtableurl">
 										<xsl:with-param name="ordername" select="''" />
 										<xsl:with-param name="addorder" select="'false'" />
 										<xsl:with-param name="orderdesclist" select="/uploaded/orders" />
 										<xsl:with-param name="orderlist" select="/uploaded/orderdirs" />
 										<xsl:with-param name="filtermanage" select="'copy'" />
-										<xsl:with-param name="onlyPendingValue" select="/uploaded/onlyPending/text()" />
+										<xsl:with-param name="onlyPendingValue"
+									select="/uploaded/onlyPending/text()" />
 									</xsl:call-template>
 								</xsl:attribute>
 								Suivant
@@ -190,14 +207,15 @@
 				<a>
 					<xsl:attribute name="href">
 						<xsl:value-of
-							select="concat('./list?first=', $firstrow, '&amp;rows=', $numrows, '&amp;')" />
+						select="concat('./list?first=', $firstrow, '&amp;rows=', $numrows, '&amp;')" />
 						<xsl:call-template name="createtableurl">
 							<xsl:with-param name="ordername" select="''" />
 							<xsl:with-param name="addorder" select="'false'" />
 							<xsl:with-param name="orderdesclist" select="/uploaded/orders" />
 							<xsl:with-param name="orderlist" select="/uploaded/orderdirs" />
 							<xsl:with-param name="filtermanage" select="'switch'" />
-							<xsl:with-param name="onlyPendingValue" select="/uploaded/onlyPending/text()" />
+							<xsl:with-param name="onlyPendingValue"
+						select="/uploaded/onlyPending/text()" />
 						</xsl:call-template>
 					</xsl:attribute>
 					<xsl:choose>
@@ -222,9 +240,10 @@
 		<xsl:param name="ordername" /> <!-- Order parameter -->
 		<xsl:param name="orderdesclist" /> <!-- Order elements -->
 		<xsl:param name="orderlist" /> <!-- Order order (asc or desc) -->
-		<xsl:param name="filtermanage" /> <!-- 'switch' if we have to switch onlyPending, 'copy' if we have to copy onlyPending -->
+		<xsl:param name="filtermanage" /> <!-- 'switch' if we have to switch onlyPending, 'copy' if we have to copy 
+			onlyPending -->
 		<xsl:param name="onlyPendingValue" /> <!-- Value of onlypending -->
-		
+
 		<xsl:for-each select="$orderdesclist/order">
 			<!-- Remember the position of this node -->
 			<xsl:variable name="count" select="count(preceding-sibling::*) + 1" />
@@ -249,7 +268,8 @@
 				</xsl:otherwise>
 			</xsl:choose>
 		</xsl:for-each>
-		<!-- If no ordering was defined for this element, and if addorder is true, create one more -->
+		<!-- If no ordering was defined for this element, and if addorder is true, 
+			create one more -->
 		<xsl:choose>
 			<xsl:when
 				test="$addorder = 'true' and not($orderdesclist/order[text() = $ordername])">
@@ -260,7 +280,8 @@
 		<!-- Manage onlyPending -->
 		<xsl:value-of select="'onlyPending='" />
 		<xsl:choose>
-			<xsl:when test = "($filtermanage = 'switch' and $onlyPendingValue = 'true') or ($filtermanage = 'copy' and $onlyPendingValue = 'false')">
+			<xsl:when
+				test="($filtermanage = 'switch' and $onlyPendingValue = 'true') or ($filtermanage = 'copy' and $onlyPendingValue = 'false')">
 				<xsl:value-of select="'false'" />
 			</xsl:when>
 			<xsl:otherwise>
