@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Set;
 
 import javax.annotation.security.PermitAll;
+import javax.servlet.ServletContext;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -17,6 +18,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response.ResponseBuilder;
@@ -24,6 +26,7 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import org.apache.commons.lang3.StringUtils;
 import org.glassfish.jersey.message.XmlHeader;
 
+import com.github.aiderpmsi.pimsdriver.jaxrs.HtmlHelper;
 import com.github.aiderpmsi.pimsdriver.odb.DocDbConnectionFactory;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.id.ORecordId;
@@ -97,7 +100,7 @@ public class ProcessPmsi {
     @Path("/list")
 	@XmlHeader("<?xml-stylesheet type=\"text/xsl\" href=\"../resources/xslt/processlist.xslt\"?>")
     @Produces({MediaType.APPLICATION_XML})
-	public UploadedElements getElements(
+	public UploadedElements getElementsXml(
 			@DefaultValue("0") @QueryParam("first") Integer first,
 			@DefaultValue("20") @QueryParam("rows") Integer rows,
 			@QueryParam("orderelts") List<String> orderelts,
@@ -187,4 +190,22 @@ public class ProcessPmsi {
 
 		return upelts;
 	}
-}
+	
+	@GET
+    @Path("/list")
+    @Produces({MediaType.TEXT_HTML})
+    public StreamingOutput getElementsHtml(
+			@DefaultValue("0") @QueryParam("first") Integer first,
+			@DefaultValue("20") @QueryParam("rows") Integer rows,
+			@QueryParam("orderelts") List<String> orderelts,
+			@QueryParam("order") List<Boolean> order,
+			@DefaultValue("true") @QueryParam("onlyPending") Boolean onlyPending,
+    		@Context ServletContext context) {
+		
+		HtmlHelper help = new HtmlHelper()
+			.setContext(context)
+			.setModel(getElementsXml(first, rows, orderelts, order, onlyPending))
+			.setXslResource("processlist");
+
+		return help;
+    }}

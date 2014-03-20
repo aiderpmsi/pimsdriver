@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.security.PermitAll;
+import javax.servlet.ServletContext;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
@@ -21,14 +22,15 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
-
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.glassfish.jersey.message.XmlHeader;
 
+import com.github.aiderpmsi.pimsdriver.jaxrs.HtmlHelper;
 import com.github.aiderpmsi.pimsdriver.jaxrs.VoidElement;
 import com.github.aiderpmsi.pimsdriver.odb.DocDbConnectionFactory;
 import com.github.aiderpmsi.pimsdriver.odb.PimsODocumentHelper;
@@ -43,15 +45,29 @@ public class ImportRsf {
     @Path("/welcome")
     @Produces({MediaType.APPLICATION_XML})
 	@XmlHeader("<?xml-stylesheet type=\"text/xsl\" href=\"../resources/xslt/importwelcome.xslt\"?>")
-    public VoidElement welcome() {
+    public VoidElement welcomeXml() {
 		return new VoidElement();
     }
 
 	@GET
+    @Path("/welcome")
+    @Produces({MediaType.TEXT_HTML})
+    public StreamingOutput welcomeHtml(
+    		@Context ServletContext context) {
+		
+		HtmlHelper help = new HtmlHelper()
+			.setContext(context)
+			.setModel(welcomeXml())
+			.setXslResource("importwelcome");
+
+		return help;
+    }
+	
+	@GET
     @Path("/singlersf")
     @Produces({MediaType.APPLICATION_XML})
 	@XmlHeader("<?xml-stylesheet type=\"text/xsl\" href=\"../resources/xslt/importsinglersf.xslt\"?>")
-    public ImportRsfModel singlersfGet(
+    public ImportRsfModel singlersfGetXml(
     		@QueryParam("month") Integer month,
     		@QueryParam("year") Integer year,
     		@QueryParam("finess") String finess,
@@ -89,6 +105,24 @@ public class ImportRsf {
         return model;
     }
 
+	@GET
+    @Path("/singlersf")
+    @Produces({MediaType.TEXT_HTML})
+    public StreamingOutput singlersfGetHtml(
+    		@QueryParam("month") Integer month,
+    		@QueryParam("year") Integer year,
+    		@QueryParam("finess") String finess,
+    		@QueryParam("rsf") String fileName,
+    		@Context ServletContext context) {
+		
+		HtmlHelper help = new HtmlHelper()
+			.setContext(context)
+			.setModel(singlersfGetXml(month, year, finess, fileName))
+			.setXslResource("importsinglersf");
+
+		return help;
+    }
+	
 	@POST
     @Path("/singlersf")
 	@Consumes({MediaType.MULTIPART_FORM_DATA})
@@ -163,7 +197,21 @@ public class ImportRsf {
 	@Path("/singlersfok")
 	@Produces({MediaType.APPLICATION_XML})
 	@XmlHeader("<?xml-stylesheet type=\"text/xsl\" href=\"../resources/xslt/importsinglersfok.xslt\"?>")
-	public VoidElement singleRsfOk() {
+	public VoidElement singleRsfOkXml() {
 		return new VoidElement();
 	}
+	
+	@GET
+    @Path("/singlersfok")
+    @Produces({MediaType.TEXT_HTML})
+    public StreamingOutput singleRsfOkHtml(
+    		@Context ServletContext context) {
+		
+		HtmlHelper help = new HtmlHelper()
+			.setContext(context)
+			.setModel(singleRsfOkXml())
+			.setXslResource("importsinglersfok");
+
+		return help;
+    }
 }
