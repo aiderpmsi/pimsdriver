@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<xsl:stylesheet version="1.0"
-	xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:date="http://exslt.org/dates-and-times">
+<xsl:stylesheet version="2.0"
+	xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
 	<xsl:output method="html" doctype-system="about:legacy-compat"
 		encoding="UTF-8" indent="yes" />
@@ -108,10 +108,8 @@
 							<xsl:value-of select="month/text()" />
 						</div>
 						<div>
-							<xsl:call-template name="date:format-date">
-								<xsl:with-param name="date-time" select="dateEnvoi/text()" />
-								<xsl:with-param name="pattern" select="'DD/MM/YYYY'" />
-							</xsl:call-template>
+							<xsl:value-of select="format-date(dateEnvoi/text(), 
+                          		'[M01]/[D01]/[Y0001] [H01]:[m01]:[s01]')" />
 						</div>
 						<div>
 							<xsl:value-of select="comment/text()" />

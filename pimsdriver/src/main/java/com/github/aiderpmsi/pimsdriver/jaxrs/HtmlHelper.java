@@ -35,7 +35,7 @@ public class HtmlHelper implements StreamingOutput {
 			TransformerFactory tfactory = TransformerFactory.newInstance();
 			final Transformer transformer = tfactory.newTransformer(
 					new StreamSource((new ResourceStreamingOutput(xslResource, "xslt", context)).getAsInputStream()));
-
+			
 			// CREATES THE STREAMING INPUT
 			final JAXBSource source = new JAXBSource(jaxbContext, model);
 
