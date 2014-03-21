@@ -76,7 +76,7 @@ public class ProcessPmsi {
 
 		UriBuilder redirectionBuilder = uriInfo.getBaseUriBuilder().
 				path(ProcessPmsi.class).
-				path(ProcessPmsi.class, "getElements");
+				path(ProcessPmsi.class, "getElementsXml");
 		if (first != null) redirectionBuilder.queryParam("first", first);
 		if (rows != null) redirectionBuilder.queryParam("rows", rows);
 		if (orderelts != null) {

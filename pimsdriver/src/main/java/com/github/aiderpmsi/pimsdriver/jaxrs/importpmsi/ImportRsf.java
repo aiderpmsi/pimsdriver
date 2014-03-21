@@ -151,7 +151,7 @@ public class ImportRsf {
 			// IF ERROR IN THE VALIDATION, REDIRECTS TO FORM
 			UriBuilder redirectionBuilder = uriInfo.getBaseUriBuilder().
 					path(ImportRsf.class).
-					path(ImportRsf.class, "singlersfGet");
+					path(ImportRsf.class, "singlersfGetXml");
 			if (month != null) redirectionBuilder.queryParam("month", month);
 			if (year != null) redirectionBuilder.queryParam("year", year);
 			if (finess != null) redirectionBuilder.queryParam("finess", finess);
@@ -187,7 +187,7 @@ public class ImportRsf {
 			// REDIRECT TO OK WINDOW
 			UriBuilder redirectionBuilder = uriInfo.getBaseUriBuilder().
 					path(ImportRsf.class).
-					path(ImportRsf.class, "singleRsfOk");
+					path(ImportRsf.class, "singleRsfOkXml");
 			ResponseBuilder resp = Response.seeOther(redirectionBuilder.build());
 			return resp.build();
 		}
