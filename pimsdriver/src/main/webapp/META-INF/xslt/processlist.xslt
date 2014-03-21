@@ -20,12 +20,13 @@
 			<xsl:variable name="numrows" select="/uploaded/askedRows/text()" />
 
 			<div class="simpletable">
-				<div class="header">
-					<div class="content">
-						<a>
-							<xsl:attribute name="href">
+				<div class="content">
+					<div class="header">
+						<div class="element">
+							<a>
+								<xsl:attribute name="href">
 							<xsl:value-of
-								select="concat('./list?first=', $firstrow, '&amp;rows=', $numrows, '&amp;')" />
+									select="concat('./list?first=', $firstrow, '&amp;rows=', $numrows, '&amp;')" />
 							<xsl:call-template name="createtableurl">
 								<xsl:with-param name="ordername" select="'finess'" />
 								<xsl:with-param name="addorder" select="'true'" />
@@ -33,17 +34,17 @@
 								<xsl:with-param name="orderlist" select="/uploaded/orderdirs" />
 								<xsl:with-param name="filtermanage" select="'copy'" />
 								<xsl:with-param name="onlyPendingValue"
-								select="/uploaded/onlyPending/text()" />
+									select="/uploaded/onlyPending/text()" />
 							</xsl:call-template>
 						</xsl:attribute>
-							<div class="headercontent">Finess</div>
-						</a>
-					</div>
-					<div class="content">
-						<a>
-							<xsl:attribute name="href">
+								<div class="headercontent">Finess</div>
+							</a>
+						</div>
+						<div class="element">
+							<a>
+								<xsl:attribute name="href">
 							<xsl:value-of
-								select="concat('./list?first=', $firstrow, '&amp;rows=', $numrows, '&amp;')" />
+									select="concat('./list?first=', $firstrow, '&amp;rows=', $numrows, '&amp;')" />
 							<xsl:call-template name="createtableurl">
 								<xsl:with-param name="ordername" select="'year'" />
 								<xsl:with-param name="addorder" select="'true'" />
@@ -51,17 +52,17 @@
 								<xsl:with-param name="orderlist" select="/uploaded/orderdirs" />
 								<xsl:with-param name="filtermanage" select="'copy'" />
 								<xsl:with-param name="onlyPendingValue"
-								select="/uploaded/onlyPending/text()" />
+									select="/uploaded/onlyPending/text()" />
 							</xsl:call-template>
 						</xsl:attribute>
-							<div class="headercontent">Année PMSI</div>
-						</a>
-					</div>
-					<div class="content">
-						<a>
-							<xsl:attribute name="href">
+								<div class="headercontent">Année PMSI</div>
+							</a>
+						</div>
+						<div class="element">
+							<a>
+								<xsl:attribute name="href">
 							<xsl:value-of
-								select="concat('./list?first=', $firstrow, '&amp;rows=', $numrows, '&amp;')" />
+									select="concat('./list?first=', $firstrow, '&amp;rows=', $numrows, '&amp;')" />
 							<xsl:call-template name="createtableurl">
 								<xsl:with-param name="ordername" select="'month'" />
 								<xsl:with-param name="addorder" select="'true'" />
@@ -69,17 +70,17 @@
 								<xsl:with-param name="orderlist" select="/uploaded/orderdirs" />
 								<xsl:with-param name="filtermanage" select="'copy'" />
 								<xsl:with-param name="onlyPendingValue"
-								select="/uploaded/onlyPending/text()" />
+									select="/uploaded/onlyPending/text()" />
 							</xsl:call-template>
 						</xsl:attribute>
-							<div class="headercontent">Mois PMSI</div>
-						</a>
-					</div>
-					<div class="content">
-						<a>
-							<xsl:attribute name="href">
+								<div class="headercontent">Mois PMSI</div>
+							</a>
+						</div>
+						<div class="element">
+							<a>
+								<xsl:attribute name="href">
 							<xsl:value-of
-								select="concat('./list?first=', $firstrow, '&amp;rows=', $numrows, '&amp;')" />
+									select="concat('./list?first=', $firstrow, '&amp;rows=', $numrows, '&amp;')" />
 							<xsl:call-template name="createtableurl">
 								<xsl:with-param name="ordername" select="'dateenvoi'" />
 								<xsl:with-param name="addorder" select="'true'" />
@@ -87,82 +88,85 @@
 								<xsl:with-param name="orderlist" select="/uploaded/orderdirs" />
 								<xsl:with-param name="filtermanage" select="'copy'" />
 								<xsl:with-param name="onlyPendingValue"
-								select="/uploaded/onlyPending/text()" />
+									select="/uploaded/onlyPending/text()" />
 							</xsl:call-template>
 						</xsl:attribute>
-							<div class="headercontent">Date d'envoi</div>
-						</a>
+								<div class="headercontent">Date d'envoi</div>
+							</a>
+						</div>
+						<div class="element">Commentaire</div>
+						<div class="element">Action</div>
 					</div>
-					<div class="content">Commentaire</div>
-					<div class="content">Action</div>
-				</div>
-				<xsl:for-each select="/uploaded/elements/element">
-					<div class="element">
-						<div>
-							<xsl:value-of select="finess/text()" />
-						</div>
-						<div>
-							<xsl:value-of select="year/text()" />
-						</div>
-						<div>
-							<xsl:value-of select="month/text()" />
-						</div>
-						<div>
-							<xsl:value-of select="format-dateTime(dateEnvoi/text(), 
+					<xsl:for-each select="/uploaded/elements/element">
+						<div class="row">
+							<div>
+								<xsl:value-of select="finess/text()" />
+							</div>
+							<div>
+								<xsl:value-of select="year/text()" />
+							</div>
+							<div>
+								<xsl:value-of select="month/text()" />
+							</div>
+							<div>
+								<xsl:value-of
+									select="format-dateTime(dateEnvoi/text(), 
                           		'[M01]/[D01]/[Y0001] [H01]:[m01]:[s01]')" />
-						</div>
-						<div>
-							<xsl:value-of select="comment/text()" />
-						</div>
-						<div>
-							<xsl:choose>
-								<xsl:when test="processed/text() = 'waiting'">
-									<a>
-										<xsl:attribute name="href">
+							</div>
+							<div>
+								<xsl:value-of select="comment/text()" />
+							</div>
+							<div>
+								<xsl:choose>
+									<xsl:when test="processed/text() = 'waiting'">
+										<a>
+											<xsl:attribute name="href">
 												<xsl:value-of select="concat('./process/', recordId/text(), '?')" />
 												<xsl:call-template name="createtableurl">
 													<xsl:with-param name="ordername" select="''" />
 													<xsl:with-param name="addorder" select="'false'" />
 													<xsl:with-param name="orderdesclist"
-											select="/uploaded/orders" />
+												select="/uploaded/orders" />
 													<xsl:with-param name="orderlist" select="/uploaded/orderdirs" />
 													<xsl:with-param name="filtermanage" select="'copy'" />
 													<xsl:with-param name="onlyPendingValue"
-											select="/uploaded/onlyPending/text()" />
+												select="/uploaded/onlyPending/text()" />
 												</xsl:call-template>
 											</xsl:attribute>
-										Traiter
-									</a>
-								</xsl:when>
-								<xsl:when test="processed/text() = 'pending'">
-									En cours de traitement
+											Traiter
+										</a>
+									</xsl:when>
+									<xsl:when test="processed/text() = 'pending'">
+										En cours de traitement
+									</xsl:when>
+									<xsl:otherwise>
+										Déjà traité
+									</xsl:otherwise>
+								</xsl:choose>
+							</div>
+						</div>
+					</xsl:for-each>
+
+				</div>
+
+				<div class="footer">
+					<div class="paginator">
+						<xsl:variable name="prev_firstrow">
+							<xsl:choose>
+								<xsl:when test="($firstrow - $numrows) &lt; 0">
+									<xsl:value-of select="0" />
 								</xsl:when>
 								<xsl:otherwise>
-									Déjà traité
+									<xsl:value-of select="$firstrow - $numrows" />
 								</xsl:otherwise>
 							</xsl:choose>
-						</div>
-					</div>
-				</xsl:for-each>
-			</div>
+						</xsl:variable>
 
-			<div class="paginator">
-				<xsl:variable name="prev_firstrow">
-					<xsl:choose>
-						<xsl:when test="($firstrow - $numrows) &lt; 0">
-							<xsl:value-of select="0" />
-						</xsl:when>
-						<xsl:otherwise>
-							<xsl:value-of select="$firstrow - $numrows" />
-						</xsl:otherwise>
-					</xsl:choose>
-				</xsl:variable>
-
-				<div class="pre">
-					<a>
-						<xsl:attribute name="href">
+						<div class="pre">
+							<a>
+								<xsl:attribute name="href">
 							<xsl:value-of
-							select="concat('./list?first=', $prev_firstrow, '&amp;rows=', $numrows, '&amp;')" />
+									select="concat('./list?first=', $prev_firstrow, '&amp;rows=', $numrows, '&amp;')" />
 							<xsl:call-template name="createtableurl">
 								<xsl:with-param name="ordername" select="''" />
 								<xsl:with-param name="addorder" select="'false'" />
@@ -170,19 +174,19 @@
 								<xsl:with-param name="orderlist" select="/uploaded/orderdirs" />
 								<xsl:with-param name="filtermanage" select="'copy'" />
 								<xsl:with-param name="onlyPendingValue"
-							select="/uploaded/onlyPending/text()" />
+									select="/uploaded/onlyPending/text()" />
 							</xsl:call-template>
 						</xsl:attribute>
-						Precedent
-					</a>
-				</div>
-				<div class="post">
-					<xsl:choose>
-						<xsl:when test="/uploaded/lastChunk[text() = 'false']">
-							<a>
-								<xsl:attribute name="href">
+								Precedent
+							</a>
+						</div>
+						<div class="post">
+							<xsl:choose>
+								<xsl:when test="/uploaded/lastChunk[text() = 'false']">
+									<a>
+										<xsl:attribute name="href">
 									<xsl:value-of
-									select="concat('./list?first=', $firstrow + $numrows, '&amp;rows=', $numrows, '&amp;')" />
+											select="concat('./list?first=', $firstrow + $numrows, '&amp;rows=', $numrows, '&amp;')" />
 									<xsl:call-template name="createtableurl">
 										<xsl:with-param name="ordername" select="''" />
 										<xsl:with-param name="addorder" select="'false'" />
@@ -190,22 +194,20 @@
 										<xsl:with-param name="orderlist" select="/uploaded/orderdirs" />
 										<xsl:with-param name="filtermanage" select="'copy'" />
 										<xsl:with-param name="onlyPendingValue"
-									select="/uploaded/onlyPending/text()" />
+											select="/uploaded/onlyPending/text()" />
 									</xsl:call-template>
 								</xsl:attribute>
-								Suivant
-							</a>
-						</xsl:when>
-					</xsl:choose>
-				</div>
-			</div>
-
-
-			<div class="filter">
-				<a>
-					<xsl:attribute name="href">
+										Suivant
+									</a>
+								</xsl:when>
+							</xsl:choose>
+						</div>
+					</div>
+					<div class="filter">
+						<a>
+							<xsl:attribute name="href">
 						<xsl:value-of
-						select="concat('./list?first=', $firstrow, '&amp;rows=', $numrows, '&amp;')" />
+								select="concat('./list?first=', $firstrow, '&amp;rows=', $numrows, '&amp;')" />
 						<xsl:call-template name="createtableurl">
 							<xsl:with-param name="ordername" select="''" />
 							<xsl:with-param name="addorder" select="'false'" />
@@ -213,20 +215,22 @@
 							<xsl:with-param name="orderlist" select="/uploaded/orderdirs" />
 							<xsl:with-param name="filtermanage" select="'switch'" />
 							<xsl:with-param name="onlyPendingValue"
-						select="/uploaded/onlyPending/text()" />
+								select="/uploaded/onlyPending/text()" />
 						</xsl:call-template>
 					</xsl:attribute>
-					<xsl:choose>
-						<xsl:when test="/uploaded/onlyPending/text() = 'true'">
-							<input type="checkbox" name="onlyPending" checked="checked" />
-							Uniquement les envois en attente de traitement
-						</xsl:when>
-						<xsl:otherwise>
-							<input type="checkbox" name="onlyPending" />
-							Uniquement les envois en attente de traitement
-						</xsl:otherwise>
-					</xsl:choose>
-				</a>
+							<xsl:choose>
+								<xsl:when test="/uploaded/onlyPending/text() = 'true'">
+									<input type="checkbox" name="onlyPending" checked="checked" />
+									Uniquement les envois en attente de traitement
+								</xsl:when>
+								<xsl:otherwise>
+									<input type="checkbox" name="onlyPending" />
+									Uniquement les envois en attente de traitement
+								</xsl:otherwise>
+							</xsl:choose>
+						</a>
+					</div>
+				</div>
 			</div>
 
 		</html>

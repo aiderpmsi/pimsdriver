@@ -1,19 +1,40 @@
 div.simpletable {
 	display: table;
+	border-collapse:collapse;
 }
 
-div.simpletable div.header {
+div.simpletable div.content {
+	display: table-row-group;
+}
+
+div.simpletable div.content div.header {
 	display: table-row;
 }
 
-div.simpletable div.header div.content {
+div.simpletable div.content div.header div.element {
 	display: table-cell;
+	text-align: left;
+	padding: 2px;
+	font-size: 105%;
+	border-bottom: 2px solid black;
 }
 
-div.simpletable div.element {
+div.simpletable div.content div.row {
 	display: table-row;
 }
 
-div.simpletable div.element div {
+div.simpletable div.content div.row div {
 	display: table-cell;
+	text-align: center;
+	padding: 1px 2px 1px 2px;
+}
+
+div.simpletable div.content div.row:last-child div {
+	border-bottom: 2px solid black;
+}
+
+div.simpletable div.footer {
+	display: table-caption;
+	text-align: center;
+	caption-side: bottom;
 }
