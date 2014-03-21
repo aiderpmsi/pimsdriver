@@ -2,6 +2,7 @@ package com.github.aiderpmsi.pimsdriver.jaxrs;
 
 import java.io.IOException;
 import java.io.OutputStream;
+
 import javax.servlet.ServletContext;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.StreamingOutput;
@@ -13,6 +14,8 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
+
+import net.sf.saxon.Configuration;
 
 import com.github.aiderpmsi.pimsdriver.jaxrs.resources.ResourceStreamingOutput;
 
@@ -32,7 +35,7 @@ public class HtmlHelper implements StreamingOutput {
 			JAXBContext jaxbContext = JAXBContext.newInstance(model.getClass());
 		
 			// SAXON TRANSFORMER FACTORY AND TRANSFORMATION
-			TransformerFactory tfactory = TransformerFactory.newInstance();
+			TransformerFactory tfactory = new net.sf.saxon.TransformerFactoryImpl(new Configuration());
 			final Transformer transformer = tfactory.newTransformer(
 					new StreamSource((new ResourceStreamingOutput(xslResource, "xslt", context)).getAsInputStream()));
 			

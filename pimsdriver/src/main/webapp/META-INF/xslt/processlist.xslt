@@ -93,8 +93,8 @@
 							<div class="headercontent">Date d'envoi</div>
 						</a>
 					</div>
-					<div class="headercontent">Commentaire</div>
-					<div class="headercontent">Action</div>
+					<div class="content">Commentaire</div>
+					<div class="content">Action</div>
 				</div>
 				<xsl:for-each select="/uploaded/elements/element">
 					<div class="element">
@@ -108,7 +108,7 @@
 							<xsl:value-of select="month/text()" />
 						</div>
 						<div>
-							<xsl:value-of select="format-date(dateEnvoi/text(), 
+							<xsl:value-of select="format-dateTime(dateEnvoi/text(), 
                           		'[M01]/[D01]/[Y0001] [H01]:[m01]:[s01]')" />
 						</div>
 						<div>
