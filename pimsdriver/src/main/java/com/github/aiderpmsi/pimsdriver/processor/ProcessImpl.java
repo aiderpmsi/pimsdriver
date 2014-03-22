@@ -1,10 +1,19 @@
 package com.github.aiderpmsi.pimsdriver.processor;
 
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.concurrent.Callable;
 
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.sax.SAXResult;
+import javax.xml.transform.sax.SAXSource;
+import javax.xml.transform.stream.StreamSource;
+
+import net.sf.saxon.Configuration;
+
 import org.xml.sax.ContentHandler;
+import org.xml.sax.InputSource;
+import org.xml.sax.XMLReader;
 
 import com.github.aiderpmsi.pims.utils.Parser;
 import com.github.aiderpmsi.pimsdriver.odb.DocDbConnectionFactory;
@@ -16,6 +25,8 @@ import com.orientechnologies.orient.core.sql.OCommandSQL;
 
 public class ProcessImpl implements Callable<Boolean> {
 
+	private static final String rsfXslPath = "com/github/aiderpmsi/pimsdriver/processor/rsfrewrite.xsl";
+	
 	private ODocument odoc;
 	
 	public ProcessImpl(ODocument odoc) {
@@ -31,11 +42,12 @@ public class ProcessImpl implements Callable<Boolean> {
 			
 			// ORIENTDB HELPER
 			PimsODocumentHelper odocHelper = new PimsODocumentHelper(odoc);
+
 			// IF RSF IS DEFINED, GET ITS CONTENT
-			@SuppressWarnings("unused")
 			InputStream rsf = null;
 			if (odoc.field("rsf") != null)
 				rsf = odocHelper.getInputStream("rsf");
+			
 			// IF RSS IS DEFINED, GET ITS CONTENT
 			@SuppressWarnings("unused")
 			InputStream rss = null;
@@ -44,13 +56,14 @@ public class ProcessImpl implements Callable<Boolean> {
 			
 			// PROCESS RSF
 			ContentHandler ch = new OdbContentHandler(tx);
-			Parser pars = new Parser(new InputStreamReader(rsf), ch);
+			XMLReader pars = new Parser();
+
+			// SAXON TRANSFORMER FACTORY AND TRANSFORMATION FOR RSF
+			TransformerFactory tfactory = new net.sf.saxon.TransformerFactoryImpl(new Configuration());
+			Transformer rsfTransformer = tfactory.newTransformer(
+					new StreamSource(ProcessImpl.class.getClassLoader().getResourceAsStream(rsfXslPath)));
 			
-			ch.startDocument();
-			ch.startElement(null, "root", "root", null);
-			pars.parse();
-			ch.endElement(null, "root", "root");
-			ch.endDocument();
+			rsfTransformer.transform(new SAXSource(pars, new InputSource(rsf)), new SAXResult(ch));
 			
 			OCommandSQL ocommand =
 					new OCommandSQL("update PmsiUpload set processed = 'processed' WHERE @RID=?");
