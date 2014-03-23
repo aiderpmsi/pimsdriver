@@ -11,6 +11,8 @@ import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamSource;
 
+import net.sf.saxon.Configuration;
+
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
@@ -57,9 +59,9 @@ public class ProcessImpl implements Callable<Boolean> {
 			// PROCESS RSF
 			ContentHandler ch = new OdbContentHandler(tx);
 			XMLReader pars = new Parser();
-
-			// SAXON TRANSFORMER FACTORY AND TRANSFORMATION FOR RSF
-			TransformerFactory tfactory = new org.apache.xalan.processor.TransformerFactoryImpl();
+			
+			// USE XALAN FOR TRANSFORMER BECAUSE PIMS GENERATES A
+			TransformerFactory tfactory = new net.sf.saxon.TransformerFactoryImpl(new Configuration());
 			Transformer rsfTransformer = tfactory.newTransformer(
 					new StreamSource(ProcessImpl.class.getClassLoader().getResourceAsStream(rsfXslPath)));
 			
