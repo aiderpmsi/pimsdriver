@@ -1,15 +1,15 @@
 package com.github.aiderpmsi.pimsdriver.processor;
 
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.concurrent.Callable;
 
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamSource;
-
-import net.sf.saxon.Configuration;
 
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
@@ -59,11 +59,20 @@ public class ProcessImpl implements Callable<Boolean> {
 			XMLReader pars = new Parser();
 
 			// SAXON TRANSFORMER FACTORY AND TRANSFORMATION FOR RSF
-			TransformerFactory tfactory = new net.sf.saxon.TransformerFactoryImpl(new Configuration());
+			TransformerFactory tfactory = new org.apache.xalan.processor.TransformerFactoryImpl();
 			Transformer rsfTransformer = tfactory.newTransformer(
 					new StreamSource(ProcessImpl.class.getClassLoader().getResourceAsStream(rsfXslPath)));
 			
-			rsfTransformer.transform(new SAXSource(pars, new InputSource(rsf)), new SAXResult(ch));
+			try {
+				rsfTransformer.transform(
+						new SAXSource(pars, new InputSource(new InputStreamReader(rsf, "ISO-8859-1"))),
+						new SAXResult(ch));
+			} catch (TransformerException e) {
+				e.printStackTrace();
+			} catch (RuntimeException e) {
+				e.printStackTrace();
+				throw e;
+			}
 			
 			OCommandSQL ocommand =
 					new OCommandSQL("update PmsiUpload set processed = 'processed' WHERE @RID=?");

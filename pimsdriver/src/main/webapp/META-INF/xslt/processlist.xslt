@@ -91,7 +91,7 @@
 									select="/uploaded/onlyPending/text()" />
 							</xsl:call-template>
 						</xsl:attribute>
-								<div class="element">Date d'envoi</div>
+								<div class="headercontent">Date d'envoi</div>
 							</a>
 						</div>
 						<div class="element">Commentaire</div>
