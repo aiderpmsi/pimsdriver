@@ -110,6 +110,8 @@ public class OdbRsfContentHandler implements ContentHandler {
 			case "rsfl": state = States.RSFL; break;
 			case "rsfm": state = States.RSFM; break;
 			}
+			if (state != States.OUT)
+				properties = new HashMap<String, String>();
 		}
 		// IF WE ARE AT DEPTH 2 AND NOT OUT, GET THE ELEMENT NAME
 		else if (depth == 2 && state != States.OUT){
