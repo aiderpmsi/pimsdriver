@@ -114,6 +114,7 @@ public class OdbRsfContentHandler implements ContentHandler {
 		// IF WE ARE AT DEPTH 2 AND NOT OUT, GET THE ELEMENT NAME
 		else if (depth == 2 && state != States.OUT){
 			currentProperty = localName;
+			currentPropertyContent = new StringBuilder();
 		}
 		
 		// BE SURE TO INCREMENT DEPTH
@@ -127,8 +128,6 @@ public class OdbRsfContentHandler implements ContentHandler {
 		// IF WE ARE AT DEPTH 3 AND NOT OUT, STORE THE PROPERTY IN PROPERTIES
 		if (depth == 3 && state != States.OUT) {
 			properties.put(currentProperty, currentPropertyContent.toString());
-			// RESET CURRENTPROPERTYCONTENT
-			currentPropertyContent = new StringBuilder();
 		}
 		
 		// IF WE ARE AT DEPTH 2 SET STATE OUT (WE ARE NOT ANYMORE IN AN INTERESSANT CONTENT)
