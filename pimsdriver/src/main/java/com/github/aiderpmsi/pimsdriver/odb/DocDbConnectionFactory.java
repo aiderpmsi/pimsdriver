@@ -25,6 +25,7 @@ public class DocDbConnectionFactory {
 				db.create();
 				// POPULATE THE CLASSES TYPES
 				db.getMetadata().getSchema().createClass("PmsiUpload");
+				db.getMetadata().getSchema().createClass("PmsiElement");
 			}
 		} finally {
 			if (db != null)
