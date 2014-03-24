@@ -12,8 +12,8 @@ import org.xml.sax.SAXException;
 public class DefaultContentHandler implements ContentHandler {
 
     /**
-* Writer utilisé dans ce collecteur
-*/
+     * Writer utilisé dans ce collecteur
+     */
     private Writer out;
 
     /**
