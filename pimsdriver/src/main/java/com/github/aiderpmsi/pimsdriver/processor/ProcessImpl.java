@@ -56,7 +56,7 @@ public class ProcessImpl implements Callable<Boolean> {
 			
 				// CHECK IF THERE WERE ANY ERRORS IN RSF
 				if (reh.getErrors().size() != 0)
-					throw new SAXException(reh.getErrors().get(0));
+					throw new SAXException("RSF : " + reh.getErrors().get(0));
 				
 				// GET THE REAL FINESS FROM RSF
 				OCommandSQL rsfFinessCommand =
@@ -82,7 +82,7 @@ public class ProcessImpl implements Callable<Boolean> {
 			
 				// CHECK IF THERE WERE ANY ERRORS IN RSS
 				if (reh.getErrors().size() != 0)
-					throw new SAXException(reh.getErrors().get(0));
+					throw new SAXException("RSS : " + reh.getErrors().get(0));
 				
 				// GET THE REAL FINESS FROM RSS
 				OCommandSQL rsfFinessCommand =
