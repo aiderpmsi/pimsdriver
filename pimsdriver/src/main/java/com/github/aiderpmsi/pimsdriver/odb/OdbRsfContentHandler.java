@@ -3,9 +3,9 @@ package com.github.aiderpmsi.pimsdriver.odb;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.Map.Entry;
+import java.util.regex.Pattern;
 
 import org.xml.sax.Attributes;
-import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 
@@ -13,39 +13,32 @@ import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.id.ORID;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 
-public class OdbRsfContentHandler implements ContentHandler {
+public class OdbRsfContentHandler extends ContentHandlerHelper {
 
 	/**
-	 * Define possible states for the contenthandler
-	 * @author delabre
-	 *
+	 * Regexp to know if we are in an element
 	 */
-	private enum States {OUT, HEADER, RSFA, RSFB, RSFC, RSFH, RSFI, RSFL, RSFM};
+	private Pattern inElement = Pattern.compile("/root/(?:rsfheader|rsfa|rsfb|rsfc|rsfh|rsfi|rsfl|rsfm)");
 	
 	/**
-	 * Define current state for ContentHandler
+	 * Regexp to know if we are in a property
 	 */
-	private States state = States.OUT;
+	private Pattern inProperty = Pattern.compile("/root/(?:rsfheader|rsfa|rsfb|rsfc|rsfh|rsfi|rsfl|rsfm)/.+");
 	
 	/**
-	 * Defines properties for the current element.
-	 */
-	private HashMap<String, String> properties;
-	
-	/**
-	 * Current property name
-	 */
-	private String currentProperty;
-	
-	/**
-	 * Current property content
+	 * Colligates the elements of charachter
 	 */
 	private StringBuilder currentPropertyContent;
 	
 	/**
-	 * Depth in the xml
+	 * Name of the property
 	 */
-	private int depth = 0;
+	private String currentProperty;
+
+	/**
+	 * Defines properties for the current element.
+	 */
+	private HashMap<String, String> properties;
 	
 	/**
 	 * Upload ORID in Database
@@ -97,47 +90,32 @@ public class OdbRsfContentHandler implements ContentHandler {
 	@Override
 	public void startElement(String uri, String localName, String qName,
 			Attributes atts) throws SAXException {
-
-		// IF WE ARE AT DEPTH 1, FIND IF THIS ELEMENT MAKES US ENTER IN ANOTHER STATE
-		if (depth == 1 && state == States.OUT) {
-			switch (localName) {
-			case "rsfheader": state = States.HEADER; break;
-			case "rsfa": state = States.RSFA; break;
-			case "rsfb": state = States.RSFB; break;
-			case "rsfc": state = States.RSFC; break;
-			case "rsfh": state = States.RSFH; break;
-			case "rsfi": state = States.RSFI; break;
-			case "rsfl": state = States.RSFL; break;
-			case "rsfm": state = States.RSFM; break;
-			}
-			if (state != States.OUT)
-				properties = new HashMap<String, String>();
+		// COUNT THE ARRIVAL IN THIS NEW ELEMENT
+		super.startElement(uri, localName, qName, atts);
+		
+		// FINDS IF THIS ELEMENT IS A NEW ELEMENT AND MUST REINIT THE PROPERTIES
+		if (getContentPath().size() == 2 && inElement.matcher(getPath()).matches()) {
+			properties = new HashMap<String, String>();
 		}
-		// IF WE ARE AT DEPTH 2 AND NOT OUT, GET THE ELEMENT NAME
-		else if (depth == 2 && state != States.OUT){
+		// IF WE ARE AT DEPTH 2 AND IN AN ELEMENT, GET THE PROPERTY NAME
+		else if (getContentPath().size() == 3 && inProperty.matcher(getPath()).matches()) {
 			currentProperty = localName;
 			currentPropertyContent = new StringBuilder();
 		}
-		
-		// BE SURE TO INCREMENT DEPTH
-		depth++;
 	}
 
 	@Override
 	public void endElement(String uri, String localName, String qName)
 			throws SAXException {
-		
-		// IF WE ARE AT DEPTH 3 AND NOT OUT, STORE THE PROPERTY IN PROPERTIES
-		if (depth == 3 && state != States.OUT) {
+		// IF WE ARE LEAVING AN PROPERTY
+		if (getContentPath().size() == 3 && inProperty.matcher(getPath()).matches()) {
 			properties.put(currentProperty, currentPropertyContent.toString());
 		}
-		
-		// IF WE ARE AT DEPTH 2 SET STATE OUT (WE ARE NOT ANYMORE IN AN INTERESSANT CONTENT)
-		// AND STORE PROPERTIES IN DB
-		if (depth == 2 && state != States.OUT) {
+		// IF WE ARE LEAVING AN ELEMENT, STORE IT IN DB
+		else if (getContentPath().size() == 2 && inElement.matcher(getPath()).matches()) {
 			// CREATES THE ENTRY IN THE RIGHT CLASS
 			ODocument odoc = tx.newInstance("PmsiElement");
-			odoc.field("type", state.toString());
+			odoc.field("type", getContentPath().getLast());
 
 			// STORES THE PROPERTIES
 			for (Entry<String, String> property : properties.entrySet()) {
@@ -146,7 +124,7 @@ public class OdbRsfContentHandler implements ContentHandler {
 			
 			// IF THIS ELEMENT IS THE HEADER, STORE THE PARENTLINK AS UPLOAD ELEMENT
 			// AND SETS THIS ELEMENT AS HEADERID
-			if (state == States.HEADER) {
+			if (getContentPath().getLast().equals("rsfheader")) {
 				odoc.field("parentlink", uploadID);
 				tx.save(odoc);
 				headerID = odoc.getIdentity();
@@ -157,20 +135,17 @@ public class OdbRsfContentHandler implements ContentHandler {
 				tx.save(odoc);
 			}
 			tx.save(odoc);
-
-			// WE ARE NOW OUT
-			state = States.OUT;
 		}
 		
 		// BE SURE TO DECREMENT DEPTH
-		depth--;
+		super.endElement(uri, localName, qName);
 	}
 
 	@Override
 	public void characters(char[] ch, int start, int length)
 			throws SAXException {
 		// IF WE ARE NOT OUT AND AT DEPTH 3, APPEND THOSE CHARACTERS TO THE CONTENT OF CURRENT PROPERTY
-		if (depth == 3 && state != States.OUT) {
+		if (getContentPath().size() == 3 && inProperty.matcher(getPath()).matches()) {
 			currentPropertyContent.append(ch, start, length);
 		}
 	}
