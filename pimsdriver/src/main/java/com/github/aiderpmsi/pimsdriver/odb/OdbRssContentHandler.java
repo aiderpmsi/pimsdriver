@@ -13,17 +13,17 @@ import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.id.ORID;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 
-public class OdbRsfContentHandler extends ContentHandlerHelper {
+public class OdbRssContentHandler extends ContentHandlerHelper {
 
 	/**
 	 * Regexp to know if we are in an element
 	 */
-	private Pattern inElement = Pattern.compile("/root/(?:rsfheader|rsfa|rsfb|rsfc|rsfh|rsfi|rsfl|rsfm)");
+	private Pattern inElement = Pattern.compile("/root/(?:rssheader|rssmain|rssacte|rssda|rssdad)");
 	
 	/**
 	 * Regexp to know if we are in a property
 	 */
-	private Pattern inProperty = Pattern.compile("/root/(?:rsfheader|rsfa|rsfb|rsfc|rsfh|rsfi|rsfl|rsfm)/.+");
+	private Pattern inProperty = Pattern.compile("/root/(?:rssheader|rssmain|rssacte|rssda|rssdad)/.+");
 	
 	/**
 	 * Colligates the elements of charachter
@@ -43,19 +43,24 @@ public class OdbRsfContentHandler extends ContentHandlerHelper {
 	/**
 	 * Upload ORID in Database
 	 */
-	ORID uploadID;
+	private ORID uploadID;
 	
 	/**
 	 * Header ORID
 	 */
-	ORID headerID;
+	private ORID headerID;
+	
+	/**
+	 * Main ORID
+	 */
+	private ORID mainID;
 	
 	/**
 	 * Database link
 	 */
 	private ODatabaseDocumentTx tx;
 
-	public OdbRsfContentHandler(ODatabaseDocumentTx tx, ORID uploadId) throws FileNotFoundException {
+	public OdbRssContentHandler(ODatabaseDocumentTx tx, ORID uploadId) throws FileNotFoundException {
 		this.tx = tx;
 		this.uploadID = uploadId;
 	}
@@ -124,14 +129,20 @@ public class OdbRsfContentHandler extends ContentHandlerHelper {
 			
 			// IF THIS ELEMENT IS THE HEADER, STORE THE PARENTLINK AS UPLOAD ELEMENT
 			// AND SETS THIS ELEMENT AS HEADERID
-			if (getContentPath().getLast().equals("rsfheader")) {
+			if (getContentPath().getLast().equals("rssheader")) {
 				odoc.field("parentlink", uploadID);
 				tx.save(odoc);
 				headerID = odoc.getIdentity();
 			}
-			// IF THIS ELEMENT IS NOT THE HEADER, STORE THE HEADERID AS THE PARENT
-			else {
+			// IF THIS ELEMENT IS A MAIN ELEMENT, STORE IT AND SETS THE HEADER AS PARENTLINK
+			else if (getContentPath().getLast().equals("rssmain")) {
 				odoc.field("parentlink", headerID);
+				tx.save(odoc);
+				mainID = odoc.getIdentity();
+			}
+			// OTHERWISE, THIS IS A SUB ELEMENT, SETS THE MAINID AS THE PARENT LINK
+			else {
+				odoc.field("parentlink", mainID);
 				tx.save(odoc);
 			}
 		}
