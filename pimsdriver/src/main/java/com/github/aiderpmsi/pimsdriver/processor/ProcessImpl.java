@@ -15,6 +15,7 @@ import com.github.aiderpmsi.pimsdriver.odb.DocDbConnectionFactory;
 import com.github.aiderpmsi.pimsdriver.odb.OdbRsfContentHandler;
 import com.github.aiderpmsi.pimsdriver.odb.OdbRssContentHandler;
 import com.github.aiderpmsi.pimsdriver.odb.PimsODocumentHelper;
+import com.github.aiderpmsi.pimsdriver.pmsi.RecorderErrorHandler;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.id.ORID;
 import com.orientechnologies.orient.core.record.impl.ODocument;
@@ -46,11 +47,17 @@ public class ProcessImpl implements Callable<Boolean> {
 
 				// PROCESS RSF
 				ContentHandler ch = new OdbRsfContentHandler(tx, (ORID) odoc.field("RID", ORID.class));
+				RecorderErrorHandler reh = new RecorderErrorHandler();
 				Parser pars = new Parser();
 				pars.setStartState("headerrsf");
 				pars.setContentHandler(ch);
+				pars.setErrorHandler(reh);
 				pars.parse(new InputSource(new InputStreamReader(rsf, "ISO-8859-1")));
 			
+				// CHECK IF THERE WERE ANY ERRORS IN RSF
+				if (reh.getErrors().size() != 0)
+					throw new SAXException(reh.getErrors().get(0));
+				
 				// GET THE REAL FINESS FROM RSF
 				OCommandSQL rsfFinessCommand =
 						new OCommandSQL("select Finess from PmsiElement where parentlink=? AND type='rsfheader'");
@@ -66,11 +73,17 @@ public class ProcessImpl implements Callable<Boolean> {
 
 				// PROCESS RSS
 				ContentHandler ch = new OdbRssContentHandler(tx, (ORID) odoc.field("RID", ORID.class));
+				RecorderErrorHandler reh = new RecorderErrorHandler();
 				Parser pars = new Parser();
 				pars.setStartState("headerrss");
 				pars.setContentHandler(ch);
+				pars.setErrorHandler(reh);
 				pars.parse(new InputSource(new InputStreamReader(rss, "ISO-8859-1")));
 			
+				// CHECK IF THERE WERE ANY ERRORS IN RSS
+				if (reh.getErrors().size() != 0)
+					throw new SAXException(reh.getErrors().get(0));
+				
 				// GET THE REAL FINESS FROM RSS
 				OCommandSQL rsfFinessCommand =
 						new OCommandSQL("select Finess from PmsiElement where parentlink=? AND type='rssheader'");
