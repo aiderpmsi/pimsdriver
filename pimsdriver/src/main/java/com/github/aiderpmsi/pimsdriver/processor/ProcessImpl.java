@@ -105,7 +105,7 @@ public class ProcessImpl implements Callable<Boolean> {
 			tx.rollback();
 			tx.begin();
 			OCommandSQL ocommand =
-					new OCommandSQL("update PmsiUpload set processed = 'failed', comment = ? WHERE @RID=?");
+					new OCommandSQL("update PmsiUpload set processed = 'failed', errorComment = ? WHERE @RID=?");
 			tx.command(ocommand).execute(e.getMessage(), (ORID) odoc.field("RID", ORID.class));
 			tx.commit();
 		}

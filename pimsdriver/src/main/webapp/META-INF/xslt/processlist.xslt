@@ -139,6 +139,10 @@
 									<xsl:when test="processed/text() = 'pending'">
 										En cours de traitement
 									</xsl:when>
+									<xsl:when test="processed/text() = 'failed'">
+										<xsl:value-of select="'Echec du traitement : '" />
+										<xsl:value-of select="processed/errorComment/text()"/>
+									</xsl:when>
 									<xsl:otherwise>
 										Déjà traité
 									</xsl:otherwise>

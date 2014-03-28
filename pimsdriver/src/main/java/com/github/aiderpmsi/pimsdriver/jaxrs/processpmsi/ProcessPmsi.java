@@ -181,6 +181,7 @@ public class ProcessPmsi {
 			element.setYear((Integer) result.field("year"));
 			element.setSuccess((Boolean) result.field("success"));
 			element.setRowNumber(new Long(first + i));
+			element.setErrorComment((String) result.field("errorComment"));
 			if (result.field("rss") == null)
 				element.setComment("RSF seul");
 			else

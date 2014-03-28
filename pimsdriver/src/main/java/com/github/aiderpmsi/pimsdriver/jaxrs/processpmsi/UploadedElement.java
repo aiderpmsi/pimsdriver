@@ -29,6 +29,8 @@ public class UploadedElement {
 	private Boolean success;
 	
 	private String comment;
+	
+	private String errorComment;
 
 	@XmlJavaTypeAdapter(ORIDJaxbAdapter.class)
 	public ORID getRecordId() {
@@ -101,6 +103,14 @@ public class UploadedElement {
 
 	public void setComment(String comment) {
 		this.comment = comment;
+	}
+
+	public String getErrorComment() {
+		return errorComment;
+	}
+
+	public void setErrorComment(String errorComment) {
+		this.errorComment = errorComment;
 	}
 
 }
