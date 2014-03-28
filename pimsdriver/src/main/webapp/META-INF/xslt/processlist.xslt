@@ -141,7 +141,7 @@
 									</xsl:when>
 									<xsl:when test="processed/text() = 'failed'">
 										<xsl:value-of select="'Echec du traitement : '" />
-										<xsl:value-of select="processed/errorComment/text()"/>
+										<xsl:value-of select="errorComment/text()"/>
 									</xsl:when>
 									<xsl:otherwise>
 										Déjà traité
