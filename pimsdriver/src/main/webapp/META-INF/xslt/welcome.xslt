@@ -24,6 +24,10 @@
 						<div class="iconprocess iconimage" />
 						<div class="icontext">process</div>
 					</a>
+					<a class="icon" href="../finess/list">
+						<div class="iconprocess iconimage" />
+						<div class="icontext">liste finess</div>
+					</a>
 				</nav>
 
 		</html>

@@ -39,7 +39,7 @@ import com.orientechnologies.orient.core.record.impl.ODocument;
 
 @Path("/import") 
 @PermitAll
-public class ImportRsf {
+public class ImportPmsi {
 	
 	@GET
     @Path("/welcome")
@@ -150,8 +150,8 @@ public class ImportRsf {
 		if (constraintViolations.size() != 0) {
 			// IF ERROR IN THE VALIDATION, REDIRECTS TO FORM
 			UriBuilder redirectionBuilder = uriInfo.getBaseUriBuilder().
-					path(ImportRsf.class).
-					path(ImportRsf.class, "singlersfGetXml");
+					path(ImportPmsi.class).
+					path(ImportPmsi.class, "singlersfGetXml");
 			if (month != null) redirectionBuilder.queryParam("month", month);
 			if (year != null) redirectionBuilder.queryParam("year", year);
 			if (finess != null) redirectionBuilder.queryParam("finess", finess);
@@ -186,8 +186,8 @@ public class ImportRsf {
 			
 			// REDIRECT TO OK WINDOW
 			UriBuilder redirectionBuilder = uriInfo.getBaseUriBuilder().
-					path(ImportRsf.class).
-					path(ImportRsf.class, "singleRsfOkXml");
+					path(ImportPmsi.class).
+					path(ImportPmsi.class, "singleRsfOkXml");
 			ResponseBuilder resp = Response.seeOther(redirectionBuilder.build());
 			return resp.build();
 		}
@@ -214,4 +214,165 @@ public class ImportRsf {
 
 		return help;
     }
+
+	@GET
+    @Path("/rsfrss")
+    @Produces({MediaType.APPLICATION_XML})
+	@XmlHeader("<?xml-stylesheet type=\"text/xsl\" href=\"../resources/xslt/importrsfrss.xslt\"?>")
+    public ImportRsfModel rsfRssGetXml(
+    		@QueryParam("month") Integer month,
+    		@QueryParam("year") Integer year,
+    		@QueryParam("finess") String finess,
+    		@QueryParam("rsf") String rsfFileName,
+    		@QueryParam("rss") String rssFileName) {
+
+		// CREATES THE MODEL
+		ImportRsfRssModel model = new ImportRsfRssModel();
+		
+		// IF NO PARAMETER IS ENTERED, CREATE A DEFAULT MODEL, AND DO NOT VALIDATE
+		if (month == null && year == null && finess == null && rsfFileName == null && rssFileName == null) {
+			model.setDefaultValues();
+			return model;
+		}
+
+		// IF SOME PARAMETERS ARE ALREADY ENTERED, VALIDATE THOSE PARAMETERS
+		if (month != null) model.setMonthValue(month);
+		if (year != null) model.setYearValue(year);
+		if (finess != null) model.setFinessValue(finess);
+		if (rsfFileName != null) model.setRsf(rsfFileName);
+		if (rssFileName != null) model.setRss(rssFileName);
+		
+		// VALIDATES THE MODEL
+		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+		Validator validator = factory.getValidator();
+		Set<ConstraintViolation<ImportRsfRssModel>> constraintViolations =
+				validator.validate(model);
+		
+		// GENERATES THE ERRORS (IF ANY) IN FORM MODEL
+		Map<String, String> violations = new HashMap<String, String>();
+		for (ConstraintViolation<ImportRsfRssModel> violation : constraintViolations) {
+			violations.put(violation.getPropertyPath().toString(),
+					violation.getMessage());
+		}
+		model.setErrorsModel(violations);
+		
+        return model;
+    }
+
+	@GET
+    @Path("/rsfrss")
+    @Produces({MediaType.TEXT_HTML})
+    public StreamingOutput rsfRssGetHtml(
+    		@QueryParam("month") Integer month,
+    		@QueryParam("year") Integer year,
+    		@QueryParam("finess") String finess,
+    		@QueryParam("rsf") String rsfFileName,
+    		@QueryParam("rss") String rssFileName,
+    		@Context ServletContext context) {
+		
+		HtmlHelper help = new HtmlHelper()
+			.setContext(context)
+			.setModel(rsfRssGetXml(month, year, finess, rsfFileName, rssFileName))
+			.setXslResource("importrsfrss");
+
+		return help;
+    }
+	
+	@POST
+    @Path("/rsfrss")
+	@Consumes({MediaType.MULTIPART_FORM_DATA})
+    public Response rsfRssPost(
+    		@FormDataParam("month") Integer month,
+    		@FormDataParam("year") Integer year,
+    		@FormDataParam("finess") String finess,
+    		@FormDataParam("rsf") InputStream rsf,
+			@FormDataParam("rsf") FormDataContentDisposition rsfInformations,
+    		@FormDataParam("rss") InputStream rss,
+			@FormDataParam("rss") FormDataContentDisposition rssInformations,
+			@Context UriInfo uriInfo) throws IOException {
+		
+		// CREATES THE MODEL
+		ImportRsfRssModel model = new ImportRsfRssModel();
+		model.setMonthValue(month);
+		model.setYearValue(year);
+		model.setFinessValue(finess);
+		if (rsfInformations != null) model.setRsf(rsfInformations.getFileName());
+		if (rssInformations != null) model.setRss(rssInformations.getFileName());
+		
+		// VALIDATES THE MODEL
+		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+		Validator validator = factory.getValidator();
+		Set<ConstraintViolation<ImportRsfRssModel>> constraintViolations =
+				validator.validate(model);
+		
+		if (constraintViolations.size() != 0) {
+			// IF ERROR IN THE VALIDATION, REDIRECTS TO FORM
+			UriBuilder redirectionBuilder = uriInfo.getBaseUriBuilder().
+					path(ImportPmsi.class).
+					path(ImportPmsi.class, "rsfRssGetXml");
+			if (month != null) redirectionBuilder.queryParam("month", month);
+			if (year != null) redirectionBuilder.queryParam("year", year);
+			if (finess != null) redirectionBuilder.queryParam("finess", finess);
+			if (rsfInformations != null) redirectionBuilder.queryParam("rsf", rsfInformations.getFileName());
+			if (rssInformations != null) redirectionBuilder.queryParam("rss", rssInformations.getFileName());
+			ResponseBuilder resp = Response.seeOther(redirectionBuilder.build());
+			return resp.build();
+		} else {
+			// IF NO ERROR IN THE FORM, STORE THE FORM CONTENT IN THE DATABASE
+			ODatabaseDocumentTx db = DocDbConnectionFactory.getInstance().getConnection();
+		
+			try {
+				// TX BEGIN
+				db.begin();
+				Date now = new Date();
+				// CREATES THE ENTRY IN THE RIGHT CLASS
+				ODocument odoc = db.newInstance("PmsiUpload");
+				// HERLPER FOR THIS DOCUMENT (STORE FILE)
+				PimsODocumentHelper odocHelper = new PimsODocumentHelper(odoc);
+				odocHelper.field("rsf", rsf);
+				odocHelper.field("rss", rss);
+				odoc.field("month", month);
+				odoc.field("year", year);
+				odoc.field("finess", finess);
+				odoc.field("processed", "waiting");
+				odoc.field("dateenvoi", now);
+				// SAVE THIS ENTRY
+				db.save(odoc);
+				// TX END
+				db.commit();
+			} finally {
+				db.close();
+			}
+			
+			// REDIRECT TO OK WINDOW
+			UriBuilder redirectionBuilder = uriInfo.getBaseUriBuilder().
+					path(ImportPmsi.class).
+					path(ImportPmsi.class, "rsfRssOkXml");
+			ResponseBuilder resp = Response.seeOther(redirectionBuilder.build());
+			return resp.build();
+		}
+    }
+
+	@GET
+	@Path("/rsfrssok")
+	@Produces({MediaType.APPLICATION_XML})
+	@XmlHeader("<?xml-stylesheet type=\"text/xsl\" href=\"../resources/xslt/importrsfrssok.xslt\"?>")
+	public VoidElement rsfRssOkXml() {
+		return new VoidElement();
+	}
+	
+	@GET
+    @Path("/rsfrssok")
+    @Produces({MediaType.TEXT_HTML})
+    public StreamingOutput rsfRssOkHtml(
+    		@Context ServletContext context) {
+		
+		HtmlHelper help = new HtmlHelper()
+			.setContext(context)
+			.setModel(rsfRssOkXml())
+			.setXslResource("importrsfrssok");
+
+		return help;
+    }
+
 }
