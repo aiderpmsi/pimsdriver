@@ -44,7 +44,7 @@ public class HtmlHelper implements StreamingOutput {
 
 			// FINAL DESTINATION
 			StreamResult str = new StreamResult(output);
-
+			
 			// TRANSFORMATION
 			transformer.transform(source, str);
 		} catch (TransformerException | JAXBException e) {
