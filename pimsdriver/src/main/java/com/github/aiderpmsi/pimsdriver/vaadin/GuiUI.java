@@ -58,14 +58,26 @@ public class GuiUI extends UI {
 
 		@Override
 		public void menuSelected(MenuItem selectedItem) {
-			Window wHelp = new Window("myAPP Help");
+			// CREATE WINDOW
+			Window wHelp = new Window("Ajouter un fichier Pmsi");
 	        wHelp.setHeight("650px");
 	        wHelp.setWidth("650px");
-			Label label = new Label();
-			label.setCaption("Contenu");
-			wHelp.setContent(label);
+	        wHelp.setModal(true);
+	        wHelp.setClosable(true);
+	        wHelp.setResizable(true);
+	        wHelp.setStyleName("addpmsi");
 	        wHelp.center();
-	        addWindow(wHelp);
+
+	        // SELECT LAYOUT
+	        VerticalLayout subContent = new VerticalLayout();
+	        wHelp.setContent(subContent);
+
+	        // SETS CONTENT
+	        Label label = new Label();
+			label.setCaption("Contenu");
+			subContent.addComponent(label);
+
+			addWindow(wHelp);
 		}
 		
 	}
