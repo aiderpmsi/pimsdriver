@@ -2,8 +2,10 @@ package com.github.aiderpmsi.pimsdriver.vaadin;
 
 import com.vaadin.annotations.Theme;
 import com.vaadin.server.VaadinRequest;
+import com.vaadin.ui.Button;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.MenuBar;
+import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.MenuBar.Command;
 import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.UI;
@@ -56,20 +58,25 @@ public class GuiUI extends UI {
 	
 	private class AddPmsi implements Command {
 
+		/**
+		 * Generated serial id
+		 */
+		private static final long serialVersionUID = 1315554704783116551L;
+
 		@Override
 		public void menuSelected(MenuItem selectedItem) {
 			// CREATE WINDOW
-			Window wHelp = new Window("Ajouter un fichier Pmsi");
-	        wHelp.setHeight("650px");
+			final Window wHelp = new Window("Ajouter un fichier Pmsi");
 	        wHelp.setWidth("650px");
+	        wHelp.setClosable(false);
+	        wHelp.setResizable(false);
 	        wHelp.setModal(true);
-	        wHelp.setClosable(true);
-	        wHelp.setResizable(true);
 	        wHelp.setStyleName("addpmsi");
 	        wHelp.center();
 
 	        // SELECT LAYOUT
 	        VerticalLayout subContent = new VerticalLayout();
+	        subContent.setMargin(true);
 	        wHelp.setContent(subContent);
 
 	        // SETS CONTENT
@@ -77,7 +84,16 @@ public class GuiUI extends UI {
 			label.setCaption("Contenu");
 			subContent.addComponent(label);
 
-			addWindow(wHelp);
+			// CLOSE BUTTON
+			Button button = new Button("Fermer", new Button.ClickListener() {
+				private static final long serialVersionUID = 2959413044468131885L;
+				@Override
+				public void buttonClick(ClickEvent event) {
+					UI.getCurrent().removeWindow(wHelp);
+				}
+			});
+			subContent.addComponent(button);
+			UI.getCurrent().addWindow(wHelp);
 		}
 		
 	}

@@ -1,4 +1,5 @@
-@import "../reindeer/styles.css";
+@import url(../reindeer/legacy-styles.css);
+@import '../reindeer/styles.css';
 
 .v-caption-header {
 	width: 100%;
@@ -22,7 +23,7 @@
 .v-menubar-mymenubar > .v-menubar-menuitem > .v-menubar-menuitem-caption {
 	color: white;
 	text-shadow: 1px 1px black;
-	padding: 4px 2px 4px 2x;
+	padding: 4px 2px 4px 2px;
 }
 
 .v-menubar-submenu-mymenubar {
@@ -42,4 +43,15 @@
 	border-radius: 4px;
 	box-shadow: 0px 0px 10px black;
 	background-color: white;
+}
+
+.v-window-addpmsi .popupContent .v-window-wrap .v-window-outerheader {
+	background: linear-gradient(to bottom, #4f5053 0%,#343638 5%,#393b34 49%,#424448 94%,#3f4044 100%);
+	padding: 5px 15px 5px 15px;
+	border-top-left-radius: 4px;
+	border-top-right-radius: 4px;
+}
+
+.v-window-addpmsi .popupContent .v-window-wrap .v-window-closebox {
+    background-image: url("img/w-close-18.png");
 }
