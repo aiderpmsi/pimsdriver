@@ -1,13 +1,16 @@
 package com.github.aiderpmsi.pimsdriver.vaadin;
 
 import com.vaadin.annotations.Theme;
+import com.vaadin.server.UserError;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.MenuBar.Command;
 import com.vaadin.ui.MenuBar.MenuItem;
+import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
@@ -29,11 +32,11 @@ public class GuiUI extends UI {
 		
 		// ROOT OF USER INTERFACE IS VERTICAL LAYOUT
 		VerticalLayout layout = new VerticalLayout();
+		layout.setStyleName("mylayout");
 		setContent(layout);
 		
 		// HEADER
-		Label header = new Label();
-		header.setCaption("PimsDriver");
+		Label header = new Label("PimsDriver");
 		header.setStyleName("header");
 		layout.addComponent(header);
 		
@@ -68,31 +71,34 @@ public class GuiUI extends UI {
 			// CREATE WINDOW
 			final Window wHelp = new Window("Ajouter un fichier Pmsi");
 	        wHelp.setWidth("650px");
-	        wHelp.setClosable(false);
-	        wHelp.setResizable(false);
+	        wHelp.setClosable(true);
+	        wHelp.setResizable(true);
 	        wHelp.setModal(true);
 	        wHelp.setStyleName("addpmsi");
 	        wHelp.center();
 
 	        // SELECT LAYOUT
 	        VerticalLayout subContent = new VerticalLayout();
-	        subContent.setMargin(true);
 	        wHelp.setContent(subContent);
 
-	        // SETS CONTENT
-	        Label label = new Label();
-			label.setCaption("Contenu");
-			subContent.addComponent(label);
+	        // ADD FORM
+	        FormLayout fl = new FormLayout();
 
-			// CLOSE BUTTON
-			Button button = new Button("Fermer", new Button.ClickListener() {
-				private static final long serialVersionUID = 2959413044468131885L;
-				@Override
-				public void buttonClick(ClickEvent event) {
-					UI.getCurrent().removeWindow(wHelp);
-				}
-			});
-			subContent.addComponent(button);
+	        fl.setSizeUndefined();
+
+	        TextField tf = new TextField("A Field");
+	        tf.setRequired(true);
+	        tf.setRequiredError("The Field may not be empty.");
+	        fl.addComponent(tf);
+
+
+	        TextField tf2 = new TextField("Another Field");
+	        tf2.setComponentError(
+		            new UserError("This is the error indicator of a Field."));
+	        fl.addComponent(tf2);
+
+	        subContent.addComponent(fl);
+	        
 			UI.getCurrent().addWindow(wHelp);
 		}
 		
