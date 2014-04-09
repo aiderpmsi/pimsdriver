@@ -160,29 +160,7 @@ public class ImportPmsi {
 			return resp.build();
 		} else {
 			// IF NO ERROR IN THE FORM, STORE THE FORM CONTENT IN THE DATABASE
-			ODatabaseDocumentTx db = DocDbConnectionFactory.getInstance().getConnection();
-		
-			try {
-				// TX BEGIN
-				db.begin();
-				Date now = new Date();
-				// CREATES THE ENTRY IN THE RIGHT CLASS
-				ODocument odoc = db.newInstance("PmsiUpload");
-				// HERLPER FOR THIS DOCUMENT (STORE FILE)
-				PimsODocumentHelper odocHelper = new PimsODocumentHelper(odoc);
-				odocHelper.field("rsf", rsf);
-				odoc.field("month", month);
-				odoc.field("year", year);
-				odoc.field("finess", finess);
-				odoc.field("processed", "waiting");
-				odoc.field("dateenvoi", now);
-				// SAVE THIS ENTRY
-				db.save(odoc);
-				// TX END
-				db.commit();
-			} finally {
-				db.close();
-			}
+			importRsf(model, rsf);
 			
 			// REDIRECT TO OK WINDOW
 			UriBuilder redirectionBuilder = uriInfo.getBaseUriBuilder().
@@ -192,6 +170,33 @@ public class ImportPmsi {
 			return resp.build();
 		}
     }
+	
+	public void importRsf(ImportPmsiBaseModel model, InputStream rsf) throws IOException {
+		ODatabaseDocumentTx db = DocDbConnectionFactory.getInstance().getConnection();
+		
+		try {
+			// TX BEGIN
+			db.begin();
+			Date now = new Date();
+			// CREATES THE ENTRY IN THE RIGHT CLASS
+			ODocument odoc = db.newInstance("PmsiUpload");
+			// HERLPER FOR THIS DOCUMENT (STORE FILE)
+			PimsODocumentHelper odocHelper = new PimsODocumentHelper(odoc);
+			odocHelper.field("rsf", rsf);
+			odoc.field("month", model.getMonthValue());
+			odoc.field("year", model.getYearValue());
+			odoc.field("finess", model.getFinessValue());
+			odoc.field("processed", "waiting");
+			odoc.field("dateenvoi", now);
+			// SAVE THIS ENTRY
+			db.save(odoc);
+			// TX END
+			db.commit();
+		} finally {
+			db.close();
+		}
+
+	}
 	
 	@GET
 	@Path("/singlersfok")
@@ -319,31 +324,8 @@ public class ImportPmsi {
 			return resp.build();
 		} else {
 			// IF NO ERROR IN THE FORM, STORE THE FORM CONTENT IN THE DATABASE
-			ODatabaseDocumentTx db = DocDbConnectionFactory.getInstance().getConnection();
-		
-			try {
-				// TX BEGIN
-				db.begin();
-				Date now = new Date();
-				// CREATES THE ENTRY IN THE RIGHT CLASS
-				ODocument odoc = db.newInstance("PmsiUpload");
-				// HERLPER FOR THIS DOCUMENT (STORE FILE)
-				PimsODocumentHelper odocHelper = new PimsODocumentHelper(odoc);
-				odocHelper.field("rsf", rsf);
-				odocHelper.field("rss", rss);
-				odoc.field("month", month);
-				odoc.field("year", year);
-				odoc.field("finess", finess);
-				odoc.field("processed", "waiting");
-				odoc.field("dateenvoi", now);
-				// SAVE THIS ENTRY
-				db.save(odoc);
-				// TX END
-				db.commit();
-			} finally {
-				db.close();
-			}
-			
+			importRsfRss(model, rsf, rss);
+
 			// REDIRECT TO OK WINDOW
 			UriBuilder redirectionBuilder = uriInfo.getBaseUriBuilder().
 					path(ImportPmsi.class).
@@ -352,6 +334,34 @@ public class ImportPmsi {
 			return resp.build();
 		}
     }
+
+	public void importRsfRss(ImportPmsiBaseModel model, InputStream rsf, InputStream rss) throws IOException {
+		ODatabaseDocumentTx db = DocDbConnectionFactory.getInstance().getConnection();
+		
+		try {
+			// TX BEGIN
+			db.begin();
+			Date now = new Date();
+			// CREATES THE ENTRY IN THE RIGHT CLASS
+			ODocument odoc = db.newInstance("PmsiUpload");
+			// HERLPER FOR THIS DOCUMENT (STORE FILE)
+			PimsODocumentHelper odocHelper = new PimsODocumentHelper(odoc);
+			odocHelper.field("rsf", rsf);
+			odocHelper.field("rss", rss);
+			odoc.field("month", model.getMonthValue());
+			odoc.field("year", model.getYearValue());
+			odoc.field("finess", model.getFinessValue());
+			odoc.field("processed", "waiting");
+			odoc.field("dateenvoi", now);
+			// SAVE THIS ENTRY
+			db.save(odoc);
+			// TX END
+			db.commit();
+		} finally {
+			db.close();
+		}
+
+	}
 
 	@GET
 	@Path("/rsfrssok")

@@ -11,8 +11,8 @@ import java.io.OutputStream;
 import com.vaadin.server.Page;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
-import com.vaadin.ui.UI;
 import com.vaadin.ui.Upload.Receiver;
+import com.vaadin.ui.Window;
 
 public class FileUploader implements Receiver {
 
@@ -21,12 +21,14 @@ public class FileUploader implements Receiver {
     private String filename = null;
     private String mimeType = null;
     private TextField feedback = null;
+    private Window window;
     
-	public FileUploader(String type) {
+	public FileUploader(String type, Window window) {
     	// SELECTS THE TYPE OF FILE
     	this.type = type;
+    	this.window = window;
     	// REMOVES IT FROM FILESYSTEM IF ALREADY EXISTS
-    	(new File("/tmp/uploads/" + type + "/" + UI.getCurrent().getSession().toString())).delete();
+    	(new File("/tmp/uploads/" + type + "/" + Integer.toHexString(window.hashCode()))).delete();
     }
     
     public OutputStream receiveUpload(String filename,
@@ -38,7 +40,7 @@ public class FileUploader implements Receiver {
         FileOutputStream fos = null;
         try {
             // CREATE FILE
-            File file = new File("/tmp/uploads/" + type + "/" + UI.getCurrent().getSession().toString());
+            File file = new File("/tmp/uploads/" + type + "/" + Integer.toHexString(window.hashCode()));
             file.getParentFile().mkdirs();
             fos = new FileOutputStream(file);
             // SETS FILENAME AND MIMETYPE
@@ -64,7 +66,7 @@ public class FileUploader implements Receiver {
     	// IF FILENAME IS NULL, WE HAVE NO STREAM, ELSE WE HAVE ONE STREAM
     	if (filename != null) {
     		try {
-    			File file = new File("/tmp/uploads/" + type + "/" + UI.getCurrent().getSession().toString());
+    			File file = new File("/tmp/uploads/" + type + "/" + Integer.toHexString(window.hashCode()));
     			fis = new FileInputStream(file);
     		} catch (IOException e) {
     			// DO NOTHING, RETURN NULL VALUE
