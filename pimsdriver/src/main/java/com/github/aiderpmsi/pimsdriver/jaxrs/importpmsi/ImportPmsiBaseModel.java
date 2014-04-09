@@ -13,8 +13,8 @@ public class ImportPmsiBaseModel extends FormModel {
 	/**
 	 * Pmsi Month. Must be between 1 and 12
 	 */
-	@Min(0)
-	@Max(13)
+	@Min(1)
+	@Max(12)
 	private Integer monthValue;
 
 	/**
@@ -65,6 +65,9 @@ public class ImportPmsiBaseModel extends FormModel {
 		// Sets the current month and current year
 		setMonthValue(cal.get(Calendar.MONTH) + 1);
 		setYearValue(cal.get(Calendar.YEAR));
+		
+		// SETS FINESS TO VOID
+		setFinessValue("");
 	}
 
 }
