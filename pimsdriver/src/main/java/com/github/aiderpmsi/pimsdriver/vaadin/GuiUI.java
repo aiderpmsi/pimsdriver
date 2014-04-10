@@ -61,7 +61,7 @@ public class GuiUI extends UI {
 		@Override
 		public void menuSelected(MenuItem selectedItem) {
 			// CREATE WINDOW
-			final Window wHelp = new ImportPmsiUpload();
+			final Window wHelp = new PmsiUploadWindow();
 	        
 			UI.getCurrent().addWindow(wHelp);
 		}

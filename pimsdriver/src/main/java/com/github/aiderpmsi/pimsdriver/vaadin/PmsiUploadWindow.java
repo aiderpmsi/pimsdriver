@@ -17,14 +17,14 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.Upload;
 import com.vaadin.ui.Window;
 
-public class ImportPmsiUpload extends Window {
+public class PmsiUploadWindow extends Window {
 
 	private static final long serialVersionUID = -2583394688969956613L;
 	
 	private FileUploader rsf;
 	private FileUploader rss;
 
-	public ImportPmsiUpload() {
+	public PmsiUploadWindow() {
 		// TITLE
 		super("Ajouter un fichier Pmsi");
 		
@@ -142,6 +142,7 @@ public class ImportPmsiUpload extends Window {
 				}
 				
 				UI.getCurrent().removeWindow(uploadWindow);
+				Notification.show("Fichier(s) téléversés", Notification.Type.WARNING_MESSAGE);
 			} catch (CommitException e) {
 				String message = e.getCause().getMessage();
 				if (message.length() == 0)
