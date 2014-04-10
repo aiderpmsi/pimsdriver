@@ -84,8 +84,28 @@ public class PmsiUploadWindow extends Window {
         okButton.addClickListener(new Validate(binder, this));
         fl.addComponent(okButton);
         
+        // ADD CLOSE LISTENER
+        addCloseListener(new CustomCloseListener());
 	}
 
+	/**
+	 * Manages the closing of the window (release the uploaded files)
+	 * @author delabre
+	 * 
+	 */
+	private class CustomCloseListener implements Window.CloseListener {
+
+		private static final long serialVersionUID = -983340052018092722L;
+
+		@Override
+		public void windowClose(CloseEvent e) {
+			// DELETES THE UPLOADED FILES
+			rss.release();
+			rsf.release();
+		}
+		
+	}
+	
 	/**
 	 * Manages the handling of datas when committing
 	 * @author delabre

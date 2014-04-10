@@ -3,7 +3,10 @@ package com.github.aiderpmsi.pimsdriver.odb;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentPool;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.metadata.schema.OClass;
+import com.orientechnologies.orient.core.metadata.schema.OClass.INDEX_TYPE;
 import com.orientechnologies.orient.core.metadata.schema.OType;
+import com.orientechnologies.orient.core.sql.OCommandExecutorSQLCreateIndex;
+import com.orientechnologies.orient.core.sql.OCommandSQL;
 
 public class DocDbConnectionFactory {
 
@@ -26,8 +29,13 @@ public class DocDbConnectionFactory {
 				// IF IT IS NOT EXISTING, CREATE IT
 				db.create();
 				// POPULATE THE CLASSES TYPES
+				// PMSIUPLOAD
 				db.getMetadata().getSchema().createClass("PmsiUpload");
+				OClass pmsiUpload = db.getMetadata().getSchema().getClass("PmsiUpload");
+				pmsiUpload.createProperty("processed", OType.STRING);
+				pmsiUpload.createIndex("pu_processed", INDEX_TYPE.NOTUNIQUE, "processed");
 				
+				// PMSIELEMENT
 				db.getMetadata().getSchema().createClass("PmsiElement");
 				OClass pmsiElement = db.getMetadata().getSchema().getClass("PmsiElement");
 				pmsiElement.createProperty("parentlink", OType.LINK);

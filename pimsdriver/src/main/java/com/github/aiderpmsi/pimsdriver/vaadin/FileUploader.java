@@ -17,19 +17,24 @@ import com.vaadin.ui.Window;
 public class FileUploader implements Receiver {
 
 	private static final long serialVersionUID = 5675725310161340636L;
-	private String type;
     private String filename = null;
     private String mimeType = null;
+    private String resourceName;
     private TextField feedback = null;
-    private Window window;
     
 	public FileUploader(String type, Window window) {
-    	// SELECTS THE TYPE OF FILE
-    	this.type = type;
-    	this.window = window;
+		// DEFINES THE NAME OF THE DOWNLOADED RESOURCE
+		resourceName = "/tmp/uploads/" + type + "_" + Integer.toHexString(window.hashCode());
     	// REMOVES IT FROM FILESYSTEM IF ALREADY EXISTS
-    	(new File("/tmp/uploads/" + type + "/" + Integer.toHexString(window.hashCode()))).delete();
+    	new File(resourceName).delete();
     }
+	
+	/**
+	 * Deletes the corresponding file (use before destroying the object)
+	 */
+	public void release() {
+    	new File(resourceName).delete();
+	}
     
     public OutputStream receiveUpload(String filename,
                                       String mimeType) {
@@ -40,13 +45,13 @@ public class FileUploader implements Receiver {
         FileOutputStream fos = null;
         try {
             // CREATE FILE
-            File file = new File("/tmp/uploads/" + type + "/" + Integer.toHexString(window.hashCode()));
+            File file = new File(resourceName);
             file.getParentFile().mkdirs();
             fos = new FileOutputStream(file);
             // SETS FILENAME AND MIMETYPE
             this.filename = (filename == null ? "" : filename);
             this.mimeType = (mimeType == null ? "" : mimeType);
-            // ADDS FILENAME TO FEEDBACK IF NOT NULL
+            // ADDS FILENAME TO FEEDBACK IF NOT ONE FEEDBACK ELEMENT HAS BEEN DEFINED
             if (feedback != null)
             	feedback.setValue(filename);
         } catch (final FileNotFoundException e) {
@@ -66,7 +71,7 @@ public class FileUploader implements Receiver {
     	// IF FILENAME IS NULL, WE HAVE NO STREAM, ELSE WE HAVE ONE STREAM
     	if (filename != null) {
     		try {
-    			File file = new File("/tmp/uploads/" + type + "/" + Integer.toHexString(window.hashCode()));
+    			File file = new File(resourceName);
     			fis = new FileInputStream(file);
     		} catch (IOException e) {
     			// DO NOTHING, RETURN NULL VALUE
