@@ -143,7 +143,10 @@ public class ImportPmsiUpload extends Window {
 				
 				UI.getCurrent().removeWindow(uploadWindow);
 			} catch (CommitException e) {
-				Notification.show(e.getCause().getMessage(), Notification.Type.WARNING_MESSAGE);
+				String message = e.getCause().getMessage();
+				if (message.length() == 0)
+					message = e.getMessage();
+				Notification.show(message, Notification.Type.WARNING_MESSAGE);
 			}
 		}
 	}

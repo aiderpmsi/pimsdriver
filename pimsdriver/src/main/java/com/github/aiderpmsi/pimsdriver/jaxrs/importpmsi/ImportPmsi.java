@@ -186,7 +186,7 @@ public class ImportPmsi {
 			odoc.field("month", model.getMonthValue());
 			odoc.field("year", model.getYearValue());
 			odoc.field("finess", model.getFinessValue());
-			odoc.field("processed", "waiting");
+			odoc.field("processed", "pending");
 			odoc.field("dateenvoi", now);
 			// SAVE THIS ENTRY
 			db.save(odoc);
@@ -351,7 +351,7 @@ public class ImportPmsi {
 			odoc.field("month", model.getMonthValue());
 			odoc.field("year", model.getYearValue());
 			odoc.field("finess", model.getFinessValue());
-			odoc.field("processed", "waiting");
+			odoc.field("processed", "pending");
 			odoc.field("dateenvoi", now);
 			// SAVE THIS ENTRY
 			db.save(odoc);
