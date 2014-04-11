@@ -11,10 +11,12 @@ import java.io.OutputStream;
 import com.vaadin.server.Page;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
+import com.vaadin.ui.Upload.FailedEvent;
+import com.vaadin.ui.Upload.FailedListener;
 import com.vaadin.ui.Upload.Receiver;
 import com.vaadin.ui.Window;
 
-public class FileUploader implements Receiver {
+public class FileUploader implements Receiver, FailedListener {
 
 	private static final long serialVersionUID = 5675725310161340636L;
     private String filename = null;
@@ -28,44 +30,54 @@ public class FileUploader implements Receiver {
     	// REMOVES IT FROM FILESYSTEM IF ALREADY EXISTS
     	new File(resourceName).delete();
     }
-	
-	/**
-	 * Deletes the corresponding file (use before destroying the object)
-	 */
-	public void release() {
-    	new File(resourceName).delete();
-	}
     
+	@Override
     public OutputStream receiveUpload(String filename,
                                       String mimeType) {
     	// REINIT FILENAME AND MIMETYPE
     	this.filename = null;
         this.mimeType = null;
-        // UPLOADSTREAM
-        FileOutputStream fos = null;
-        try {
-            // CREATE FILE
-            File file = new File(resourceName);
-            file.getParentFile().mkdirs();
-            fos = new FileOutputStream(file);
-            // SETS FILENAME AND MIMETYPE
-            this.filename = (filename == null ? "" : filename);
-            this.mimeType = (mimeType == null ? "" : mimeType);
-            // ADDS FILENAME TO FEEDBACK IF NOT ONE FEEDBACK ELEMENT HAS BEEN DEFINED
-            if (feedback != null)
+
+    	// UPLOADSTREAM
+    	OutputStream fos = null;
+
+    	// IF FILENAME IS VOID STRING, NOTHING HAS BEEN DOWNLOADED, DO NOTHING
+        if (filename.length() != 0) {
+        
+        	try {
+        		// CREATE FILE
+        		File file = new File(resourceName);
+        		file.getParentFile().mkdirs();
+        		fos = new FileOutputStream(file);
+        		// SETS FILENAME AND MIMETYPE
+        		this.filename = filename;
+        		this.mimeType = mimeType;
+        		// ADDS FILENAME TO FEEDBACK IF NOT ONE FEEDBACK ELEMENT HAS BEEN DEFINED
+        		if (feedback != null)
             	feedback.setValue(filename);
-        } catch (final FileNotFoundException e) {
-            new Notification("Could not open file<br/>",
-                             e.getMessage(),
-                             Notification.Type.ERROR_MESSAGE)
-                .show(Page.getCurrent());
-            return null;
+        	} catch (final FileNotFoundException e) {
+        		new Notification("Could not open file<br/>",
+        				e.getMessage(),
+        				Notification.Type.ERROR_MESSAGE)
+                	.show(Page.getCurrent());
+        		return null;
+        	}
         }
-        // RETURNS THE STREAM WE HAVE TO WRITE INTO
+        
+        // RETURNS THE STREAM WE HAVE TO WRITE INTO (NULL IF NOTHING HAS BEEN SET)
         return fos;
     }
-    
-    public InputStream getFile() {
+
+
+	@Override
+	public void uploadFailed(FailedEvent event) {
+		new Notification("Could not open file<br/>",
+				event.getReason().getMessage(),
+				Notification.Type.ERROR_MESSAGE)
+		.show(Page.getCurrent());
+	}
+	
+	public InputStream getFile() {
     	// RETURNED INPUTSTREAM
     	InputStream fis = null;
     	// IF FILENAME IS NULL, WE HAVE NO STREAM, ELSE WE HAVE ONE STREAM
@@ -79,6 +91,13 @@ public class FileUploader implements Receiver {
     	}
     	return fis;
     }
+	
+	/**
+	 * Deletes the corresponding file (use before destroying the object)
+	 */
+	public void release() {
+    	new File(resourceName).delete();
+	}
     
     public String getFilename() {
 		return filename;

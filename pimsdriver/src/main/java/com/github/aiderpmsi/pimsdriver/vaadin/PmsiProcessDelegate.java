@@ -2,35 +2,75 @@ package com.github.aiderpmsi.pimsdriver.vaadin;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.github.aiderpmsi.pimsdriver.odb.DocDbConnectionFactory;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
+import com.orientechnologies.orient.core.metadata.schema.OType;
+import com.orientechnologies.orient.core.record.impl.ODocument;
+import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 import com.vaadin.data.Container.Filter;
+import com.vaadin.data.util.filter.And;
 import com.vaadin.data.util.sqlcontainer.RowItem;
 import com.vaadin.data.util.sqlcontainer.query.OrderBy;
 import com.vaadin.data.util.sqlcontainer.query.QueryDelegate;
 
 public class PmsiProcessDelegate implements QueryDelegate {
 
+	private static final long serialVersionUID = 3686523542320482729L;
+	private List<Filter> filters = new ArrayList<>(0);
+	private List<OrderBy> orderBys = new ArrayList<>(0);
+	
 	@Override
 	public int getCount() throws SQLException {
 		ODatabaseDocumentTx tx = null;
+		List<ODocument> results = null;
 		try {
 			tx = DocDbConnectionFactory.getInstance().getConnection();
-			StringBuilder query = new StringBuilder("SELECT COUNT(processed) FROM PmsiUpload WHERE processed='pending'");
+			OSQLSynchQuery<ODocument> oquery = new OSQLSynchQuery<ODocument>(
+					"SELECT COUNT(*) as nbrows FROM PmsiUpload WHERE processed='pending'");
+			tx.begin();
+			results = tx.command(oquery).execute();
+			tx.commit();
 		} finally {
 			if (tx != null)
 				tx.close();
 			tx = null;
 		}
-		return 0;
+		Integer nbrows = results.get(0).field("nbrows", OType.INTEGER);
+		return nbrows;
 	}
 
 	@Override
 	public ResultSet getResults(int offset, int pagelength) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		
+		ODatabaseDocumentTx tx = null;
+		List<ODocument> results = null;
+		
+		// CREATE QUERY
+		StringBuilder query = new StringBuilder("SELECT * FROM PmsiUpload WHERE processed='waiting' ");
+
+		// DO NOTHING FOR THE MOMENT WITH FILTERS AND ORDERS
+		
+		// OFFSET
+		query.append("OFFSET ").append(offset).append(" LIMIT ").append(pagelength).append(" ");
+		
+		try {
+			tx = DocDbConnectionFactory.getInstance().getConnection();
+			OSQLSynchQuery<ODocument> oquery = new OSQLSynchQuery<ODocument>(
+					query.toString());
+			tx.begin();
+			results = tx.command(oquery).execute();
+			tx.commit();
+		} finally {
+			if (tx != null)
+				tx.close();
+			tx = null;
+		}
+		ResultSet res = new Resul
+		Integer nbrows = results.get(0).field("nbrows", OType.INTEGER);
+		return nbrows;
 	}
 
 	@Override
@@ -42,29 +82,25 @@ public class PmsiProcessDelegate implements QueryDelegate {
 	@Override
 	public void setFilters(List<Filter> filters)
 			throws UnsupportedOperationException {
-		// TODO Auto-generated method stub
-
+		this.filters = filters;
 	}
 
 	@Override
 	public void setOrderBy(List<OrderBy> orderBys)
 			throws UnsupportedOperationException {
-		// TODO Auto-generated method stub
-
+		this.orderBys = orderBys;
 	}
 
 	@Override
 	public int storeRow(RowItem row) throws UnsupportedOperationException,
 			SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+		throw new UnsupportedOperationException("Not implemented");
 	}
 
 	@Override
 	public boolean removeRow(RowItem row) throws UnsupportedOperationException,
 			SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		throw new UnsupportedOperationException("Not implemented");
 	}
 
 	@Override
