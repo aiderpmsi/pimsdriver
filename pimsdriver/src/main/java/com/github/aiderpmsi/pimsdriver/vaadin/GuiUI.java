@@ -41,7 +41,7 @@ public class GuiUI extends UI {
 		MenuItem files = menubar.addItem("Fichiers", null, null);
 		files.addItem("Ajouter Pmsi", null, new AddPmsi());
 		files.addSeparator();
-		files.addItem("Traitements Pmsi", null, null);	
+		files.addItem("Traitements Pmsi", null, new ProcessPmsi());	
 		layout.addComponent(menubar);
 		
 		
@@ -65,7 +65,18 @@ public class GuiUI extends UI {
 	        
 			UI.getCurrent().addWindow(wHelp);
 		}
-		
 	}
 	
+	private class ProcessPmsi implements Command {
+
+		private static final long serialVersionUID = -9046058057507224310L;
+
+		@Override
+		public void menuSelected(MenuItem selectedItem) {
+			// CREATE WINDOW
+			final Window wProcess = new PmsiProcessWindow();
+	        
+			UI.getCurrent().addWindow(wProcess);
+		}
+	}
 }
