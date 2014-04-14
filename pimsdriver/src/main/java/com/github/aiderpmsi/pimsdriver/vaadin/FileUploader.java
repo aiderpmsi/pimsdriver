@@ -11,12 +11,10 @@ import java.io.OutputStream;
 import com.vaadin.server.Page;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
-import com.vaadin.ui.Upload.FailedEvent;
-import com.vaadin.ui.Upload.FailedListener;
 import com.vaadin.ui.Upload.Receiver;
 import com.vaadin.ui.Window;
 
-public class FileUploader implements Receiver, FailedListener {
+public class FileUploader implements Receiver {
 
 	private static final long serialVersionUID = 5675725310161340636L;
     private String filename = null;
@@ -41,41 +39,27 @@ public class FileUploader implements Receiver, FailedListener {
     	// UPLOADSTREAM
     	OutputStream fos = null;
 
-    	// IF FILENAME IS VOID STRING, NOTHING HAS BEEN DOWNLOADED, DO NOTHING
-        if (filename.length() != 0) {
-        
-        	try {
-        		// CREATE FILE
-        		File file = new File(resourceName);
-        		file.getParentFile().mkdirs();
-        		fos = new FileOutputStream(file);
-        		// SETS FILENAME AND MIMETYPE
-        		this.filename = filename;
-        		this.mimeType = mimeType;
-        		// ADDS FILENAME TO FEEDBACK IF NOT ONE FEEDBACK ELEMENT HAS BEEN DEFINED
-        		if (feedback != null)
-            	feedback.setValue(filename);
-        	} catch (final FileNotFoundException e) {
-        		new Notification("Could not open file<br/>",
-        				e.getMessage(),
-        				Notification.Type.ERROR_MESSAGE)
-                	.show(Page.getCurrent());
-        		return null;
-        	}
+       	try {
+       		// CREATE FILE
+       		File file = new File(resourceName);
+       		file.getParentFile().mkdirs();
+       		fos = new FileOutputStream(file);
+       		// SETS FILENAME AND MIMETYPE
+       		this.filename = filename;
+       		this.mimeType = mimeType;
+       		// ADDS FILENAME TO FEEDBACK IF NOT ONE FEEDBACK ELEMENT HAS BEEN DEFINED
+       		if (feedback != null)
+       			feedback.setValue(filename);
+       	} catch (final FileNotFoundException e) {
+       		new Notification("Could not open file<br/>",
+       				e.getMessage(),
+       				Notification.Type.ERROR_MESSAGE)
+       		.show(Page.getCurrent());
         }
         
-        // RETURNS THE STREAM WE HAVE TO WRITE INTO (NULL IF NOTHING HAS BEEN SET)
+        // RETURNS THE STREAM WE HAVE TO WRITE INTO
         return fos;
     }
-
-
-	@Override
-	public void uploadFailed(FailedEvent event) {
-		new Notification("Could not open file<br/>",
-				event.getReason().getMessage(),
-				Notification.Type.ERROR_MESSAGE)
-		.show(Page.getCurrent());
-	}
 	
 	public InputStream getFile() {
     	// RETURNED INPUTSTREAM

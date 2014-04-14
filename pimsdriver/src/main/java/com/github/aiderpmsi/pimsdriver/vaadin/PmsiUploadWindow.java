@@ -43,7 +43,7 @@ public class PmsiUploadWindow extends Window {
         // ADD RSF FILE PICKER
         rsf = new FileUploader("rsf", this);
         Upload rsfUp = new Upload("RSF ", rsf);
-        rsfUp.addFailedListener(rsf);
+        rsfUp.setImmediate(true);
         rsfUp.setButtonCaption("Téléverser");
         fl.addComponent(rsfUp);
         
@@ -56,7 +56,7 @@ public class PmsiUploadWindow extends Window {
         // ADD RSS FILE PICKER
         rss = new FileUploader("rss", this);
         Upload rssUp = new Upload("RSS ", rss);
-        rssUp.addFailedListener(rss);
+        rssUp.setImmediate(true);
         rssUp.setButtonCaption("Téléverser");
         fl.addComponent(rssUp);
         

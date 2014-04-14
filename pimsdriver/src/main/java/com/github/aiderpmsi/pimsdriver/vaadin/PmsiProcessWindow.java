@@ -34,7 +34,6 @@ public class PmsiProcessWindow extends Window {
         		new LazyQueryContainer(
         				new LazyQueryDefinition(false, 1000, "RID"),
         				new PmsiProcessQueryFactory()));
-        processtable.setVisibleColumns(new Object[] { "finess", "monthValue", "yearValue" });
         processtable.setSelectable(true);
         processtable.setImmediate(true);
         layout.addComponent(processtable);
