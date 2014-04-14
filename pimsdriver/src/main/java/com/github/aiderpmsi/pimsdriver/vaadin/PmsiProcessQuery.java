@@ -27,7 +27,7 @@ public class PmsiProcessQuery implements Query {
 	/** Query used for the content */
 	private String contentQuery;
 	/** Arguments for the contentQuery */
-	private List<Object> contentQueryArgs;
+	private Object[] contentQueryArgs;
 	
 	protected PmsiProcessQuery() {}
 	
@@ -38,10 +38,11 @@ public class PmsiProcessQuery implements Query {
 		
 		// ADDS THE FILTERS
 		Compare filter = new Compare.Equal("processed", "pending");
-		contentQueryArgs = new LinkedList<>();
+		List<Object> contentQueryArgsList = new LinkedList<>();
 		qd.getFilters().add(new And(filter));
 		// CREATES THE FILTERS AND FILLS THE ARGUMENTS
-		String filtersQuery = ODBQueryBuilder.getWhereStringForFilters(qd.getFilters(), contentQueryArgs);
+		String filtersQuery = ODBQueryBuilder.getWhereStringForFilters(qd.getFilters(), contentQueryArgsList);
+		contentQueryArgs = contentQueryArgsList.toArray();
 		
 		// ADDS THE ORDERINGS
 		StringBuilder orderBuilder = new StringBuilder();
