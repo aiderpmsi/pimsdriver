@@ -33,11 +33,11 @@ public class PmsiProcessQuery implements Query {
 	
 	public PmsiProcessQuery(QueryDefinition qd) {
 		
-		StringBuilder countQueryBuilder = new StringBuilder("SELECT COUNT(*) as nbrows FROM PmsiUpload WHERE ");
-		StringBuilder contentQueryBuilder = new StringBuilder("SELECT * FROM PmsiUpload WHERE ");
+		StringBuilder countQueryBuilder = new StringBuilder("SELECT COUNT(*) as nbrows FROM PmsiUpload ");
+		StringBuilder contentQueryBuilder = new StringBuilder("SELECT * FROM PmsiUpload ");
 		
 		// ADDS THE FILTERS
-		Compare filter = new Compare.Equal("processed", "wainting");
+		Compare filter = new Compare.Equal("processed", "pending");
 		contentQueryArgs = new LinkedList<>();
 		qd.getFilters().add(new And(filter));
 		// CREATES THE FILTERS AND FILLS THE ARGUMENTS
@@ -137,7 +137,7 @@ public class PmsiProcessQuery implements Query {
 		try {
 			tx = DocDbConnectionFactory.getInstance().getConnection();
 			tx.begin();
-			results = tx.command(oquery).execute();
+			results = tx.command(oquery).execute(contentQueryArgs);
 			tx.commit();
 		} finally {
 			if (tx != null)
