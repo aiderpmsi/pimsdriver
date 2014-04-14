@@ -3,7 +3,6 @@ package com.github.aiderpmsi.pimsdriver.jaxrs;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
@@ -15,7 +14,6 @@ import com.github.aiderpmsi.pimsdriver.jaxrs.resources.ResourceDispatcher;
 import com.github.aiderpmsi.pimsdriver.processor.ProcessListener;
 import com.github.aiderpmsi.pimsdriver.security.SecurityFilter;
 
-@ApplicationPath("/")
 public class PimsDriverApplication extends Application {
 
 	@Override

@@ -15,6 +15,7 @@ import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
+import com.vaadin.data.Container.Filter;
 import com.vaadin.data.Item;
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.util.filter.And;
@@ -37,11 +38,12 @@ public class PmsiProcessQuery implements Query {
 		StringBuilder contentQueryBuilder = new StringBuilder("SELECT * FROM PmsiUpload ");
 		
 		// ADDS THE FILTERS
+		List<Filter> filters = new LinkedList<>(qd.getFilters());
 		Compare filter = new Compare.Equal("processed", "pending");
+		filters.add(new And(filter));
 		List<Object> contentQueryArgsList = new LinkedList<>();
-		qd.getFilters().add(new And(filter));
 		// CREATES THE FILTERS AND FILLS THE ARGUMENTS
-		String filtersQuery = ODBQueryBuilder.getWhereStringForFilters(qd.getFilters(), contentQueryArgsList);
+		String filtersQuery = ODBQueryBuilder.getWhereStringForFilters(filters, contentQueryArgsList);
 		contentQueryArgs = contentQueryArgsList.toArray();
 		
 		// ADDS THE ORDERINGS
@@ -146,7 +148,7 @@ public class PmsiProcessQuery implements Query {
 		}
 
 		// GETS THE FIRST RESULT
-		return results.get(0).field("nbrows", OType.INTEGER);
+		return ((Long) results.get(0).field("nbrows")).intValue();
 	}
 
 }
