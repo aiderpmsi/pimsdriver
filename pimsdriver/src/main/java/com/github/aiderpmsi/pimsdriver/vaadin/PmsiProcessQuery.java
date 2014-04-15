@@ -1,13 +1,13 @@
 package com.github.aiderpmsi.pimsdriver.vaadin;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.vaadin.addons.lazyquerycontainer.Query;
 import org.vaadin.addons.lazyquerycontainer.QueryDefinition;
 
+import com.github.aiderpmsi.pimsdriver.jaxrs.processpmsi.ProcessPmsiBase;
 import com.github.aiderpmsi.pimsdriver.jaxrs.processpmsi.UploadedElement;
 import com.github.aiderpmsi.pimsdriver.odb.DocDbConnectionFactory;
 import com.github.aiderpmsi.pimsdriver.odb.vaadin.ODBQueryBuilder;
@@ -20,7 +20,7 @@ import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.util.filter.And;
 import com.vaadin.data.util.filter.Compare;
 
-public class PmsiProcessQuery implements Query {
+public class PmsiProcessQuery extends ProcessPmsiBase implements Query{
 
 	/** Query used for the count */
 	private String countQuery;
@@ -81,40 +81,13 @@ public class PmsiProcessQuery implements Query {
 	@Override
 	public List<Item> loadItems(int startIndex, int count) {
 		OSQLSynchQuery<ODocument> oquery = new OSQLSynchQuery<ODocument>(contentQuery + " OFFSET " + startIndex + " LIMIT " + count);
-		ODatabaseDocumentTx tx = null;
-		List<ODocument> results = null;
-		try {
-			tx = DocDbConnectionFactory.getInstance().getConnection();
-			tx.begin();
-			results = tx.command(oquery).execute(contentQueryArgs);
-			tx.commit();
-		} finally {
-			if (tx != null)
-				tx.close();
-		}
 
+		// GETS THE LIST OF UPLOADED ELEMENTS
+		List<UploadedElement> elements = getPendingUploadedElements(oquery.toString());
+		
 		// CREATE THE LIST OF ITEMS
 		List<Item> items = new ArrayList<>(count);
-
-		// Fills the list of items
-		for (ODocument result : results) {
-			// BEAN FOR THIS ITEM
-			UploadedElement element = new UploadedElement();
-
-			// FILLS THE BEAN
-			element.setRecordId(result.getIdentity());
-			element.setDateEnvoi((Date) result.field("dateenvoi"));
-			element.setFiness((String) result.field("finess"));
-			element.setMonth((Integer) result.field("month"));
-			element.setProcessed((String) result.field("processed"));
-			element.setYear((Integer) result.field("year"));
-			element.setSuccess((Boolean) result.field("success"));
-			element.setErrorComment((String) result.field("errorComment"));
-			if (result.field("rss") == null)
-				element.setComment("RSF seul");
-			else
-				element.setComment("RSF et RSS");
-
+		for (UploadedElement element : elements) {
 			// CREATES THE ITEM FROM THE BEAN
 			BeanItem<UploadedElement> ueItem = new BeanItem<UploadedElement>(element);
 			

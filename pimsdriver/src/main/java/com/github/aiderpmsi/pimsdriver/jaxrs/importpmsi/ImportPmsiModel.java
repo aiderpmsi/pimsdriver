@@ -8,7 +8,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-public class ImportPmsiBaseModel extends FormModel {
+public class ImportPmsiModel {
 
 	/**
 	 * Pmsi Month. Must be between 1 and 12

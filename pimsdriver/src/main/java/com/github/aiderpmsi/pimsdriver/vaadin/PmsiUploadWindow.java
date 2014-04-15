@@ -3,7 +3,7 @@ package com.github.aiderpmsi.pimsdriver.vaadin;
 import java.io.IOException;
 
 import com.github.aiderpmsi.pimsdriver.jaxrs.importpmsi.ImportPmsi;
-import com.github.aiderpmsi.pimsdriver.jaxrs.importpmsi.ImportPmsiBaseModel;
+import com.github.aiderpmsi.pimsdriver.jaxrs.importpmsi.ImportPmsiModel;
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitEvent;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
@@ -67,10 +67,10 @@ public class PmsiUploadWindow extends Window {
         fl.addComponent(rssFeedBack);
         
         // ADD FORM FIELDS (FINESS, YEAR AND MONTH)
-        ImportPmsiBaseModel model = new ImportPmsiBaseModel();
+        ImportPmsiModel model = new ImportPmsiModel();
         model.setDefaultValues();
-        final BeanFieldGroup<ImportPmsiBaseModel> binder =
-        		new BeanFieldGroup<ImportPmsiBaseModel>(ImportPmsiBaseModel.class);
+        final BeanFieldGroup<ImportPmsiModel> binder =
+        		new BeanFieldGroup<ImportPmsiModel>(ImportPmsiModel.class);
         binder.setItemDataSource(model);
 
         TextField yearValue = binder.buildAndBind("Année", "yearValue", TextField.class);
@@ -137,10 +137,10 @@ public class PmsiUploadWindow extends Window {
 	private class Validate implements Button.ClickListener {
 		
 		private static final long serialVersionUID = 1L;
-		private BeanFieldGroup<ImportPmsiBaseModel> binder;
+		private BeanFieldGroup<ImportPmsiModel> binder;
 		private Window uploadWindow;
 		
-		public Validate(BeanFieldGroup<ImportPmsiBaseModel> binder, Window uploadWindow) {
+		public Validate(BeanFieldGroup<ImportPmsiModel> binder, Window uploadWindow) {
 			this.binder = binder;
 			this.uploadWindow = uploadWindow;
 		}
@@ -151,14 +151,13 @@ public class PmsiUploadWindow extends Window {
 				binder.commit();
 
 				// NO ERROR : STORE THE ELEMENTS
-				ImportPmsiBaseModel model = binder.getItemDataSource().getBean();
+				ImportPmsiModel model = binder.getItemDataSource().getBean();
 				
 				try {
-					if (rss.getFilename() == null)
-						(new ImportPmsi()).importRsf(model, rsf.getFile());
-					else {
-						(new ImportPmsi()).importRsfRss(model, rsf.getFile(), rss.getFile());
-					}
+					new ImportPmsi().importPmsi(
+							model,
+							rsf.getFile(),
+							(rss.getFilename() == null ? null : rss.getFile()));
 				} catch (IOException e) {
 					throw new CommitException(e);
 				}
