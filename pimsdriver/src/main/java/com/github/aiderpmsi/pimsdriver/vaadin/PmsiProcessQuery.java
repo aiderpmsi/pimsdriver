@@ -12,7 +12,6 @@ import com.github.aiderpmsi.pimsdriver.jaxrs.processpmsi.UploadedElement;
 import com.github.aiderpmsi.pimsdriver.odb.DocDbConnectionFactory;
 import com.github.aiderpmsi.pimsdriver.odb.vaadin.ODBQueryBuilder;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
-import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 import com.vaadin.data.Container.Filter;

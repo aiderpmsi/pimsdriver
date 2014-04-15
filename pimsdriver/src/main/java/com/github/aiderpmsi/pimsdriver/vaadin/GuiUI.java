@@ -1,5 +1,7 @@
 package com.github.aiderpmsi.pimsdriver.vaadin;
 
+import java.util.Date;
+
 import org.vaadin.addons.lazyquerycontainer.LazyQueryContainer;
 import org.vaadin.addons.lazyquerycontainer.LazyQueryDefinition;
 
@@ -79,20 +81,6 @@ public class GuiUI extends UI {
 		
 		layout.addComponent(table);
 		
-        Table processtable = new Table("Pmsi en cours de traitement");
-        LazyQueryContainer lqc = new LazyQueryContainer(
-				new LazyQueryDefinition(false, 1000, "recordId"),
-				new PmsiProcessQueryFactory());
-        lqc.addContainerProperty("finess", String.class, "", true, true);
-        lqc.addContainerProperty("year", Integer.class, null, true, true);
-        processtable.setContainerDataSource(lqc);
-        processtable.setVisibleColumns(new Object[] {"finess", "year"});
-        processtable.setColumnHeaders(new String[] {"Finess", "Année"} );
-        processtable.setSelectable(true);
-        processtable.setPageLength(5);
-        
-       layout.addComponent(processtable);
-
 	}
 	
 	private class AddPmsi implements Command {

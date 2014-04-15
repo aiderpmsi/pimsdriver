@@ -16,7 +16,7 @@ public class UploadedElement {
 	
 	private Long rowNumber;
 	
-	private Date dateEnvoi;
+	private Date dateenvoi;
 
 	private Integer month;
 	
@@ -50,11 +50,11 @@ public class UploadedElement {
 	}
 
 	public Date getDateEnvoi() {
-		return dateEnvoi;
+		return dateenvoi;
 	}
 
 	public void setDateEnvoi(Date dateEnvoi) {
-		this.dateEnvoi = dateEnvoi;
+		this.dateenvoi = dateEnvoi;
 	}
 
 	public Integer getMonth() {
