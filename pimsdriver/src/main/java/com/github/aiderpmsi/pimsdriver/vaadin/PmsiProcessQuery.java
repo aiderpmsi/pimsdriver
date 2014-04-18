@@ -83,7 +83,7 @@ public class PmsiProcessQuery extends ProcessPmsiBase implements Query{
 		OSQLSynchQuery<ODocument> oquery = new OSQLSynchQuery<ODocument>(contentQuery + " OFFSET " + startIndex + " LIMIT " + count);
 
 		// GETS THE LIST OF UPLOADED ELEMENTS
-		List<UploadedElement> elements = getPendingUploadedElements(oquery.toString());
+		List<UploadedElement> elements = getPendingUploadedElements(oquery.toString(), contentQueryArgs);
 		
 		// CREATE THE LIST OF ITEMS
 		List<Item> items = new ArrayList<>(count);

@@ -3,8 +3,10 @@ package com.github.aiderpmsi.pimsdriver.jaxrs.processpmsi;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
 import javax.annotation.security.PermitAll;
 import javax.ws.rs.Path;
+
 import com.github.aiderpmsi.pimsdriver.odb.DocDbConnectionFactory;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.record.impl.ODocument;
@@ -15,7 +17,7 @@ import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 public class ProcessPmsiBase {
 	
 	protected List<UploadedElement> getPendingUploadedElements (
-			String query) {
+			String query, Object[] arguments) {
 
 		// EXECUTES THE QUERY
 		OSQLSynchQuery<ODocument> oquery = new OSQLSynchQuery<ODocument>(query.toString());
@@ -24,7 +26,7 @@ public class ProcessPmsiBase {
 		try {
 			tx = DocDbConnectionFactory.getInstance().getConnection();
 			tx.begin();
-			results = tx.command(oquery).execute();
+			results = tx.command(oquery).execute(arguments);
 			tx.commit();
 		} finally {
 			if (tx != null)

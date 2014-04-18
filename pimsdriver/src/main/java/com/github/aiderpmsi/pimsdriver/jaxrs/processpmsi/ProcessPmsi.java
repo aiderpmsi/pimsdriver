@@ -68,7 +68,7 @@ public class ProcessPmsi extends ProcessPmsiBase {
 		query.append("offset ").append(first).append(" limit ").append(rows + 1);
 		
 		// EXECUTES THE QUERY
-		return getPendingUploadedElements(query.toString());
+		return getPendingUploadedElements(query.toString(), new Object[]{});
 	}
 	
 }
