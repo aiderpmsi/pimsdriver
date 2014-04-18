@@ -49,12 +49,12 @@ public class UploadedElement {
 		this.rowNumber = rowNumber;
 	}
 
-	public Date getDateEnvoi() {
+	public Date getDateenvoi() {
 		return dateenvoi;
 	}
 
-	public void setDateEnvoi(Date dateEnvoi) {
-		this.dateenvoi = dateEnvoi;
+	public void setDateenvoi(Date dateenvoi) {
+		this.dateenvoi = dateenvoi;
 	}
 
 	public Integer getMonth() {

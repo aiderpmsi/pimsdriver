@@ -41,7 +41,7 @@ public class ProcessPmsiBase {
 
 			// FILLS THE BEAN
 			element.setRecordId(result.getIdentity());
-			element.setDateEnvoi((Date) result.field("dateenvoi"));
+			element.setDateenvoi((Date) result.field("dateenvoi"));
 			element.setFiness((String) result.field("finess"));
 			element.setMonth((Integer) result.field("month"));
 			element.setProcessed((String) result.field("processed"));

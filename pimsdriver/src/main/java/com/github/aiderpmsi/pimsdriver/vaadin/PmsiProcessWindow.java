@@ -1,6 +1,7 @@
 package com.github.aiderpmsi.pimsdriver.vaadin;
 
 import java.util.Date;
+import java.util.Locale;
 
 import org.vaadin.addons.lazyquerycontainer.LazyQueryContainer;
 import org.vaadin.addons.lazyquerycontainer.LazyQueryDefinition;
@@ -20,6 +21,7 @@ public class PmsiProcessWindow extends Window {
 		
 		// SET VISUAL ASPECT
         setWidth("650px");
+        setHeight("80%");
         setClosable(true);
         setResizable(true);
         setModal(true);
@@ -28,23 +30,24 @@ public class PmsiProcessWindow extends Window {
 
         // SELECT LAYOUT
         VerticalLayout layout = new VerticalLayout();
+        layout.setSizeFull();
         setContent(layout);
 
         // ADDS DATATABLE
-        Table processtable = new Table("Pmsi en cours de traitement");
+        Table processtable = new Table();
+        processtable.setLocale(Locale.FRANCE);
         LazyQueryContainer lqc = new LazyQueryContainer(
         		new LazyQueryDefinition(false, 1000, "recordId"),
         		new PmsiProcessQueryFactory());
         lqc.addContainerProperty("finess", String.class, "", true, true);
         lqc.addContainerProperty("year", Integer.class, null, true, true);
         lqc.addContainerProperty("month", Integer.class, null, true, true);
-        lqc.addContainerProperty("dateenvoi", Date.class, null, true, true);
+        lqc.addContainerProperty("dateenvoi", Date.class, new Date(), true, true);
         lqc.addContainerProperty("comment", String.class, "", true, true);
         processtable.setContainerDataSource(lqc);
         processtable.setVisibleColumns(new Object[] {"finess", "year", "month", "dateenvoi", "comment"});
         processtable.setColumnHeaders(new String[] {"Finess", "Année", "Mois", "Date d'envoi", "Commentaire"} );
         processtable.setSelectable(true);
-        processtable.setPageLength(20);
         processtable.setSizeFull();
         layout.addComponent(processtable);
         
