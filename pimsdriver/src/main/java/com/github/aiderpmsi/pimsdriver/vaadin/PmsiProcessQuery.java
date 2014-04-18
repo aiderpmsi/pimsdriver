@@ -7,8 +7,8 @@ import java.util.List;
 import org.vaadin.addons.lazyquerycontainer.Query;
 import org.vaadin.addons.lazyquerycontainer.QueryDefinition;
 
-import com.github.aiderpmsi.pimsdriver.jaxrs.processpmsi.ProcessPmsiBase;
-import com.github.aiderpmsi.pimsdriver.jaxrs.processpmsi.UploadedElement;
+import com.github.aiderpmsi.pimsdriver.dao.UploadedElementsDAO;
+import com.github.aiderpmsi.pimsdriver.model.UploadedElementModel;
 import com.github.aiderpmsi.pimsdriver.odb.DocDbConnectionFactory;
 import com.github.aiderpmsi.pimsdriver.odb.vaadin.ODBQueryBuilder;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
@@ -20,7 +20,7 @@ import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.util.filter.And;
 import com.vaadin.data.util.filter.Compare;
 
-public class PmsiProcessQuery extends ProcessPmsiBase implements Query{
+public class PmsiProcessQuery implements Query{
 
 	/** Query used for the count */
 	private String countQuery;
@@ -70,7 +70,7 @@ public class PmsiProcessQuery extends ProcessPmsiBase implements Query{
 	
 	@Override
 	public Item constructItem() {
-		return new BeanItem<UploadedElement>(new UploadedElement());
+		return new BeanItem<UploadedElementModel>(new UploadedElementModel());
 	}
 
 	@Override
@@ -81,13 +81,14 @@ public class PmsiProcessQuery extends ProcessPmsiBase implements Query{
 	@Override
 	public List<Item> loadItems(int startIndex, int count) {
 		// GETS THE LIST OF UPLOADED ELEMENTS
-		List<UploadedElement> elements = getPendingUploadedElements(contentQuery + " OFFSET " + startIndex + " LIMIT " + count, contentQueryArgs);
+		UploadedElementsDAO ued = new UploadedElementsDAO();
+		List<UploadedElementModel> elements = ued.getPendingUploadedElements(contentQuery + " OFFSET " + startIndex + " LIMIT " + count, contentQueryArgs);
 		
 		// CREATE THE LIST OF ITEMS
 		List<Item> items = new ArrayList<>(count);
-		for (UploadedElement element : elements) {
+		for (UploadedElementModel element : elements) {
 			// CREATES THE ITEM FROM THE BEAN
-			BeanItem<UploadedElement> ueItem = new BeanItem<UploadedElement>(element);
+			BeanItem<UploadedElementModel> ueItem = new BeanItem<UploadedElementModel>(element);
 			
 			// ADDS IT TO THE LIST
 			items.add(ueItem);

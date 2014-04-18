@@ -1,4 +1,4 @@
-package com.github.aiderpmsi.pimsdriver.jaxrs.importpmsi;
+package com.github.aiderpmsi.pimsdriver.model;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;

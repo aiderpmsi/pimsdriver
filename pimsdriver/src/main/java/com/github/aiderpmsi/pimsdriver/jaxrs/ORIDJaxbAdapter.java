@@ -1,4 +1,4 @@
-package com.github.aiderpmsi.pimsdriver.odb;
+package com.github.aiderpmsi.pimsdriver.jaxrs;
 
 import java.io.IOException;
 import java.util.regex.Matcher;

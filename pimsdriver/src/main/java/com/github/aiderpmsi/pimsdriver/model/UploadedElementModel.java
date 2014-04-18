@@ -1,4 +1,4 @@
-package com.github.aiderpmsi.pimsdriver.jaxrs.processpmsi;
+package com.github.aiderpmsi.pimsdriver.model;
 
 import java.util.Date;
 
@@ -6,11 +6,11 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
-import com.github.aiderpmsi.pimsdriver.odb.ORIDJaxbAdapter;
+import com.github.aiderpmsi.pimsdriver.jaxrs.ORIDJaxbAdapter;
 import com.orientechnologies.orient.core.id.ORID;
 
 @XmlAccessorType(XmlAccessType.PUBLIC_MEMBER)
-public class UploadedElement {
+public class UploadedElementModel {
 
 	private ORID recordId;
 	

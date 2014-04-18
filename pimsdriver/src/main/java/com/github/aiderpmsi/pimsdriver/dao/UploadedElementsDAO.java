@@ -1,22 +1,18 @@
-package com.github.aiderpmsi.pimsdriver.jaxrs.processpmsi;
+package com.github.aiderpmsi.pimsdriver.dao;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import javax.annotation.security.PermitAll;
-import javax.ws.rs.Path;
-
+import com.github.aiderpmsi.pimsdriver.model.UploadedElementModel;
 import com.github.aiderpmsi.pimsdriver.odb.DocDbConnectionFactory;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 
-@Path("/process") 
-@PermitAll
-public class ProcessPmsiBase {
+public class UploadedElementsDAO {
 	
-	protected List<UploadedElement> getPendingUploadedElements (
+	public List<UploadedElementModel> getPendingUploadedElements (
 			String query, Object[] arguments) {
 
 		// EXECUTES THE QUERY
@@ -34,10 +30,10 @@ public class ProcessPmsiBase {
 		}
 
 		// LIST OF THE ELEMENTS
-		List<UploadedElement> upeltslist = new ArrayList<>();
+		List<UploadedElementModel> upeltslist = new ArrayList<>();
 		for (ODocument result : results) {
 			// BEAN FOR THIS ITEM
-			UploadedElement element = new UploadedElement();
+			UploadedElementModel element = new UploadedElementModel();
 
 			// FILLS THE BEAN
 			element.setRecordId(result.getIdentity());

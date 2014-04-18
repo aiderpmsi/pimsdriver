@@ -1,4 +1,4 @@
-package com.github.aiderpmsi.pimsdriver.jaxrs.processpmsi;
+package com.github.aiderpmsi.pimsdriver.jaxrs;
 
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -12,11 +12,15 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+
 import org.apache.commons.lang3.StringUtils;
 
-@Path("/process") 
+import com.github.aiderpmsi.pimsdriver.dao.UploadedElementsDAO;
+import com.github.aiderpmsi.pimsdriver.model.UploadedElementModel;
+
+@Path("/uploaded") 
 @PermitAll
-public class ProcessPmsi extends ProcessPmsiBase {
+public class UploadedPmsi {
 
 	@SuppressWarnings("serial")
 	public static final Set<String> orderindex = new HashSet<String>(5){{
@@ -30,7 +34,7 @@ public class ProcessPmsi extends ProcessPmsiBase {
 	@GET
     @Path("/list")
     @Produces({MediaType.APPLICATION_XML})
-	public List<UploadedElement> getPendingUploadedElements(
+	public List<UploadedElementModel> getPendingUploadedElements(
 			@DefaultValue("0") @QueryParam("first") Integer first,
 			@DefaultValue("20") @QueryParam("rows") Integer rows,
 			@QueryParam("orderelts") List<String> orderelts,
@@ -68,7 +72,8 @@ public class ProcessPmsi extends ProcessPmsiBase {
 		query.append("offset ").append(first).append(" limit ").append(rows + 1);
 		
 		// EXECUTES THE QUERY
-		return getPendingUploadedElements(query.toString(), new Object[]{});
+		UploadedElementsDAO ued = new UploadedElementsDAO();
+		return ued.getPendingUploadedElements(query.toString(), new Object[]{});
 	}
 	
 }

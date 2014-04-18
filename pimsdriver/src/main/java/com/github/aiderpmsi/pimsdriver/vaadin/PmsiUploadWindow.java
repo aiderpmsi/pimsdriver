@@ -2,8 +2,8 @@ package com.github.aiderpmsi.pimsdriver.vaadin;
 
 import java.io.IOException;
 
-import com.github.aiderpmsi.pimsdriver.jaxrs.importpmsi.ImportPmsi;
-import com.github.aiderpmsi.pimsdriver.jaxrs.importpmsi.ImportPmsiModel;
+import com.github.aiderpmsi.pimsdriver.jaxrs.ImportPmsi;
+import com.github.aiderpmsi.pimsdriver.model.ImportPmsiModel;
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitEvent;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;

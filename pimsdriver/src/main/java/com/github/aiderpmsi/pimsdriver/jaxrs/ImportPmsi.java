@@ -1,4 +1,4 @@
-package com.github.aiderpmsi.pimsdriver.jaxrs.importpmsi;
+package com.github.aiderpmsi.pimsdriver.jaxrs;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,6 +22,8 @@ import javax.ws.rs.core.UriInfo;
 
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
+
+import com.github.aiderpmsi.pimsdriver.model.ImportPmsiModel;
 import com.github.aiderpmsi.pimsdriver.odb.DocDbConnectionFactory;
 import com.github.aiderpmsi.pimsdriver.odb.PimsODocumentHelper;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
