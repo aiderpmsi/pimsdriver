@@ -80,10 +80,8 @@ public class PmsiProcessQuery extends ProcessPmsiBase implements Query{
 
 	@Override
 	public List<Item> loadItems(int startIndex, int count) {
-		OSQLSynchQuery<ODocument> oquery = new OSQLSynchQuery<ODocument>(contentQuery + " OFFSET " + startIndex + " LIMIT " + count);
-
 		// GETS THE LIST OF UPLOADED ELEMENTS
-		List<UploadedElement> elements = getPendingUploadedElements(oquery.toString(), contentQueryArgs);
+		List<UploadedElement> elements = getPendingUploadedElements(contentQuery + " OFFSET " + startIndex + " LIMIT " + count, contentQueryArgs);
 		
 		// CREATE THE LIST OF ITEMS
 		List<Item> items = new ArrayList<>(count);
