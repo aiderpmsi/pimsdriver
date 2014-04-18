@@ -2,7 +2,7 @@ package com.github.aiderpmsi.pimsdriver.vaadin;
 
 import java.io.IOException;
 
-import com.github.aiderpmsi.pimsdriver.jaxrs.ImportPmsi;
+import com.github.aiderpmsi.pimsdriver.dao.ImportPmsiDAO;
 import com.github.aiderpmsi.pimsdriver.model.ImportPmsiModel;
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitEvent;
@@ -154,7 +154,7 @@ public class PmsiUploadWindow extends Window {
 				ImportPmsiModel model = binder.getItemDataSource().getBean();
 				
 				try {
-					new ImportPmsi().importPmsi(
+					new ImportPmsiDAO().importPmsi(
 							model,
 							rsf.getFile(),
 							(rss.getFilename() == null ? null : rss.getFile()));

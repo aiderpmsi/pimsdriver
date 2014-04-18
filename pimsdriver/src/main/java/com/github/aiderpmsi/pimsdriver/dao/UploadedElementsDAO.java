@@ -54,4 +54,23 @@ public class UploadedElementsDAO {
 		return upeltslist;
 	}
 	
+	public int size(String query, Object[] arguments) {
+		OSQLSynchQuery<ODocument> oquery = new OSQLSynchQuery<ODocument>(query);
+		ODatabaseDocumentTx tx = null;
+		List<ODocument> results = null;
+		try {
+			tx = DocDbConnectionFactory.getInstance().getConnection();
+			tx.begin();
+			results = tx.command(oquery).execute(arguments);
+			tx.commit();
+		} finally {
+			if (tx != null)
+				tx.close();
+		}
+
+		// GETS THE FIRST RESULT
+		return ((Long) results.get(0).field("nbrows")).intValue();
+	}
+
+	
 }

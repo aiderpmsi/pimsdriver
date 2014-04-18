@@ -9,11 +9,7 @@ import org.vaadin.addons.lazyquerycontainer.QueryDefinition;
 
 import com.github.aiderpmsi.pimsdriver.dao.UploadedElementsDAO;
 import com.github.aiderpmsi.pimsdriver.model.UploadedElementModel;
-import com.github.aiderpmsi.pimsdriver.odb.DocDbConnectionFactory;
 import com.github.aiderpmsi.pimsdriver.odb.vaadin.ODBQueryBuilder;
-import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
-import com.orientechnologies.orient.core.record.impl.ODocument;
-import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 import com.vaadin.data.Container.Filter;
 import com.vaadin.data.Item;
 import com.vaadin.data.util.BeanItem;
@@ -105,21 +101,8 @@ public class PmsiProcessQuery implements Query{
 
 	@Override
 	public int size() {
-		OSQLSynchQuery<ODocument> oquery = new OSQLSynchQuery<ODocument>(countQuery);
-		ODatabaseDocumentTx tx = null;
-		List<ODocument> results = null;
-		try {
-			tx = DocDbConnectionFactory.getInstance().getConnection();
-			tx.begin();
-			results = tx.command(oquery).execute(contentQueryArgs);
-			tx.commit();
-		} finally {
-			if (tx != null)
-				tx.close();
-		}
-
-		// GETS THE FIRST RESULT
-		return ((Long) results.get(0).field("nbrows")).intValue();
+		UploadedElementsDAO ued = new UploadedElementsDAO();
+		return ued.size(countQuery, new Object[]{});
 	}
 
 }
