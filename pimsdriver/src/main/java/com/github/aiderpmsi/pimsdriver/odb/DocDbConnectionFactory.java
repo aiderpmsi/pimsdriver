@@ -32,6 +32,8 @@ public class DocDbConnectionFactory {
 				OClass pmsiUpload = db.getMetadata().getSchema().getClass("PmsiUpload");
 				pmsiUpload.createProperty("processed", OType.STRING);
 				pmsiUpload.createIndex("pu_processed", INDEX_TYPE.NOTUNIQUE, "processed");
+				pmsiUpload.createProperty("finess", OType.STRING);
+				pmsiUpload.createIndex("pu_finess", INDEX_TYPE.NOTUNIQUE, "finess", "processed");
 				
 				// PMSIELEMENT
 				db.getMetadata().getSchema().createClass("PmsiElement");

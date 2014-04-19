@@ -102,7 +102,7 @@ public class PmsiProcessQuery implements Query{
 	@Override
 	public int size() {
 		UploadedElementsDAO ued = new UploadedElementsDAO();
-		return ued.size(countQuery, new Object[]{});
+		return ued.size(countQuery, new Object[]{"pending"});
 	}
 
 }
