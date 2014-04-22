@@ -39,6 +39,7 @@ public class DocDbConnectionFactory {
 				OClass pmsiElement = db.getMetadata().getSchema().getClass("PmsiElement");
 				pmsiElement.createProperty("parentlink", OType.LINK);
 				pmsiElement.createProperty("type", OType.STRING);
+				pmsiUpload.createIndex("pu_processed", INDEX_TYPE.NOTUNIQUE, "parentlink", "type");
 			}
 		} finally {
 			if (db != null)
