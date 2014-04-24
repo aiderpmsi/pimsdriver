@@ -107,13 +107,11 @@ public class FinessPanel extends Panel {
 			/** Generated serial id */
 			private static final long serialVersionUID = -8083420762047096032L;
 			public void nodeCollapse(CollapseEvent event) {
-				if (event.getItemId() == idsuccess) {
-					// REMOVE ALL CHILDREN OF THIS COLLAPSING ITEM
-					@SuppressWarnings("unchecked")
-					Collection<Object> children = (Collection<Object>) hc.getChildren(event.getItemId());
-					for (Object child : children) {
-						hc.removeItemRecursively(child);
-					}
+				// REMOVE ALL CHILDREN OF THIS COLLAPSING ITEM
+				@SuppressWarnings("unchecked")
+				Collection<Object> children = (Collection<Object>) hc.getChildren(event.getItemId());
+				for (Object child : children) {
+					hc.removeItemRecursively(child);
 				}
 			}
 		});
