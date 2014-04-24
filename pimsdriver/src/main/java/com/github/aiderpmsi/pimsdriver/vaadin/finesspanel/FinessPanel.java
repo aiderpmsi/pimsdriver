@@ -1,7 +1,9 @@
 package com.github.aiderpmsi.pimsdriver.vaadin.finesspanel;
 
 import java.util.Collection;
+import java.util.List;
 
+import com.github.aiderpmsi.pimsdriver.dao.NavigationDAO;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.HierarchicalContainer;
 import com.vaadin.ui.Panel;
@@ -45,13 +47,17 @@ public class FinessPanel extends Panel {
 			private static final long serialVersionUID = 7235194562779113128L;
 			@Override
 			public void nodeExpand(ExpandEvent event) {
-				if (event.getItemId() == idsuccess) {
+				if (event.getItemId() == idsuccess || event.getItemId() == idfail) {
+					String filter = (event.getItemId() == idsuccess ? "processed" : "failed");
 					// FILL THE SUCCESS TREE
-					Object id = hc.addItem();
-					@SuppressWarnings("unchecked")
-					Property<String> prop = (Property<String>) hc.getContainerProperty(id, "caption");
-					prop.setValue("158");
-					hc.setParent(id, event.getItemId());
+					List<String> finesses = (new NavigationDAO()).getFiness(filter);
+					for (String finess : finesses) {
+						Object id = hc.addItem();
+						@SuppressWarnings("unchecked")
+						Property<String> prop = (Property<String>) hc.getContainerProperty(id, "caption");
+						prop.setValue(finess);
+						hc.setParent(id, event.getItemId());
+					}
 				}
 			}
 		});
