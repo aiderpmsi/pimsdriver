@@ -1,5 +1,6 @@
 package com.github.aiderpmsi.pimsdriver.processor;
 
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -39,9 +40,10 @@ public class ProcessListener implements ContainerLifecycleListener {
 		threadResult.cancel(true);
 		try {
 			threadResult.get();
-			DocDbConnectionFactory.getInstance().close();
-		} catch (InterruptedException | ExecutionException e) {
+		} catch (InterruptedException | ExecutionException | CancellationException e) {
 			log.warning(e.getMessage());
+		} finally {
+			DocDbConnectionFactory.getInstance().close();
 		}
 	}
 }
