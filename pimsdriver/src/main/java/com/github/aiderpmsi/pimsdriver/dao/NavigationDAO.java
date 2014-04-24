@@ -10,6 +10,11 @@ import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 
 public class NavigationDAO {
 
+	public class YM {
+		public Integer year;
+		public Integer month;
+	}
+	
 	public List<String> getFiness(String status) {
 		OSQLSynchQuery<ODocument> oquery = new OSQLSynchQuery<ODocument>("SELECT DISTINCT(finess) AS d_finess FROM PmsiUpload WHERE processed = ?");
 		ODatabaseDocumentTx tx = null;
@@ -32,4 +37,36 @@ public class NavigationDAO {
 		return finesses;
 	}
 
+	public List<YM> getYM(String status, String finess) {
+		OSQLSynchQuery<ODocument> oquery = new OSQLSynchQuery<ODocument>(
+				"select distinct($d) AS ym,year, month from PmsiUpload let $d = year.append(' ').append(month)"
+				+ " WHERE processed = ? AND finess = ?"
+				+ " ORDER BY year DESC, month DESC");
+		ODatabaseDocumentTx tx = null;
+		List<ODocument> results = null;
+		try {
+			tx = DocDbConnectionFactory.getInstance().getConnection();
+			tx.begin();
+			results = tx.command(oquery).execute(status, finess);
+			tx.commit();
+		} finally {
+			if (tx != null)
+				tx.close();
+		}
+
+		// IF NO RESULT, THIS FINESS DOESN'T EXIST ANYMORE, RETURN NULL VALUE
+		if (results.size() == 0) {
+			return null;
+		} else {
+			List<YM> yms = new ArrayList<>(results.size());
+			for (ODocument result : results) {
+				YM ym = new YM();
+				ym.year = (Integer) result.field("year");
+				ym.month = (Integer) result.field("month");
+				yms.add(ym);
+			}
+			return yms;
+		}
+	}
+	
 }

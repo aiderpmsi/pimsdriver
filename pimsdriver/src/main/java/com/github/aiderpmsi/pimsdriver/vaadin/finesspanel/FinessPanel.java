@@ -29,12 +29,18 @@ public class FinessPanel extends Panel {
 		@SuppressWarnings("unchecked")
 		Property<String> propsucess = (Property<String>) hc.getContainerProperty(idsuccess, "caption");
 		propsucess.setValue("Finess");
+		@SuppressWarnings("unchecked")
+		Property<Integer> propsucessdepth = (Property<Integer>) hc.getContainerProperty(idsuccess, "depth");
+		propsucessdepth.setValue(0);
 		
 		// ERRORS ROOT
 		final Object idfail = hc.addItem();
 		@SuppressWarnings("unchecked")
 		Property<String> propfail = (Property<String>) hc.getContainerProperty(idfail, "caption");
 		propfail.setValue("Fichiers en erreur");
+		@SuppressWarnings("unchecked")
+		Property<Integer> propfaildepth = (Property<Integer>) hc.getContainerProperty(idfail, "depth");
+		propfaildepth.setValue(0);
 
 		// TREE WIDGET
 		Tree finessTree = new Tree();
@@ -47,7 +53,8 @@ public class FinessPanel extends Panel {
 			private static final long serialVersionUID = 7235194562779113128L;
 			@Override
 			public void nodeExpand(ExpandEvent event) {
-				if (event.getItemId() == idsuccess || event.getItemId() == idfail) {
+				// IF WE EXPAND A ROOT NODE
+				if ((Integer) hc.getContainerProperty(event.getItemId(), "depth").getValue() == 0) {
 					String filter = (event.getItemId() == idsuccess ? "processed" : "failed");
 					// FILL THE SUCCESS TREE
 					List<String> finesses = (new NavigationDAO()).getFiness(filter);
@@ -56,7 +63,38 @@ public class FinessPanel extends Panel {
 						@SuppressWarnings("unchecked")
 						Property<String> prop = (Property<String>) hc.getContainerProperty(id, "caption");
 						prop.setValue(finess);
+						@SuppressWarnings("unchecked")
+						Property<Integer> depth = (Property<Integer>) hc.getContainerProperty(id, "depth");
+						depth.setValue(1);
 						hc.setParent(id, event.getItemId());
+					}
+				}
+				// IF WE EXPAND A FINESS NODE
+				else if ((Integer) hc.getContainerProperty(event.getItemId(), "depth").getValue() == 1) {
+					String filter = (hc.getParent(event.getItemId()) == idsuccess ? "processed" : "failed");
+					String finess = (String) hc.getContainerProperty(event.getItemId(), "caption").getValue();
+					// FILL THE FINESS TREE :
+					List<NavigationDAO.YM> yms = (new NavigationDAO()).getYM(filter, finess);
+					// WHEN YMS IS NULL, IT MEANS THIS ITEM DOESN'T EXIST ANYMORE, REMOVE IT FROM THE TREE
+					if (yms == null) {
+						hc.removeItemRecursively(event.getItemId());
+					} else {
+						for (NavigationDAO.YM ym : yms) {
+							Object id = hc.addItem();
+							@SuppressWarnings("unchecked")
+							Property<String> prop = (Property<String>) hc.getContainerProperty(id, "caption");
+							prop.setValue(ym.year + " M" + ym.month);
+							@SuppressWarnings("unchecked")
+							Property<Integer> propyear = (Property<Integer>) hc.getContainerProperty(id, "year");
+							propyear.setValue(ym.year);
+							@SuppressWarnings("unchecked")
+							Property<Integer> propmonth = (Property<Integer>) hc.getContainerProperty(id, "month");
+							propmonth.setValue(ym.month);
+							@SuppressWarnings("unchecked")
+							Property<Integer> depth = (Property<Integer>) hc.getContainerProperty(id, "depth");
+							depth.setValue(2);
+							hc.setParent(id, event.getItemId());
+						}
 					}
 				}
 			}
