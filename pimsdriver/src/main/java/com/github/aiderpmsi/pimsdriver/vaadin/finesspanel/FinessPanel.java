@@ -55,7 +55,7 @@ public class FinessPanel extends Panel {
 			/** Generated serial id */
 			private static final long serialVersionUID = 7235194562779113128L;
 			@Override
-			public void nodeExpand(ExpandEvent event) {
+			public synchronized void nodeExpand(ExpandEvent event) {
 				// IF WE EXPAND A ROOT NODE
 				if ((Integer) hc.getContainerProperty(event.getItemId(), "depth").getValue() == 0) {
 					String filter = (event.getItemId() == idsuccess ? "processed" : "failed");
@@ -106,12 +106,14 @@ public class FinessPanel extends Panel {
 		finessTree.addCollapseListener(new Tree.CollapseListener() {
 			/** Generated serial id */
 			private static final long serialVersionUID = -8083420762047096032L;
-			public void nodeCollapse(CollapseEvent event) {
-				// REMOVE ALL CHILDREN OF THIS COLLAPSING ITEM
+			public synchronized void nodeCollapse(CollapseEvent event) {
+				// REMOVE ALL CHILDREN OF THIS COLLAPSING ITEM IF NOT NULL
 				@SuppressWarnings("unchecked")
-				Collection<Object> children = (Collection<Object>) hc.getChildren(event.getItemId());
-				for (Object child : children) {
-					hc.removeItemRecursively(child);
+				Collection<Object> childrenCollection = (Collection<Object>) hc.getChildren(event.getItemId());
+				if (childrenCollection != null) {
+					for (Object child : childrenCollection.toArray()) {
+						hc.removeItemRecursively(child);
+					}
 				}
 			}
 		});
