@@ -11,7 +11,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import com.github.aiderpmsi.pims.utils.Parser;
-import com.github.aiderpmsi.pimsdriver.odb.DocDbConnectionFactory;
+import com.github.aiderpmsi.pimsdriver.odb.DataSourceSingleton;
 import com.github.aiderpmsi.pimsdriver.odb.OdbRsfContentHandler;
 import com.github.aiderpmsi.pimsdriver.odb.OdbRssContentHandler;
 import com.github.aiderpmsi.pimsdriver.odb.PimsODocumentHelper;
@@ -33,7 +33,7 @@ public class ProcessImpl implements Callable<Boolean> {
 	public Boolean call() {
 		ODatabaseDocumentTx tx = null;
 		try {
-			tx = DocDbConnectionFactory.getInstance().getConnection();
+			tx = DataSourceSingleton.getInstance().getConnection();
 			tx.begin();
 			
 			// ORIENTDB HELPER

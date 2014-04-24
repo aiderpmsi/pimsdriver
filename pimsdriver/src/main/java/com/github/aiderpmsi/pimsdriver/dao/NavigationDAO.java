@@ -3,7 +3,7 @@ package com.github.aiderpmsi.pimsdriver.dao;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.github.aiderpmsi.pimsdriver.odb.DocDbConnectionFactory;
+import com.github.aiderpmsi.pimsdriver.odb.DataSourceSingleton;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
@@ -20,7 +20,7 @@ public class NavigationDAO {
 		ODatabaseDocumentTx tx = null;
 		List<ODocument> results = null;
 		try {
-			tx = DocDbConnectionFactory.getInstance().getConnection();
+			tx = DataSourceSingleton.getInstance().getConnection();
 			tx.begin();
 			results = tx.command(oquery).execute(status);
 			tx.commit();
@@ -45,7 +45,7 @@ public class NavigationDAO {
 		ODatabaseDocumentTx tx = null;
 		List<ODocument> results = null;
 		try {
-			tx = DocDbConnectionFactory.getInstance().getConnection();
+			tx = DataSourceSingleton.getInstance().getConnection();
 			tx.begin();
 			results = tx.command(oquery).execute(status, finess);
 			tx.commit();

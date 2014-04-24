@@ -12,7 +12,7 @@ import javax.ws.rs.ext.Provider;
 import org.glassfish.jersey.server.spi.Container;
 import org.glassfish.jersey.server.spi.ContainerLifecycleListener;
 
-import com.github.aiderpmsi.pimsdriver.odb.DocDbConnectionFactory;
+import com.github.aiderpmsi.pimsdriver.odb.DataSourceSingleton;
 
 @Provider
 public class ProcessListener implements ContainerLifecycleListener {
@@ -43,7 +43,7 @@ public class ProcessListener implements ContainerLifecycleListener {
 		} catch (InterruptedException | ExecutionException | CancellationException e) {
 			log.warning(e.getMessage());
 		} finally {
-			DocDbConnectionFactory.getInstance().close();
+			DataSourceSingleton.getInstance().close();
 		}
 	}
 }

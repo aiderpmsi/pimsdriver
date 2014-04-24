@@ -5,7 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.github.aiderpmsi.pimsdriver.model.UploadedElementModel;
-import com.github.aiderpmsi.pimsdriver.odb.DocDbConnectionFactory;
+import com.github.aiderpmsi.pimsdriver.odb.DataSourceSingleton;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
@@ -20,7 +20,7 @@ public class UploadedElementsDAO {
 		ODatabaseDocumentTx tx = null;
 		List<ODocument> results = null;
 		try {
-			tx = DocDbConnectionFactory.getInstance().getConnection();
+			tx = DataSourceSingleton.getInstance().getConnection();
 			tx.begin();
 			results = tx.command(oquery).execute(arguments);
 			tx.commit();
@@ -59,7 +59,7 @@ public class UploadedElementsDAO {
 		ODatabaseDocumentTx tx = null;
 		List<ODocument> results = null;
 		try {
-			tx = DocDbConnectionFactory.getInstance().getConnection();
+			tx = DataSourceSingleton.getInstance().getConnection();
 			tx.begin();
 			results = tx.command(oquery).execute(arguments);
 			tx.commit();

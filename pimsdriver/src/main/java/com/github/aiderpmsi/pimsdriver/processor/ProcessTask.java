@@ -8,7 +8,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.logging.Logger;
 
-import com.github.aiderpmsi.pimsdriver.odb.DocDbConnectionFactory;
+import com.github.aiderpmsi.pimsdriver.odb.DataSourceSingleton;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
@@ -27,7 +27,7 @@ public class ProcessTask implements Callable<Boolean> {
 			OSQLSynchQuery<ODocument> oquery = new OSQLSynchQuery<ODocument>("select @RID, rsf, rss from PmsiUpload where processed='pending'");
 			List<ODocument> results = null;
 			try {
-				tx = DocDbConnectionFactory.getInstance().getConnection();
+				tx = DataSourceSingleton.getInstance().getConnection();
 				tx.begin();
 				results = tx.query(oquery);
 				tx.commit();
