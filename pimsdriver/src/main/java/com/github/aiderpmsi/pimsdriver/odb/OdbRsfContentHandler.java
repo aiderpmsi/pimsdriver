@@ -11,6 +11,7 @@ import org.xml.sax.SAXException;
 
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.id.ORID;
+import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 
 public class OdbRsfContentHandler extends ContentHandlerHelper {
@@ -125,13 +126,13 @@ public class OdbRsfContentHandler extends ContentHandlerHelper {
 			// IF THIS ELEMENT IS THE HEADER, STORE THE PARENTLINK AS UPLOAD ELEMENT
 			// AND SETS THIS ELEMENT AS HEADERID
 			if (getContentPath().getLast().equals("rsfheader")) {
-				odoc.field("parentlink", uploadID);
+				odoc.field("parentlink", uploadID, OType.LINK);
 				tx.save(odoc);
 				headerID = odoc.getIdentity();
 			}
 			// IF THIS ELEMENT IS NOT THE HEADER, STORE THE HEADERID AS THE PARENT
 			else {
-				odoc.field("parentlink", headerID);
+				odoc.field("parentlink", headerID, OType.LINK);
 				tx.save(odoc);
 			}
 		}
