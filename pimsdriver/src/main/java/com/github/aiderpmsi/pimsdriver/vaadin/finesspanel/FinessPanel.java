@@ -23,6 +23,9 @@ public class FinessPanel extends Panel {
 		// SETS THE HIERARCHICAL CONTAINER PROPERTIES
 		final HierarchicalContainer hc = new HierarchicalContainer();
 		hc.addContainerProperty("caption", String.class, "");
+		hc.addContainerProperty("depth", Integer.class, null);
+		hc.addContainerProperty("year", Integer.class, null);
+		hc.addContainerProperty("month", Integer.class, null);
 		
 		// SUCESS ROOT
 		final Object idsuccess = hc.addItem();
