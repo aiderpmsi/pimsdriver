@@ -16,7 +16,7 @@ public class DocDbConnectionFactory {
 	
 	private static DocDbConnectionFactory con = null;
 	
-	private ODatabaseDocumentPool pool = null;
+	private static ODatabaseDocumentPool pool = null;
 	
 	protected DocDbConnectionFactory() {
 		// CREATE DB IF NECESSARY
@@ -52,6 +52,10 @@ public class DocDbConnectionFactory {
 
 	public synchronized ODatabaseDocumentTx getConnection() {
 		return pool.acquire();
+	}
+	
+	public synchronized void close() {
+		pool.close();
 	}
 	
 	public static synchronized DocDbConnectionFactory getInstance() {

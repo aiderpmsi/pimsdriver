@@ -10,14 +10,14 @@ import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 
 public class NavigationDAO {
 
-	public List<String> getDistinctFiness() {
-		OSQLSynchQuery<ODocument> oquery = new OSQLSynchQuery<ODocument>("SELECT DISTINCT(finess) AS d_finess FROM PmsiUpload WHERE processed <> 'pending'");
+	public List<String> getFiness(String status) {
+		OSQLSynchQuery<ODocument> oquery = new OSQLSynchQuery<ODocument>("SELECT DISTINCT(finess) AS d_finess FROM PmsiUpload WHERE processed = ?");
 		ODatabaseDocumentTx tx = null;
 		List<ODocument> results = null;
 		try {
 			tx = DocDbConnectionFactory.getInstance().getConnection();
 			tx.begin();
-			results = tx.command(oquery).execute();
+			results = tx.command(oquery).execute(status);
 			tx.commit();
 		} finally {
 			if (tx != null)

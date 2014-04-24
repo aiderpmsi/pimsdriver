@@ -1,5 +1,6 @@
 package com.github.aiderpmsi.pimsdriver.vaadin;
 
+import com.github.aiderpmsi.pimsdriver.vaadin.finesspanel.FinessPanel;
 import com.vaadin.annotations.Theme;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.ui.HorizontalSplitPanel;
@@ -15,11 +16,12 @@ import com.vaadin.ui.Window;
 @Theme("pimsdriver")
 public class GuiUI extends UI {
 
-	/**
-	 * Generated Serial
-	 */
+	/** Generated Serial */
 	private static final long serialVersionUID = 3109715875916629911L;
 
+	/** liste des panels de navigation */
+	Panel finessPanels[];
+	
 	@Override
 	protected void init(VaadinRequest request) {
 		initLayout();
@@ -61,19 +63,13 @@ public class GuiUI extends UI {
 		// ADDS A SPLIT PANEL
 		HorizontalSplitPanel hsplit = new HorizontalSplitPanel();
 		hsplit.setSizeFull();
+		hsplit.setSplitPosition(.25f, Unit.PERCENTAGE);
 		pan.setContent(hsplit);
 
-		// ADDS A VERTICAL LAYOUT ON THE LEFT
+		// ADDS THE PANEL WITH THE FINESS TREE ON THE LEFT
 		VerticalLayout leftPanelLayout = new VerticalLayout();
 		hsplit.addComponent(leftPanelLayout);
-		
-		// ADD ALL FINESS WHICH HAVE BEEN PROCESSES
-		Label l1 = new Label("There are no previously saved actions.");
-		Label l2 = new Label("There are no saved notes.");
-		Label l3 = new Label("There are currently no issues.");
-		leftPanelLayout.addComponent(l1);
-		leftPanelLayout.addComponent(l2);
-		leftPanelLayout.addComponent(l3);
+		leftPanelLayout.addComponent(new FinessPanel());
 		
 	}
 	
