@@ -73,7 +73,7 @@ public class UploadedPmsi {
 		
 		// EXECUTES THE QUERY
 		UploadedElementsDAO ued = new UploadedElementsDAO();
-		return ued.getPendingUploadedElements(query.toString(), new Object[]{});
+		return ued.getUploadedElements(query.toString(), new Object[]{});
 	}
 	
 }

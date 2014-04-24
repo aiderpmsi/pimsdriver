@@ -78,7 +78,7 @@ public class PmsiProcessQuery implements Query{
 	public List<Item> loadItems(int startIndex, int count) {
 		// GETS THE LIST OF UPLOADED ELEMENTS
 		UploadedElementsDAO ued = new UploadedElementsDAO();
-		List<UploadedElementModel> elements = ued.getPendingUploadedElements(contentQuery + " OFFSET " + startIndex + " LIMIT " + count, contentQueryArgs);
+		List<UploadedElementModel> elements = ued.getUploadedElements(contentQuery + " OFFSET " + startIndex + " LIMIT " + count, contentQueryArgs);
 		
 		// CREATE THE LIST OF ITEMS
 		List<Item> items = new ArrayList<>(count);

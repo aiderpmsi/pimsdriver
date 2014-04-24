@@ -1,11 +1,16 @@
 package com.github.aiderpmsi.pimsdriver.vaadin.finesspanel;
 
+import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.List;
 
 import com.github.aiderpmsi.pimsdriver.dao.NavigationDAO;
+import com.github.aiderpmsi.pimsdriver.dao.UploadedElementsDAO;
+import com.github.aiderpmsi.pimsdriver.model.UploadedElementModel;
+import com.orientechnologies.orient.core.id.ORID;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.HierarchicalContainer;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.Tree;
 import com.vaadin.ui.Tree.CollapseEvent;
@@ -26,6 +31,7 @@ public class FinessPanel extends Panel {
 		hc.addContainerProperty("depth", Integer.class, null);
 		hc.addContainerProperty("year", Integer.class, null);
 		hc.addContainerProperty("month", Integer.class, null);
+		hc.addContainerProperty("RID", ORID.class, null);
 		
 		// SUCESS ROOT
 		final Object idsuccess = hc.addItem();
@@ -56,8 +62,10 @@ public class FinessPanel extends Panel {
 			private static final long serialVersionUID = 7235194562779113128L;
 			@Override
 			public synchronized void nodeExpand(ExpandEvent event) {
+				// GETS THE EVENT NODE DEPTH
+				Integer eventDepth = (Integer) hc.getContainerProperty(event.getItemId(), "depth").getValue();
 				// IF WE EXPAND A ROOT NODE
-				if ((Integer) hc.getContainerProperty(event.getItemId(), "depth").getValue() == 0) {
+				if (eventDepth == 0) {
 					String filter = (event.getItemId() == idsuccess ? "processed" : "failed");
 					// FILL THE SUCCESS TREE
 					List<String> finesses = (new NavigationDAO()).getFiness(filter);
@@ -73,7 +81,7 @@ public class FinessPanel extends Panel {
 					}
 				}
 				// IF WE EXPAND A FINESS NODE
-				else if ((Integer) hc.getContainerProperty(event.getItemId(), "depth").getValue() == 1) {
+				else if (eventDepth == 1) {
 					String filter = (hc.getParent(event.getItemId()) == idsuccess ? "processed" : "failed");
 					String finess = (String) hc.getContainerProperty(event.getItemId(), "caption").getValue();
 					// FILL THE FINESS TREE :
@@ -81,6 +89,8 @@ public class FinessPanel extends Panel {
 					// WHEN YMS IS NULL, IT MEANS THIS ITEM DOESN'T EXIST ANYMORE, REMOVE IT FROM THE TREE
 					if (yms == null) {
 						hc.removeItemRecursively(event.getItemId());
+						// SHOW THAT THIS ITEM DOESN'T EXIST ANYMORE
+						Notification.show("Le finess sélectionné n'existe plus", Notification.Type.WARNING_MESSAGE);
 					} else {
 						for (NavigationDAO.YM ym : yms) {
 							Object id = hc.addItem();
@@ -96,6 +106,39 @@ public class FinessPanel extends Panel {
 							@SuppressWarnings("unchecked")
 							Property<Integer> depth = (Property<Integer>) hc.getContainerProperty(id, "depth");
 							depth.setValue(2);
+							hc.setParent(id, event.getItemId());
+						}
+					}
+				}
+				// IF WE EXPAND A YEAR / MONTH NODE
+				else if (eventDepth == 2) {
+					String filter = (hc.getParent(hc.getParent(event.getItemId())) == idsuccess ? "processed" : "failed");
+					String finess = (String) hc.getContainerProperty(hc.getParent(event.getItemId()), "caption").getValue();
+					Integer year = (Integer) hc.getContainerProperty(event.getItemId(), "year").getValue();
+					Integer month = (Integer) hc.getContainerProperty(event.getItemId(), "month").getValue();
+					Object[] arguments = new Object[] {filter, finess, year, month};
+					UploadedElementsDAO ued = new UploadedElementsDAO();
+					// FILLS THE DATEENVOI TREE
+					List<UploadedElementModel> models = 
+							ued.getUploadedElements(
+									"SELECT * FROM PmsiUpload WHERE processed = ? AND finess = ? AND year = ? AND month = ? ORDER BY dateenvoi DESC",
+									arguments);
+					// IF WE HAVE NO RESULT, IT MEANS THIS ITEM DOESN'T EXIST ANYMORE, REMOVE IT FROM THE TREE
+					if (models.size() == 0) {
+						hc.removeItemRecursively(event.getItemId());
+					} else {
+						for (UploadedElementModel model : models) {
+							Object id = hc.addItem();
+							@SuppressWarnings("unchecked")
+							Property<String> prop = (Property<String>) hc.getContainerProperty(id, "caption");
+							SimpleDateFormat sdf = new SimpleDateFormat("DD/mm/YYYY HH:MM:SS");
+							prop.setValue(sdf.format(model.getDateenvoi()));
+							@SuppressWarnings("unchecked")
+							Property<ORID> proprid = (Property<ORID>) hc.getContainerProperty(id, "RID");
+							proprid.setValue(model.getRecordId());
+							@SuppressWarnings("unchecked")
+							Property<Integer> depth = (Property<Integer>) hc.getContainerProperty(id, "depth");
+							depth.setValue(3);
 							hc.setParent(id, event.getItemId());
 						}
 					}

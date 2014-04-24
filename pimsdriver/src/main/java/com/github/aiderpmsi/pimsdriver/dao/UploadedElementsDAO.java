@@ -12,7 +12,7 @@ import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 
 public class UploadedElementsDAO {
 	
-	public List<UploadedElementModel> getPendingUploadedElements (
+	public List<UploadedElementModel> getUploadedElements (
 			String query, Object[] arguments) {
 
 		// EXECUTES THE QUERY
