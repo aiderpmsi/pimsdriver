@@ -22,7 +22,7 @@ import javax.ws.rs.core.UriInfo;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 
-import com.github.aiderpmsi.pimsdriver.dao.ImportPmsiDAO;
+import com.github.aiderpmsi.pimsdriver.dao.ImportPmsiDTO;
 import com.github.aiderpmsi.pimsdriver.model.PmsiUploadElementModel;
 
 @Path("/import") 
@@ -71,7 +71,7 @@ public class ImportPmsi {
 		}
 		// THE FORM IS OK AND WE HAVE AT LEAST ONE RSF, IMPORT THE DATAS
 		else {
-			ImportPmsiDAO ipd = new ImportPmsiDAO();
+			ImportPmsiDTO ipd = new ImportPmsiDTO();
 			ipd.importPmsi(model, rsf, rss);
 
 			// REDIRECT TO OK WINDOW
