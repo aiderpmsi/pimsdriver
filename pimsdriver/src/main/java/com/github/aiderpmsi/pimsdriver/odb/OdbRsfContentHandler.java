@@ -1,7 +1,13 @@
 package com.github.aiderpmsi.pimsdriver.odb;
 
 import java.io.FileNotFoundException;
+import java.sql.Array;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
@@ -9,62 +15,41 @@ import org.xml.sax.Attributes;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 
-import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
-import com.orientechnologies.orient.core.id.ORID;
-import com.orientechnologies.orient.core.metadata.schema.OType;
-import com.orientechnologies.orient.core.record.impl.ODocument;
-
 public class OdbRsfContentHandler extends ContentHandlerHelper {
 
-	/**
-	 * Regexp to know if we are in an element
-	 */
+	/** Regexp to know if we are in an element */
 	private Pattern inElement = Pattern.compile("/root/(?:rsfheader|rsfa|rsfb|rsfc|rsfh|rsfi|rsfl|rsfm)");
 	
-	/**
-	 * Regexp to know if we are in a property
-	 */
+	/** Regexp to know if we are in a property */
 	private Pattern inProperty = Pattern.compile("/root/(?:rsfheader|rsfa|rsfb|rsfc|rsfh|rsfi|rsfl|rsfm)/.+");
 	
-	/**
-	 * Colligates the elements of charachter
-	 */
+	/** Colligates the elements of charachter */
 	private StringBuilder currentPropertyContent;
 	
-	/**
-	 * Name of the property
-	 */
+	/** Name of the property */
 	private String currentProperty;
 
-	/**
-	 * Defines properties for the current element.
-	 */
+	/** Defines properties for the current element. */
 	private HashMap<String, String> properties;
 	
-	/**
-	 * Upload ORID in Database
-	 */
-	ORID uploadID;
+	/** Upload PK in DB (plud_id) */
+	private Long uploadPKId;
 	
-	/**
-	 * Header ORID
-	 */
-	ORID headerID;
+	/** Header PK in DB */
+	private Long headerPKId = null;
 	
-	/**
-	 * Database link
-	 */
-	private ODatabaseDocumentTx tx;
+	/** Database link */
+	private Connection con;
 
-	public OdbRsfContentHandler(ODatabaseDocumentTx tx, ORID uploadId) throws FileNotFoundException {
-		this.tx = tx;
-		this.uploadID = uploadId;
+	public OdbRsfContentHandler(Connection con, Long uploadPKId) {
+		this.con = con;
+		this.uploadPKId = uploadPKId;
 	}
 
 	//======== METHODS FOR CONTENTHANDLER =======
 	@Override
 	public void setDocumentLocator(Locator locator) {
-		// Do nothing
+		// DO NOTHING
 	}
 
 	@Override
@@ -80,12 +65,12 @@ public class OdbRsfContentHandler extends ContentHandlerHelper {
 	@Override
 	public void startPrefixMapping(String prefix, String uri)
 			throws SAXException {
-		// Do nothing
+		// DO NOTHIN
 	}
 
 	@Override
 	public void endPrefixMapping(String prefix) throws SAXException {
-		// Do nothing
+		// DO NOTHING
 	}
 
 	@Override
@@ -114,26 +99,35 @@ public class OdbRsfContentHandler extends ContentHandlerHelper {
 		}
 		// IF WE ARE LEAVING AN ELEMENT, STORE IT IN DB
 		else if (getContentPath().size() == 2 && inElement.matcher(getPath()).matches()) {
-			// CREATES THE ENTRY IN THE RIGHT CLASS
-			ODocument odoc = tx.newInstance("PmsiElement");
-			odoc.field("type", getContentPath().getLast());
+			// GENERATES THE QUERY
+			String query = "INSERT INTO pmel_pmsielement (pmel_root, pmel_parent, pmel_type, pmel_attributes) "
+					+ "VALUES(?, ?, ?, hstore(?, ?)) RETURNING pmel_id";
 
-			// STORES THE PROPERTIES
-			for (Entry<String, String> property : properties.entrySet()) {
-				odoc.field(property.getKey(), property.getValue());
-			}
+			PreparedStatement ps = con.prepareStatement(query);
 			
-			// IF THIS ELEMENT IS THE HEADER, STORE THE PARENTLINK AS UPLOAD ELEMENT
-			// AND SETS THIS ELEMENT AS HEADERID
-			if (getContentPath().getLast().equals("rsfheader")) {
-				odoc.field("parentlink", uploadID, OType.LINK);
-				tx.save(odoc);
-				headerID = odoc.getIdentity();
+			// CREATES THE ARRAY OF ARGUMENTS (KEYS AND VALUES) FOUND IN RSF
+			List<String> argskeys = new ArrayList<>(properties.size());
+			List<String> argsvalues = new ArrayList<>(properties.size());
+			for (Entry<String, String> property : properties.entrySet()) {
+				argskeys.add(property.getKey());
+				argsvalues.add(property.getValue());
 			}
-			// IF THIS ELEMENT IS NOT THE HEADER, STORE THE HEADERID AS THE PARENT
-			else {
-				odoc.field("parentlink", headerID, OType.LINK);
-				tx.save(odoc);
+
+			Array argskeysarray = con.createArrayOf("text", argskeys.toArray(new String[properties.size()]));
+			Array argsvaluesarray = con.createArrayOf("text", argsvalues.toArray(new String[properties.size()]));
+			
+			// SETS THE VALUES OF QUERY ARGS
+			ps.setLong(1, uploadPKId);
+			ps.setLong(2, headerPKId);
+			ps.setString(3, getContentPath().getLast());
+			ps.setArray(4, argskeysarray);
+			ps.setArray(5, argsvaluesarray);
+			
+			ResultSet rs = ps.executeQuery();
+			
+			// IF THIS ELEMENT IS THE HEADER, USE THIS ELEMENT ID AS PARENT ID (HEADER ID)
+			if (getContentPath().getLast().equals("rsfheader")) {
+				headerPKId = rs.getLong(1);
 			}
 		}
 		

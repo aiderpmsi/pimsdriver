@@ -4,8 +4,8 @@ import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.List;
 
-import com.github.aiderpmsi.pimsdriver.dao.NavigationDAO;
-import com.github.aiderpmsi.pimsdriver.dao.UploadedElementsDAO;
+import com.github.aiderpmsi.pimsdriver.dao.NavigationDTO;
+import com.github.aiderpmsi.pimsdriver.dao.UploadedElementsDTO;
 import com.github.aiderpmsi.pimsdriver.model.PmsiUploadedElementModel;
 import com.orientechnologies.orient.core.id.ORID;
 import com.vaadin.data.Property;
@@ -68,7 +68,7 @@ public class FinessPanel extends Panel {
 				if (eventDepth == 0) {
 					String filter = (event.getItemId() == idsuccess ? "processed" : "failed");
 					// FILL THE SUCCESS TREE
-					List<String> finesses = (new NavigationDAO()).getFiness(filter);
+					List<String> finesses = (new NavigationDTO()).getFiness(filter);
 					for (String finess : finesses) {
 						Object id = hc.addItem();
 						@SuppressWarnings("unchecked")
@@ -85,14 +85,14 @@ public class FinessPanel extends Panel {
 					String filter = (hc.getParent(event.getItemId()) == idsuccess ? "processed" : "failed");
 					String finess = (String) hc.getContainerProperty(event.getItemId(), "caption").getValue();
 					// FILL THE FINESS TREE :
-					List<NavigationDAO.YM> yms = (new NavigationDAO()).getYM(filter, finess);
+					List<NavigationDTO.YM> yms = (new NavigationDTO()).getYM(filter, finess);
 					// WHEN YMS IS NULL, IT MEANS THIS ITEM DOESN'T EXIST ANYMORE, REMOVE IT FROM THE TREE
 					if (yms == null) {
 						hc.removeItemRecursively(event.getItemId());
 						// SHOW THAT THIS ITEM DOESN'T EXIST ANYMORE
 						Notification.show("Le finess sélectionné n'existe plus", Notification.Type.WARNING_MESSAGE);
 					} else {
-						for (NavigationDAO.YM ym : yms) {
+						for (NavigationDTO.YM ym : yms) {
 							Object id = hc.addItem();
 							@SuppressWarnings("unchecked")
 							Property<String> prop = (Property<String>) hc.getContainerProperty(id, "caption");
@@ -117,7 +117,7 @@ public class FinessPanel extends Panel {
 					Integer year = (Integer) hc.getContainerProperty(event.getItemId(), "year").getValue();
 					Integer month = (Integer) hc.getContainerProperty(event.getItemId(), "month").getValue();
 					Object[] arguments = new Object[] {filter, finess, year, month};
-					UploadedElementsDAO ued = new UploadedElementsDAO();
+					UploadedElementsDTO ued = new UploadedElementsDTO();
 					// FILLS THE DATEENVOI TREE
 					List<PmsiUploadedElementModel> models = 
 							ued.getUploadedElements(

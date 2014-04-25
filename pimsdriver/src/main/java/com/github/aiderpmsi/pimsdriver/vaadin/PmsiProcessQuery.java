@@ -7,7 +7,7 @@ import java.util.List;
 import org.vaadin.addons.lazyquerycontainer.Query;
 import org.vaadin.addons.lazyquerycontainer.QueryDefinition;
 
-import com.github.aiderpmsi.pimsdriver.dao.UploadedElementsDAO;
+import com.github.aiderpmsi.pimsdriver.dao.UploadedElementsDTO;
 import com.github.aiderpmsi.pimsdriver.model.PmsiUploadedElementModel;
 import com.github.aiderpmsi.pimsdriver.odb.vaadin.ODBQueryBuilder;
 import com.vaadin.data.Container.Filter;
@@ -77,7 +77,7 @@ public class PmsiProcessQuery implements Query{
 	@Override
 	public List<Item> loadItems(int startIndex, int count) {
 		// GETS THE LIST OF UPLOADED ELEMENTS
-		UploadedElementsDAO ued = new UploadedElementsDAO();
+		UploadedElementsDTO ued = new UploadedElementsDTO();
 		List<PmsiUploadedElementModel> elements = ued.getUploadedElements(contentQuery + " OFFSET " + startIndex + " LIMIT " + count, contentQueryArgs);
 		
 		// CREATE THE LIST OF ITEMS
@@ -101,7 +101,7 @@ public class PmsiProcessQuery implements Query{
 
 	@Override
 	public int size() {
-		UploadedElementsDAO ued = new UploadedElementsDAO();
+		UploadedElementsDTO ued = new UploadedElementsDTO();
 		return ued.size(countQuery, new Object[]{"pending"});
 	}
 
