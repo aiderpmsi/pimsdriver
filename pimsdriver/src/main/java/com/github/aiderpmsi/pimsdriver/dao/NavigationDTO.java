@@ -86,7 +86,7 @@ public class NavigationDTO {
 			return yms;
 		} catch (SQLException e) {
 			try { con.rollback(); } catch (SQLException e2) { e2.addSuppressed(e); throw new RuntimeException(e2); }
-			throw new TransactionException("Erreur de récupération des différents finess", e);
+			throw new TransactionException("Erreur de récupération des différents mois / années du finess", e);
 		} finally {
 			if (con != null)
 				try { con.close(); } catch (SQLException e) { throw new RuntimeException(e); }
