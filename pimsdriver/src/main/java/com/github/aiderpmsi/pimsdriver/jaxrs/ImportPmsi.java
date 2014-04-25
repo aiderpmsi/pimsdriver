@@ -23,7 +23,7 @@ import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 
 import com.github.aiderpmsi.pimsdriver.dao.ImportPmsiDAO;
-import com.github.aiderpmsi.pimsdriver.model.ImportPmsiModel;
+import com.github.aiderpmsi.pimsdriver.model.PmsiUploadElementModel;
 
 @Path("/import") 
 @PermitAll
@@ -43,15 +43,15 @@ public class ImportPmsi {
 			@Context UriInfo uriInfo) throws IOException {
 		
 		// CREATES THE MODEL
-		ImportPmsiModel model = new ImportPmsiModel();
-		model.setMonthValue(month);
-		model.setYearValue(year);
-		model.setFinessValue(finess);
+		PmsiUploadElementModel model = new PmsiUploadElementModel();
+		model.setMonth(month);
+		model.setYear(year);
+		model.setFiness(finess);
 		
 		// VALIDATES THE MODEL
 		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
 		Validator validator = factory.getValidator();
-		Set<ConstraintViolation<ImportPmsiModel>> constraintViolations =
+		Set<ConstraintViolation<PmsiUploadElementModel>> constraintViolations =
 				validator.validate(model);		
 		
 		if (constraintViolations.size() != 0) {

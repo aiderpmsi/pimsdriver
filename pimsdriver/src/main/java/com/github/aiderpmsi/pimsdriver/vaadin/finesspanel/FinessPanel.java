@@ -6,7 +6,7 @@ import java.util.List;
 
 import com.github.aiderpmsi.pimsdriver.dao.NavigationDAO;
 import com.github.aiderpmsi.pimsdriver.dao.UploadedElementsDAO;
-import com.github.aiderpmsi.pimsdriver.model.UploadedElementModel;
+import com.github.aiderpmsi.pimsdriver.model.PmsiUploadedElementModel;
 import com.orientechnologies.orient.core.id.ORID;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.HierarchicalContainer;
@@ -119,7 +119,7 @@ public class FinessPanel extends Panel {
 					Object[] arguments = new Object[] {filter, finess, year, month};
 					UploadedElementsDAO ued = new UploadedElementsDAO();
 					// FILLS THE DATEENVOI TREE
-					List<UploadedElementModel> models = 
+					List<PmsiUploadedElementModel> models = 
 							ued.getUploadedElements(
 									"SELECT * FROM PmsiUpload WHERE processed = ? AND finess = ? AND year = ? AND month = ? ORDER BY dateenvoi DESC",
 									arguments);
@@ -127,7 +127,7 @@ public class FinessPanel extends Panel {
 					if (models.size() == 0) {
 						hc.removeItemRecursively(event.getItemId());
 					} else {
-						for (UploadedElementModel model : models) {
+						for (PmsiUploadedElementModel model : models) {
 							Object id = hc.addItem();
 							@SuppressWarnings("unchecked")
 							Property<String> prop = (Property<String>) hc.getContainerProperty(id, "caption");

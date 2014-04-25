@@ -1,45 +1,91 @@
 package com.github.aiderpmsi.pimsdriver.dao;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.Array;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.Date;
 
-import com.github.aiderpmsi.pimsdriver.model.ImportPmsiModel;
+import javax.transaction.Status;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Marshaller;
+
+import org.eclipse.persistence.jaxb.MarshallerProperties;
+import org.postgresql.largeobject.LargeObject;
+import org.postgresql.largeobject.LargeObjectManager;
+
+import com.github.aiderpmsi.pimsdriver.jaxb.JsonJaxbConverter;
+import com.github.aiderpmsi.pimsdriver.model.PmsiUploadElementModel;
+import com.github.aiderpmsi.pimsdriver.model.PmsiUploadedElementModel;
 import com.github.aiderpmsi.pimsdriver.odb.DataSourceSingleton;
 import com.github.aiderpmsi.pimsdriver.odb.PimsODocumentHelper;
-import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
-import com.orientechnologies.orient.core.record.impl.ODocument;
 
 public class ImportPmsiDAO {
 
-	public void importPmsi(ImportPmsiModel model, InputStream rsf, InputStream rss) throws IOException {
-		ODatabaseDocumentTx db = DataSourceSingleton.getInstance().getConnection();
+	public void importPmsi(PmsiUploadElementModel model, InputStream rsf, InputStream rss) throws IOException {
+		Connection con = null;
 		
 		try {
-			// TX BEGIN
-			db.begin();
-			Date now = new Date();
-			// CREATES THE ENTRY IN THE RIGHT CLASS
-			ODocument odoc = db.newInstance("PmsiUpload");
-			// HERLPER FOR THIS DOCUMENT (STORE FILE)
-			PimsODocumentHelper odocHelper = new PimsODocumentHelper(odoc);
-			odocHelper.field("rsf", rsf);
-			if (rss != null)
-				odocHelper.field("rss", rss);
-			odoc.field("month", model.getMonthValue());
-			odoc.field("year", model.getYearValue());
-			odoc.field("finess", model.getFinessValue());
-			odoc.field("processed", "pending");
-			odoc.field("dateenvoi", now);
-			// SAVE THIS ENTRY
-			db.save(odoc);
-			// TX END
-			db.commit();
+			// TRANSFORMS THE MODEL TO JSON
+			String modelJson = (new JsonJaxbConverter<PmsiUploadElementModel>(PmsiUploadElementModel.class)).toString(model);
+	        
+			// GETS THE DB CONNECTION
+			con = DataSourceSingleton.getInstance().getConnection();
+			
+			// USE THE LARGE OBJECT INTERFACE FOR FILES
+			LargeObjectManager lom = ((org.postgresql.PGConnection)con).getLargeObjectAPI();
+			
+			// CREATES AND FILLS THE RSF LARGE OBJECT
+			long rsfoid = lom.createLO(LargeObjectManager.READ | LargeObjectManager.WRITE);
+			LargeObject rsfobj = lom.open(rsfoid, LargeObjectManager.WRITE);
+			store(rsfobj, rsf);
+
+			// CREATES AND FILLS THE RSS LARGE OBJECT (IF IT EXISTS)
+			if (rss != null) {
+				long rssoid = lom.createLO(LargeObjectManager.READ | LargeObjectManager.WRITE);
+				LargeObject rssobj = lom.open(rsfoid, LargeObjectManager.WRITE);
+				store(rssobj, rss);
+			}
+
+			// THEN CREATES THE SQL QUERY TO INSERT EVERYTHING IN PLUD :
+			String query = 
+					"INSERT INTO plud_pimsupload("
+					+ "plud_processed, plud_finess, plud_year, plud_month, "
+					+ "plud_dateenvoi, plud_rsf_oid, plud_rss_oid, plud_arguments) "
+					+ "VALUES (?::public.plud_status, ?, ?, ?, "
+					+ "transaction_timestamp(), ?, ?, ?);";
+			PreparedStatement ps = con.prepareStatement(query);
+			ps.setString(1, "pending");
+			ps.setString(2, model.getFiness());
+			ps.setInt(3, model.getYear());
+			ps.setInt(4, model.getMonth());
+			ps.setString(5, PmsiUploadedElementModel.Status.pending.toString());
+			ps.setLong(6, rsfoid);
+			ps.setLong(7, rsfoid);
+			Array arguments = con.createArrayOf("text", new String[]{});
+			ps.setArray(8, arguments);
+
+			// EXECUTE QUERY
+			ps.execute();
+			
+			// COMMIT
+			con.commit();
 		} finally {
-			db.close();
+			if (con != null)
+				con.close();
 		}
 
 	}
 
-
+	private void store(LargeObject lo, InputStream is) throws IOException, SQLException {
+		// COPY FROM INPUTSTREAM TO LARGEOBJECT
+		byte buf[] = new byte[2048];
+		int s = 0;
+		while ((s = is.read(buf, 0, 2048)) > 0) {
+		   lo.write(buf, 0, s);
+		}
+	}
 }

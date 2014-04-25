@@ -8,7 +8,7 @@ import org.vaadin.addons.lazyquerycontainer.Query;
 import org.vaadin.addons.lazyquerycontainer.QueryDefinition;
 
 import com.github.aiderpmsi.pimsdriver.dao.UploadedElementsDAO;
-import com.github.aiderpmsi.pimsdriver.model.UploadedElementModel;
+import com.github.aiderpmsi.pimsdriver.model.PmsiUploadedElementModel;
 import com.github.aiderpmsi.pimsdriver.odb.vaadin.ODBQueryBuilder;
 import com.vaadin.data.Container.Filter;
 import com.vaadin.data.Item;
@@ -66,7 +66,7 @@ public class PmsiProcessQuery implements Query{
 	
 	@Override
 	public Item constructItem() {
-		return new BeanItem<UploadedElementModel>(new UploadedElementModel());
+		return new BeanItem<PmsiUploadedElementModel>(new PmsiUploadedElementModel());
 	}
 
 	@Override
@@ -78,13 +78,13 @@ public class PmsiProcessQuery implements Query{
 	public List<Item> loadItems(int startIndex, int count) {
 		// GETS THE LIST OF UPLOADED ELEMENTS
 		UploadedElementsDAO ued = new UploadedElementsDAO();
-		List<UploadedElementModel> elements = ued.getUploadedElements(contentQuery + " OFFSET " + startIndex + " LIMIT " + count, contentQueryArgs);
+		List<PmsiUploadedElementModel> elements = ued.getUploadedElements(contentQuery + " OFFSET " + startIndex + " LIMIT " + count, contentQueryArgs);
 		
 		// CREATE THE LIST OF ITEMS
 		List<Item> items = new ArrayList<>(count);
-		for (UploadedElementModel element : elements) {
+		for (PmsiUploadedElementModel element : elements) {
 			// CREATES THE ITEM FROM THE BEAN
-			BeanItem<UploadedElementModel> ueItem = new BeanItem<UploadedElementModel>(element);
+			BeanItem<PmsiUploadedElementModel> ueItem = new BeanItem<PmsiUploadedElementModel>(element);
 			
 			// ADDS IT TO THE LIST
 			items.add(ueItem);

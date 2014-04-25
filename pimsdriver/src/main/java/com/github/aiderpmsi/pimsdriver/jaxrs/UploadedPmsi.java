@@ -16,7 +16,7 @@ import javax.ws.rs.core.MediaType;
 import org.apache.commons.lang3.StringUtils;
 
 import com.github.aiderpmsi.pimsdriver.dao.UploadedElementsDAO;
-import com.github.aiderpmsi.pimsdriver.model.UploadedElementModel;
+import com.github.aiderpmsi.pimsdriver.model.PmsiUploadedElementModel;
 
 @Path("/uploaded") 
 @PermitAll
@@ -34,7 +34,7 @@ public class UploadedPmsi {
 	@GET
     @Path("/list")
     @Produces({MediaType.APPLICATION_XML})
-	public List<UploadedElementModel> getPendingUploadedElements(
+	public List<PmsiUploadedElementModel> getPendingUploadedElements(
 			@DefaultValue("0") @QueryParam("first") Integer first,
 			@DefaultValue("20") @QueryParam("rows") Integer rows,
 			@QueryParam("orderelts") List<String> orderelts,

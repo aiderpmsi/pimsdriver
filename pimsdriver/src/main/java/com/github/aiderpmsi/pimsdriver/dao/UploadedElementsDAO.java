@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import com.github.aiderpmsi.pimsdriver.model.UploadedElementModel;
+import com.github.aiderpmsi.pimsdriver.model.PmsiUploadedElementModel;
 import com.github.aiderpmsi.pimsdriver.odb.DataSourceSingleton;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.record.impl.ODocument;
@@ -12,7 +12,7 @@ import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 
 public class UploadedElementsDAO {
 	
-	public List<UploadedElementModel> getUploadedElements (
+	public List<PmsiUploadedElementModel> getUploadedElements (
 			String query, Object[] arguments) {
 
 		// EXECUTES THE QUERY
@@ -30,10 +30,10 @@ public class UploadedElementsDAO {
 		}
 
 		// LIST OF THE ELEMENTS
-		List<UploadedElementModel> upeltslist = new ArrayList<>();
+		List<PmsiUploadedElementModel> upeltslist = new ArrayList<>();
 		for (ODocument result : results) {
 			// BEAN FOR THIS ITEM
-			UploadedElementModel element = new UploadedElementModel();
+			PmsiUploadedElementModel element = new PmsiUploadedElementModel();
 
 			// FILLS THE BEAN
 			element.setRecordId(result.getIdentity());
