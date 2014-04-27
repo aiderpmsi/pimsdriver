@@ -34,7 +34,7 @@ public class PmsiProcessQuery implements Query{
 		
 		// ADDS THE FILTERS
 		List<Filter> filters = new LinkedList<>(qd.getFilters());
-		Compare filter = new Compare.Equal("plud_processed", PmsiUploadedElementModel.Status.pending.toString());
+		Compare filter = new Compare.Equal("plud_processed", PmsiUploadedElementModel.Status.pending);
 		filters.add(new And(filter));
 		List<Object> contentQueryArgsList = new LinkedList<>();
 		// CREATES THE FILTERS AND FILLS THE ARGUMENTS

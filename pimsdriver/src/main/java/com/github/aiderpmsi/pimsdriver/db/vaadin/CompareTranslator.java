@@ -16,30 +16,38 @@ public class CompareTranslator implements DBTranslator {
 
 	@Override
 	public String getWhereStringForFilter(Filter filter, List<Object> arguments) {
-        Compare compare = (Compare) filter;
+		// USED TO CONSTRUCT EXPRESSION
+		String prefix, postfix;
+		
+		Compare compare = (Compare) filter;
 
         // ADAPTS THE COMPARE PROPERTY TYPE
         Object compareValue = compare.getValue(); 
-        String postpand = "";
         if (compareValue instanceof PmsiUploadedElementModel.Status) {
-        	postpand = "::plud_status";
+        	PmsiUploadedElementModel.Status status =
+        			(PmsiUploadedElementModel.Status) compareValue;
+        	postfix = "::plud_status";
+        	arguments.add(status.toString());
+        } else {
+        	postfix = "";
+        	arguments.add(compareValue.toString());
         }
         
         // ADDS THE VALUE OF THE COMPARE
         arguments.add(compare.getValue());
         
-        String prop = (String) compare.getPropertyId();
+        prefix = (String) compare.getPropertyId();
         switch (compare.getOperation()) {
         case EQUAL:
-            return prop + " = ?" + postpand;
+            return prefix + " = ?" + postfix;
         case GREATER:
-            return prop + " > ?" + postpand;
+            return prefix + " > ?" + postfix;
         case GREATER_OR_EQUAL:
-            return prop + " >= ?" + postpand;
+            return prefix + " >= ?" + postfix;
         case LESS:
-            return prop + " < ?" + postpand;
+            return prefix + " < ?" + postfix;
         case LESS_OR_EQUAL:
-            return prop + " <= ?" + postpand;
+            return prefix + " <= ?" + postfix;
         default:
             return "";
         }
