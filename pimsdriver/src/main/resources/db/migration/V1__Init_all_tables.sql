@@ -1,6 +1,6 @@
-CREATE TYPE plud_status AS ENUM ('pending', 'processed', 'failed');
+CREATE TYPE plud_status AS ENUM ('pending', 'successed', 'failed');
 
-CREATE TABLE plud_pimsupload (
+CREATE TABLE plud_pmsiupload (
   plud_id bigserial NOT NULL,
   plud_processed plud_status NOT NULL,
   plud_finess character varying NOT NULL,
@@ -10,22 +10,22 @@ CREATE TABLE plud_pimsupload (
   plud_rsf_oid oid,
   plud_rss_oid oid,
   plud_arguments hstore,
-  CONSTRAINT plud_pimsupload_pkey PRIMARY KEY (plud_id)
+  CONSTRAINT plud_pmsiupload_pkey PRIMARY KEY (plud_id)
 );
 
-CREATE TABLE pmel_pimselement (
+CREATE TABLE pmel_pmsielement (
   pmel_id bigserial NOT NULL,
   pmel_root bigint NOT NULL,
   pmel_parent bigint,
   pmel_type character varying NOT NULL,
   pmel_attributes hstore NOT NULL,
-  CONSTRAINT pmel_pimselement_pkey PRIMARY KEY (pmel_id),
-  CONSTRAINT pmel_pimselement_pmel_parent_fkey FOREIGN KEY (pmel_parent)
-      REFERENCES pmel_pimselement (pmel_id) MATCH SIMPLE
+  CONSTRAINT pmel_pmsielement_pkey PRIMARY KEY (pmel_id),
+  CONSTRAINT pmel_pmsielement_pmel_parent_fkey FOREIGN KEY (pmel_parent)
+      REFERENCES pmel_pmsielement (pmel_id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION DEFERRABLE INITIALLY DEFERRED,
-  CONSTRAINT pmel_pimselement_pmel_root_fkey FOREIGN KEY (pmel_root)
-      REFERENCES plud_pimsupload (plud_id) MATCH SIMPLE
+  CONSTRAINT pmel_pmsielement_pmel_root_fkey FOREIGN KEY (pmel_root)
+      REFERENCES plud_pmsiupload (plud_id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION DEFERRABLE INITIALLY DEFERRED
 );
 
-CREATE INDEX pmel_pimselement_pmel_root_idx ON pmel_pimselement USING btree (pmel_root);
+CREATE INDEX pmel_pmsielement_pmel_root_idx ON pmel_pmsielement USING btree (pmel_root);

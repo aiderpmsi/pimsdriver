@@ -26,8 +26,8 @@ public class NavigationDTO {
 			
 			// CREATES THE QUERY
 			String query = 
-					"SELECT DISTINCT(plud_finess) FROM plud_pimsupload "
-					+ "WHERE processed = ?::public.plud_status ORDER BY plud_finess ASC";
+					"SELECT DISTINCT(plud_finess) FROM plud_pmsiupload "
+					+ "WHERE plud_processed = ?::public.plud_status ORDER BY plud_finess ASC";
 			PreparedStatement ps = con.prepareStatement(query);
 			ps.setString(1, status.toString());
 
