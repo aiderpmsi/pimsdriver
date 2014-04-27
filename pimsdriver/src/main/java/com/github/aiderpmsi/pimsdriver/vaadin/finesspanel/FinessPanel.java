@@ -134,7 +134,7 @@ public class FinessPanel extends Panel {
 							Object id = hc.addItem();
 							@SuppressWarnings("unchecked")
 							Property<String> prop = (Property<String>) hc.getContainerProperty(id, "caption");
-							SimpleDateFormat sdf = new SimpleDateFormat("DD/mm/YYYY HH:MM:SS");
+							SimpleDateFormat sdf = new SimpleDateFormat("dd/mm/YYYY HH:MM:SS");
 							prop.setValue(sdf.format(model.getDateenvoi()));
 							@SuppressWarnings("unchecked")
 							Property<Long> proprid = (Property<Long>) hc.getContainerProperty(id, "recordid");
