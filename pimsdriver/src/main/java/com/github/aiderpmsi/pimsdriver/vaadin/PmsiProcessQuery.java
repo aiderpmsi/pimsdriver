@@ -15,29 +15,53 @@ import com.vaadin.data.Item;
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.util.filter.And;
 import com.vaadin.data.util.filter.Compare;
-import com.vaadin.data.util.sqlcontainer.query.OrderBy;
-import com.vaadin.data.util.sqlcontainer.query.generator.DefaultSQLGenerator;
-import com.vaadin.data.util.sqlcontainer.query.generator.StatementHelper;
 
 public class PmsiProcessQuery implements Query{
 
-	/** Order by clause */
-	private List<OrderBy> obs;
+	/** Query used for the count */
+	private String countQuery;
+	/** Query used for the content */
+	private String contentQuery;
+	/** Arguments for the contentQuery */
+	private Object[] contentQueryArgs;
 	
-	/** Filters */
-	private List<Filter> filters;
-
 	protected PmsiProcessQuery() {}
 	
 	public PmsiProcessQuery(QueryDefinition qd) {
 		
-		// GENERATES THE ASKED ORDERING
-		obs = new ArrayList<>(qd.getDefaultSortPropertyIds().length);
-		for (int i = 0 ; i < qd.getSortPropertyIds().length ; i++) {
-			OrderBy ob = new OrderBy((String) qd.getSortPropertyIds()[i],
-					qd.getSortPropertyAscendingStates().length < i ? true : qd.getSortPropertyAscendingStates()[i]);
-			obs.add(ob);
+		StringBuilder countQueryBuilder = new StringBuilder("SELECT COUNT(*) as nbrows FROM pmsiupload ");
+		StringBuilder contentQueryBuilder = new StringBuilder("SELECT * FROM pmsiupload ");
+		
+		// ADDS THE FILTERS
+		List<Filter> filters = new LinkedList<>(qd.getFilters());
+		Compare filter = new Compare.Equal("processed", "pending");
+		filters.add(new And(filter));
+		List<Object> contentQueryArgsList = new LinkedList<>();
+		// CREATES THE FILTERS AND FILLS THE ARGUMENTS
+		String filtersQuery = DBQueryBuilder.getWhereStringForFilters(filters, contentQueryArgsList);
+		contentQueryArgs = contentQueryArgsList.toArray();
+		
+		// ADDS THE ORDERINGS
+		StringBuilder orderBuilder = new StringBuilder();
+		if (qd.getSortPropertyIds().length != 0) {
+			orderBuilder.append(" ORDER BY ");
+			for (int i = 0 ; i < qd.getSortPropertyIds().length ; i++) {
+				orderBuilder.append((String) qd.getSortPropertyIds()[i]);
+				if ((qd.getSortPropertyAscendingStates().length < i) || 
+						qd.getSortPropertyAscendingStates()[i]) {
+					orderBuilder.append(" ASC ");
+				} else {
+					orderBuilder.append(" DESC ");
+				}
+			}
 		}
+		
+		// MERGES COUNT AND CONTENTBUILDER
+		countQueryBuilder.append(filtersQuery);
+		contentQueryBuilder.append(filtersQuery).append(orderBuilder);
+		
+		countQuery = countQueryBuilder.toString();
+		contentQuery = contentQueryBuilder.toString();
 	}
 	
 	@Override
@@ -53,27 +77,6 @@ public class PmsiProcessQuery implements Query{
 	@Override
 	public List<Item> loadItems(int startIndex, int count) {
 		// GETS THE LIST OF UPLOADED ELEMENTS
-		// CREATES THE FILTERS AND FILLS THE ARGUMENTS
-		DefaultSQLGenerator dsg = new DefaultSQLGenerator(StatementHelper.class);
-		StatementHelper sh = dsg.generateSelectQuery("pmsielement", filters, obs, startIndex, count, "*");
-		sh.
-	
-	StringBuilder countQueryBuilder = new StringBuilder("SELECT COUNT(*) as nbrows FROM PmsiUpload ");
-		StringBuilder contentQueryBuilder = new StringBuilder("SELECT * FROM PmsiUpload ");
-		
-		// CREATES THE FILTERS AND FILLS THE ARGUMENTS
-		DefaultSQLGenerator dsg = new DefaultSQLGenerator(StatementHelper.class);
-		String filtersQuery = dsg.generateSelectQuery("pmsielement", qd.getFilters(), qd.get, offset, pagelength, toSelect)("public.pmsielement", , orderBys, offset, pagelength, toSelect)getWhereStringForFilters(filters, contentQueryArgsList);
-		contentQueryArgs = contentQueryArgsList.toArray();
-		
-		
-		// MERGES COUNT AND CONTENTBUILDER
-		countQueryBuilder.append(filtersQuery);
-		contentQueryBuilder.append(filtersQuery).append(orderBuilder);
-		
-		countQuery = countQueryBuilder.toString();
-		contentQuery = contentQueryBuilder.toString();
-
 		UploadedElementsDTO ued = new UploadedElementsDTO();
 		List<PmsiUploadedElementModel> elements = ued.getUploadedElements(contentQuery + " OFFSET " + startIndex + " LIMIT " + count, contentQueryArgs);
 		
@@ -99,7 +102,7 @@ public class PmsiProcessQuery implements Query{
 	@Override
 	public int size() {
 		UploadedElementsDTO ued = new UploadedElementsDTO();
-		return ued.size(countQuery, new Object[]{"pending"});
+		return (int) ued.size(countQuery, new Object[]{"pending"});
 	}
 
 }
