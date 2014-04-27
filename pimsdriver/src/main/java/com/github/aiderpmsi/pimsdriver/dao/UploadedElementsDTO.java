@@ -30,7 +30,7 @@ public class UploadedElementsDTO {
 			
 			// FILLS THE LIST OF ELEMENTS
 			List<PmsiUploadedElementModel> upeltslist = new ArrayList<>();
-			while (!rs.isLast()) {
+			while (rs.next()) {
 				// BEAN FOR THIS ITEM
 				PmsiUploadedElementModel element = new PmsiUploadedElementModel();
 
@@ -75,6 +75,7 @@ public class UploadedElementsDTO {
 			ResultSet rs = ps.executeQuery();
 			
 			// GETS THE FIRST RESULT
+			rs.next();
 			long nbresults = rs.getLong(1);
 
 			// COMMIT

@@ -127,6 +127,7 @@ public class OdbRsfContentHandler extends ContentHandlerHelper {
 				
 				// IF THIS ELEMENT IS THE HEADER, USE THIS ELEMENT ID AS PARENT ID (HEADER ID)
 				if (getContentPath().getLast().equals("rsfheader")) {
+					rs.next();
 					headerPKId = rs.getLong(1);
 				}
 			} catch (SQLException e) {

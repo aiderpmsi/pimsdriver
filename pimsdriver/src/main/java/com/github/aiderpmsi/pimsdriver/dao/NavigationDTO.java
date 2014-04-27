@@ -36,7 +36,8 @@ public class NavigationDTO {
 			
 			// FILLS THE LIST OF ELEMENTS
 			List<String> finesses = new ArrayList<>();
-			while (!rs.isLast()) {
+			while (rs.next()) {
+				rs.next();
 				finesses.add(rs.getString(1));
 			}
 			
@@ -73,7 +74,7 @@ public class NavigationDTO {
 			
 			// FILLS THE LIST OF ELEMENTS
 			List<YM> yms = new ArrayList<>();
-			while (!rs.isLast()) {
+			while (rs.next()) {
 				YM ym = new YM();
 				ym.year = rs.getInt(1);
 				ym.month = rs.getInt(2);
