@@ -10,9 +10,9 @@ import java.sql.SQLException;
 import org.postgresql.largeobject.LargeObject;
 import org.postgresql.largeobject.LargeObjectManager;
 
+import com.github.aiderpmsi.pimsdriver.db.DataSourceSingleton;
 import com.github.aiderpmsi.pimsdriver.model.PmsiUploadElementModel;
 import com.github.aiderpmsi.pimsdriver.model.PmsiUploadedElementModel;
-import com.github.aiderpmsi.pimsdriver.odb.DataSourceSingleton;
 
 public class ImportPmsiDTO {
 

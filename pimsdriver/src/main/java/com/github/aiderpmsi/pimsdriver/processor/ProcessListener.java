@@ -12,7 +12,7 @@ import javax.ws.rs.ext.Provider;
 import org.glassfish.jersey.server.spi.Container;
 import org.glassfish.jersey.server.spi.ContainerLifecycleListener;
 
-import com.github.aiderpmsi.pimsdriver.odb.DataSourceSingleton;
+import com.github.aiderpmsi.pimsdriver.db.DataSourceSingleton;
 
 @Provider
 public class ProcessListener implements ContainerLifecycleListener {

@@ -1,4 +1,4 @@
-package com.github.aiderpmsi.pimsdriver.odb;
+package com.github.aiderpmsi.pimsdriver.db;
 
 import java.util.LinkedList;
 import org.apache.commons.lang3.StringUtils;

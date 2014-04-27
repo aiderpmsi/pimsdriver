@@ -7,8 +7,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.github.aiderpmsi.pimsdriver.db.DataSourceSingleton;
 import com.github.aiderpmsi.pimsdriver.model.PmsiUploadedElementModel;
-import com.github.aiderpmsi.pimsdriver.odb.DataSourceSingleton;
 
 public class UploadedElementsDTO {
 	

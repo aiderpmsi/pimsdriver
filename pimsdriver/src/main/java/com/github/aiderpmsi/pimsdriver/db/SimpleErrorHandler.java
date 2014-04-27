@@ -1,4 +1,4 @@
-package com.github.aiderpmsi.pimsdriver.odb;
+package com.github.aiderpmsi.pimsdriver.db;
 
 import java.util.ArrayList;
 import java.util.List;

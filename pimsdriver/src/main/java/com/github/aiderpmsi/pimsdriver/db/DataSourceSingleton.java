@@ -1,4 +1,4 @@
-package com.github.aiderpmsi.pimsdriver.odb;
+package com.github.aiderpmsi.pimsdriver.db;
 
 import java.sql.Connection;
 import java.sql.SQLException;

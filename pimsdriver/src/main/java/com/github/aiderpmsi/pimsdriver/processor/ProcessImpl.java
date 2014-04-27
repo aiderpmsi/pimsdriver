@@ -11,10 +11,10 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import com.github.aiderpmsi.pims.utils.Parser;
-import com.github.aiderpmsi.pimsdriver.odb.DataSourceSingleton;
-import com.github.aiderpmsi.pimsdriver.odb.OdbRsfContentHandler;
-import com.github.aiderpmsi.pimsdriver.odb.OdbRssContentHandler;
-import com.github.aiderpmsi.pimsdriver.odb.PimsODocumentHelper;
+import com.github.aiderpmsi.pimsdriver.db.DataSourceSingleton;
+import com.github.aiderpmsi.pimsdriver.db.OdbRsfContentHandler;
+import com.github.aiderpmsi.pimsdriver.db.OdbRssContentHandler;
+import com.github.aiderpmsi.pimsdriver.db.PimsODocumentHelper;
 import com.github.aiderpmsi.pimsdriver.pmsi.RecorderErrorHandler;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.id.ORID;
