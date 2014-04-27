@@ -26,7 +26,7 @@ public class ProcessTask implements Callable<Boolean> {
 			List<PmsiUploadedElementModel> elts = (new UploadedElementsDTO()).getUploadedElements(
 					"SELECT plud_id, plud_processed, plud_finess, "
 							+ "plud_year, plud_month, plud_dateenvoi, plud_rsf_oid oid, "
-							+ "plud_rss_oid, plud_arguments FROM PmsiUpload FROM pmsiupload where processed = 'pending'", new Object[] {});
+							+ "plud_rss_oid, plud_arguments FROM plud_pmsiupload where processed = 'pending'", new Object[] {});
 
 			// TRAITEMENT DES PMSI UN PAR UN :
 			for (PmsiUploadedElementModel elt : elts) {

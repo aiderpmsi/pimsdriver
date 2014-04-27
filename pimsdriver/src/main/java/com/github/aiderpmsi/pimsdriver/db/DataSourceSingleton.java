@@ -13,6 +13,7 @@ import org.apache.commons.dbcp2.PoolableConnectionFactory;
 import org.apache.commons.dbcp2.PoolingDataSource;
 import org.apache.commons.pool2.ObjectPool;
 import org.apache.commons.pool2.impl.GenericObjectPool;
+import org.flywaydb.core.Flyway;
 
 public class DataSourceSingleton {
 
@@ -64,6 +65,11 @@ public class DataSourceSingleton {
 
 			 // CREATE THE DATASOURCE
 			 dataSource = new PoolingDataSource<>(connectionPool);
+			 
+			 // NOW CREATE THE DATABASE IF NEEDED
+			 Flyway flyway = new Flyway();
+			 flyway.setDataSource(dataSource);
+			 flyway.migrate();
 	}
 	
 	public synchronized Connection getConnection() throws SQLException {
