@@ -1,6 +1,7 @@
 package com.github.aiderpmsi.pimsdriver.vaadin;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -25,6 +26,17 @@ public class PmsiProcessQuery implements Query{
 	/** Arguments for the contentQuery */
 	private Object[] contentQueryArgs;
 	
+	private final static HashMap<String, String> tableFieldsMapping = new HashMap<>();
+	
+	{
+		tableFieldsMapping.put("id", "plud_id");
+		tableFieldsMapping.put("processed", "plud_processed");
+		tableFieldsMapping.put("finess", "plud_finess");
+		tableFieldsMapping.put("year", "plud_year");
+		tableFieldsMapping.put("month", "plud_month");
+		tableFieldsMapping.put("dateenvoi", "plud_dateenvoi");
+	}
+	
 	protected PmsiProcessQuery() {}
 	
 	public PmsiProcessQuery(QueryDefinition qd) {
@@ -40,7 +52,7 @@ public class PmsiProcessQuery implements Query{
 		filters.add(new And(filter));
 		List<Object> contentQueryArgsList = new LinkedList<>();
 		// CREATES THE FILTERS AND FILLS THE ARGUMENTS
-		String filtersQuery = DBQueryBuilder.getWhereStringForFilters(filters, contentQueryArgsList);
+		String filtersQuery = DBQueryBuilder.getWhereStringForFilters(filters, tableFieldsMapping, contentQueryArgsList);
 		contentQueryArgs = contentQueryArgsList.toArray();
 		
 		// ADDS THE ORDERINGS
@@ -48,7 +60,7 @@ public class PmsiProcessQuery implements Query{
 		if (qd.getSortPropertyIds().length != 0) {
 			orderBuilder.append(" ORDER BY ");
 			for (int i = 0 ; i < qd.getSortPropertyIds().length ; i++) {
-				orderBuilder.append((String) qd.getSortPropertyIds()[i]);
+				orderBuilder.append(tableFieldsMapping.get((String) qd.getSortPropertyIds()[i]));
 				if ((qd.getSortPropertyAscendingStates().length < i) || 
 						qd.getSortPropertyAscendingStates()[i]) {
 					orderBuilder.append(" ASC ");
