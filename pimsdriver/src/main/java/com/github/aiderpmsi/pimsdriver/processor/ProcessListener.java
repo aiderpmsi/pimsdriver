@@ -12,8 +12,6 @@ import javax.ws.rs.ext.Provider;
 import org.glassfish.jersey.server.spi.Container;
 import org.glassfish.jersey.server.spi.ContainerLifecycleListener;
 
-import com.github.aiderpmsi.pimsdriver.db.DataSourceSingleton;
-
 @Provider
 public class ProcessListener implements ContainerLifecycleListener {
 
@@ -43,7 +41,7 @@ public class ProcessListener implements ContainerLifecycleListener {
 		} catch (InterruptedException | ExecutionException | CancellationException e) {
 			log.warning(e.getMessage());
 		} finally {
-			DataSourceSingleton.getInstance().close();
+			// DO NOTHING
 		}
 	}
 }

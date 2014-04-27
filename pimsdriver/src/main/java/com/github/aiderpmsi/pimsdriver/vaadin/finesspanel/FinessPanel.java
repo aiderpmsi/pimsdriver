@@ -7,7 +7,6 @@ import java.util.List;
 import com.github.aiderpmsi.pimsdriver.dao.NavigationDTO;
 import com.github.aiderpmsi.pimsdriver.dao.UploadedElementsDTO;
 import com.github.aiderpmsi.pimsdriver.model.PmsiUploadedElementModel;
-import com.orientechnologies.orient.core.id.ORID;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.HierarchicalContainer;
 import com.vaadin.ui.Notification;
@@ -21,8 +20,6 @@ public class FinessPanel extends Panel {
 	/** Generated serial id */
 	private static final long serialVersionUID = 5192397393504372354L;
 
-	// TODO : IN ORDER TO ENSURE THAT THE LIST OF ELEMENTS IN PANEL IS UP TO DATE, USE POSTGRESQL WITH JSON
-
 	public FinessPanel() {
 		
 		// SETS THE HIERARCHICAL CONTAINER PROPERTIES
@@ -31,7 +28,7 @@ public class FinessPanel extends Panel {
 		hc.addContainerProperty("depth", Integer.class, null);
 		hc.addContainerProperty("year", Integer.class, null);
 		hc.addContainerProperty("month", Integer.class, null);
-		hc.addContainerProperty("RID", ORID.class, null);
+		hc.addContainerProperty("recordid", Long.class, null);
 		
 		// SUCESS ROOT
 		final Object idsuccess = hc.addItem();
@@ -66,7 +63,8 @@ public class FinessPanel extends Panel {
 				Integer eventDepth = (Integer) hc.getContainerProperty(event.getItemId(), "depth").getValue();
 				// IF WE EXPAND A ROOT NODE
 				if (eventDepth == 0) {
-					String filter = (event.getItemId() == idsuccess ? "processed" : "failed");
+					PmsiUploadedElementModel.Status filter =
+							(event.getItemId() == idsuccess ? PmsiUploadedElementModel.Status.successed : PmsiUploadedElementModel.Status.failed);
 					// FILL THE SUCCESS TREE
 					List<String> finesses = (new NavigationDTO()).getFiness(filter);
 					for (String finess : finesses) {
@@ -134,7 +132,7 @@ public class FinessPanel extends Panel {
 							SimpleDateFormat sdf = new SimpleDateFormat("DD/mm/YYYY HH:MM:SS");
 							prop.setValue(sdf.format(model.getDateenvoi()));
 							@SuppressWarnings("unchecked")
-							Property<ORID> proprid = (Property<ORID>) hc.getContainerProperty(id, "RID");
+							Property<Long> proprid = (Property<Long>) hc.getContainerProperty(id, "RID");
 							proprid.setValue(model.getRecordId());
 							@SuppressWarnings("unchecked")
 							Property<Integer> depth = (Property<Integer>) hc.getContainerProperty(id, "depth");

@@ -8,10 +8,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.logging.Logger;
 
-import com.github.aiderpmsi.pimsdriver.db.DataSourceSingleton;
-import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
-import com.orientechnologies.orient.core.record.impl.ODocument;
-import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
+import com.github.aiderpmsi.pimsdriver.dao.UploadedElementsDTO;
+import com.github.aiderpmsi.pimsdriver.model.PmsiUploadedElementModel;
 
 public class ProcessTask implements Callable<Boolean> {
 
@@ -21,26 +19,18 @@ public class ProcessTask implements Callable<Boolean> {
 	public Boolean call() throws Exception {
 		// LANCEMENT DE LA RECHERCHE DE PMSI A TRAITER TOUTES LES MINUTES
 		ExecutorService execute = Executors.newSingleThreadExecutor();
-		ODatabaseDocumentTx tx = null;
+
+		// TRAITEMENT TANT QU'UNE INTERRUPTION N'A PAS EU LIEU
 		while (true) {
 			// RECUPERATION DES PMSI A TRAITER :
-			OSQLSynchQuery<ODocument> oquery = new OSQLSynchQuery<ODocument>("select @RID, rsf, rss from PmsiUpload where processed='pending'");
-			List<ODocument> results = null;
-			try {
-				tx = DataSourceSingleton.getInstance().getConnection();
-				tx.begin();
-				results = tx.query(oquery);
-				tx.commit();
-			} finally {
-				if (tx != null) {
-					tx.close();
-					tx = null;
-				}
-			}
+			List<PmsiUploadedElementModel> elts = (new UploadedElementsDTO()).getUploadedElements(
+					"SELECT plud_id, plud_processed, plud_finess, "
+							+ "plud_year, plud_month, plud_dateenvoi, plud_rsf_oid oid, "
+							+ "plud_rss_oid, plud_arguments FROM PmsiUpload FROM pmsiupload where processed = 'pending'", new Object[] {});
 
 			// TRAITEMENT DES PMSI UN PAR UN :
-			for (ODocument result : results) {
-				ProcessImpl processImpl = new ProcessImpl(result);
+			for (PmsiUploadedElementModel elt : elts) {
+				ProcessImpl processImpl = new ProcessImpl(elt);
 				Future<Boolean> futureResult = execute.submit(processImpl);
 				// WAIT THE RESULT OF THE COMPUTATION
 				try {
