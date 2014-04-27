@@ -6,7 +6,9 @@ import java.sql.Array;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Types;
 
+import org.apache.commons.dbcp2.DelegatingConnection;
 import org.postgresql.largeobject.LargeObject;
 import org.postgresql.largeobject.LargeObjectManager;
 
@@ -24,7 +26,9 @@ public class ImportPmsiDTO {
 			con = DataSourceSingleton.getInstance().getConnection();
 			
 			// USE THE LARGE OBJECT INTERFACE FOR FILES
-			LargeObjectManager lom = ((org.postgresql.PGConnection)con).getLargeObjectAPI();
+			@SuppressWarnings("unchecked")
+			Connection conn = ((DelegatingConnection<Connection>) con).getInnermostDelegateInternal();
+			LargeObjectManager lom = ((org.postgresql.PGConnection)conn).getLargeObjectAPI();
 			
 			// CREATES AND FILLS THE RSF LARGE OBJECT
 			long rsfoid = lom.createLO(LargeObjectManager.READ | LargeObjectManager.WRITE);
@@ -41,22 +45,25 @@ public class ImportPmsiDTO {
 
 			// THEN CREATES THE SQL QUERY TO INSERT EVERYTHING IN PLUD :
 			String query = 
-					"INSERT INTO plud_pimsupload("
+					"INSERT INTO plud_pmsiupload("
 					+ "plud_processed, plud_finess, plud_year, plud_month, "
 					+ "plud_dateenvoi, plud_rsf_oid, plud_rss_oid, plud_arguments) "
 					+ "VALUES (?::public.plud_status, ?, ?, ?, "
-					+ "transaction_timestamp(), ?, ?, ?);";
+					+ "transaction_timestamp(), ?, ?, hstore(?::text[], ?::text[]));";
 			PreparedStatement ps = con.prepareStatement(query);
-			ps.setString(1, "pending");
+			ps.setString(1, PmsiUploadedElementModel.Status.pending.toString());
 			ps.setString(2, model.getFiness());
 			ps.setInt(3, model.getYear());
 			ps.setInt(4, model.getMonth());
-			ps.setString(5, PmsiUploadedElementModel.Status.pending.toString());
-			ps.setLong(6, rsfoid);
-			ps.setLong(7, rssoid);
-			Array arguments = con.createArrayOf("text", new String[]{});
-			ps.setArray(8, arguments);
-
+			ps.setLong(5, rsfoid);
+			if (rssoid != null)
+				ps.setLong(6, rssoid);
+			else
+				ps.setNull(6, Types.BIGINT);
+			Array emptyarray = con.createArrayOf("text", new String[]{});
+			ps.setArray(7, emptyarray);
+			ps.setArray(8, emptyarray);
+			
 			// EXECUTE QUERY
 			ps.execute();
 			

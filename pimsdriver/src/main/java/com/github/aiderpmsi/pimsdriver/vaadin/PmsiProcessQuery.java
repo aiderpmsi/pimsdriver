@@ -29,12 +29,12 @@ public class PmsiProcessQuery implements Query{
 	
 	public PmsiProcessQuery(QueryDefinition qd) {
 		
-		StringBuilder countQueryBuilder = new StringBuilder("SELECT COUNT(*) as nbrows FROM pmsiupload ");
-		StringBuilder contentQueryBuilder = new StringBuilder("SELECT * FROM pmsiupload ");
+		StringBuilder countQueryBuilder = new StringBuilder("SELECT COUNT(*) as nbrows FROM plud_pmsiupload ");
+		StringBuilder contentQueryBuilder = new StringBuilder("SELECT * FROM plud_pmsiupload ");
 		
 		// ADDS THE FILTERS
 		List<Filter> filters = new LinkedList<>(qd.getFilters());
-		Compare filter = new Compare.Equal("processed", "pending");
+		Compare filter = new Compare.Equal("plud_processed", PmsiUploadedElementModel.Status.pending.toString());
 		filters.add(new And(filter));
 		List<Object> contentQueryArgsList = new LinkedList<>();
 		// CREATES THE FILTERS AND FILLS THE ARGUMENTS
@@ -102,7 +102,7 @@ public class PmsiProcessQuery implements Query{
 	@Override
 	public int size() {
 		UploadedElementsDTO ued = new UploadedElementsDTO();
-		return (int) ued.size(countQuery, new Object[]{"pending"});
+		return (int) ued.size(countQuery, contentQueryArgs);
 	}
 
 }

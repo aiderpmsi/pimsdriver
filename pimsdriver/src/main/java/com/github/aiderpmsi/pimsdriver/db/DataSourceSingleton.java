@@ -53,6 +53,7 @@ public class DataSourceSingleton {
 		props.setProperty("defaultReadOnly", "false");
 		props.setProperty("defaultTransactionIsolation", "SERIALIZABLE");
 		props.setProperty("initialSize", "2");
+		props.setProperty("accessToUnderlyingConnectionAllowed", "true");
 
 		// THE POOL WILL USE IT TO CREATE CONNECTIONS
 		ConnectionFactory connectionFactory =

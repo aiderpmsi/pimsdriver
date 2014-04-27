@@ -72,12 +72,12 @@ public class PmsiUploadWindow extends Window {
         		new BeanFieldGroup<PmsiUploadElementModel>(PmsiUploadElementModel.class);
         binder.setItemDataSource(model);
 
-        TextField yearValue = binder.buildAndBind("Année", "yearValue", TextField.class);
-        fl.addComponent(yearValue);
-        TextField monthValue = binder.buildAndBind("Mois", "monthValue", TextField.class);
-        fl.addComponent(monthValue);
-        TextField finessValue = binder.buildAndBind("Finess", "finessValue", TextField.class);
-        fl.addComponent(finessValue);
+        TextField yearField = binder.buildAndBind("Année", "year", TextField.class);
+        fl.addComponent(yearField);
+        TextField monthField = binder.buildAndBind("Mois", "month", TextField.class);
+        fl.addComponent(monthField);
+        TextField finessField = binder.buildAndBind("Finess", "finess", TextField.class);
+        fl.addComponent(finessField);
         
         // ADD VALIDATOR
         binder.addCommitHandler(new CommitManager());
