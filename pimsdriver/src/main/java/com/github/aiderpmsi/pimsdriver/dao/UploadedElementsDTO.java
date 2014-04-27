@@ -40,7 +40,7 @@ public class UploadedElementsDTO {
 				element.setFiness(rs.getString(3));
 				element.setYear(rs.getInt(4));
 				element.setMonth(rs.getInt(5));
-				element.setDateenvoi(rs.getDate(6));
+				element.setDateenvoi(rs.getTimestamp(6));
 
 				// ADDS THE BEAN TO THE ELEMENTS
 				upeltslist.add(element);

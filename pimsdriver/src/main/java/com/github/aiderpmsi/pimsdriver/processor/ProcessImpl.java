@@ -9,6 +9,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.concurrent.Callable;
 
+import org.apache.commons.dbcp2.DelegatingConnection;
 import org.postgresql.largeobject.LargeObjectManager;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
@@ -17,8 +18,8 @@ import org.xml.sax.SAXException;
 import com.github.aiderpmsi.pims.utils.Parser;
 import com.github.aiderpmsi.pimsdriver.dao.TransactionException;
 import com.github.aiderpmsi.pimsdriver.db.DataSourceSingleton;
-import com.github.aiderpmsi.pimsdriver.db.OdbRsfContentHandler;
-import com.github.aiderpmsi.pimsdriver.db.OdbRssContentHandler;
+import com.github.aiderpmsi.pimsdriver.db.RsfContentHandler;
+import com.github.aiderpmsi.pimsdriver.db.RssContentHandler;
 import com.github.aiderpmsi.pimsdriver.model.PmsiUploadedElementModel;
 import com.github.aiderpmsi.pimsdriver.pmsi.RecorderErrorHandler;
 
@@ -39,12 +40,14 @@ public class ProcessImpl implements Callable<Boolean> {
 			con = DataSourceSingleton.getInstance().getConnection();
 			
 			// USE THE LARGE OBJECT INTERFACE FOR FILES
-			LargeObjectManager lom = ((org.postgresql.PGConnection)con).getLargeObjectAPI();
+			@SuppressWarnings("unchecked")
+			Connection conn = ((DelegatingConnection<Connection>) con).getInnermostDelegateInternal();
+			LargeObjectManager lom = ((org.postgresql.PGConnection)conn).getLargeObjectAPI();
 			
 			// FIRST GET ALL FIELDS OF PLUD
 			String selectquery = 
 					"SELECT plud_processed, plud_finess, plud_year, plud_month, "
-					+ "plud_dateenvoi, plud_rsf_oid, plud_rss_oid, plud_arguments) "
+					+ "plud_dateenvoi, plud_rsf_oid, plud_rss_oid, plud_arguments "
 					+ "FROM plud_pmsiupload WHERE plud_id = ?";
 			PreparedStatement selectps = con.prepareStatement(selectquery);
 			selectps.setLong(1, element.getRecordId());
@@ -55,13 +58,13 @@ public class ProcessImpl implements Callable<Boolean> {
 			// RSF AND RSS FINESSES
 			String rsfFiness = null, rssFiness = null;
 			
-			// GETS RSF OID
+			// GETS RSF INPUTSTREAM
 			Long rsfoid = rs.getLong(6);
-			InputStream rsfis = lom.open(rsfoid, LargeObjectManager.READ).getInputStream();
-
+			InputStream rsfis = lom.open(rsfoid).getInputStream();
+			
 			// PROCESS RSF
 			{
-				ContentHandler rsfch = new OdbRsfContentHandler(con, element.getRecordId());
+				ContentHandler rsfch = new RsfContentHandler(con, element.getRecordId());
 				RecorderErrorHandler rsfreh = new RecorderErrorHandler();
 				Parser psfpars = new Parser();
 				psfpars.setStartState("headerrsf");
@@ -90,7 +93,7 @@ public class ProcessImpl implements Callable<Boolean> {
 			if (!rs.wasNull()) {
 				InputStream rssis = lom.open(rssoid, LargeObjectManager.READ).getInputStream();
 			
-				ContentHandler rssch = new OdbRssContentHandler(con, element.getRecordId());
+				ContentHandler rssch = new RssContentHandler(con, element.getRecordId());
 				RecorderErrorHandler rssreh = new RecorderErrorHandler();
 				Parser rsspars = new Parser();
 				rsspars.setStartState("headerrss");
@@ -129,10 +132,11 @@ public class ProcessImpl implements Callable<Boolean> {
 			try {
 				// IF WE HAVE AN ERROR, ROLLBACK TRANSACTION AND STORE THE REASON FOR THE FAILURE
 				con.rollback();
-				String updatequery = "UPDATE plud_pmsiupload SET plud_processed = 'failed', plud_arguments = plud_arguments || (?, ?) WHERE plud_id = ?";
+				String updatequery = "UPDATE plud_pmsiupload SET plud_processed = 'failed', plud_arguments = plud_arguments || hstore(?, ?) WHERE plud_id = ?";
 				PreparedStatement updateps = con.prepareStatement(updatequery);
 				updateps.setString(1, "error");
-				updateps.setString(2, e.getMessage());
+				updateps.setString(2, e.getMessage() == null ? e.getClass().toString() : e.getMessage());
+				updateps.setLong(3, element.getRecordId());
 				updateps.execute();
 			} catch (SQLException e2) { e2.addSuppressed(e); throw new RuntimeException(e2); }
 			throw new TransactionException("Erreur de gestion du fichier pmsi", e);

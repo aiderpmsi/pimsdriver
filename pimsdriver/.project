@@ -3,6 +3,7 @@
 	<name>pimsdriver</name>
 	<comment></comment>
 	<projects>
+		<project>pims</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

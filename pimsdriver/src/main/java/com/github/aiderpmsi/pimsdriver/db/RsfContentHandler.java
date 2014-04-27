@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,7 +16,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 
-public class OdbRsfContentHandler extends ContentHandlerHelper {
+public class RsfContentHandler extends ContentHandlerHelper {
 
 	/** Regexp to know if we are in an element */
 	private Pattern inElement = Pattern.compile("/root/(?:rsfheader|rsfa|rsfb|rsfc|rsfh|rsfi|rsfl|rsfm)");
@@ -41,7 +42,7 @@ public class OdbRsfContentHandler extends ContentHandlerHelper {
 	/** Database link */
 	private Connection con;
 
-	public OdbRsfContentHandler(Connection con, Long uploadPKId) {
+	public RsfContentHandler(Connection con, Long uploadPKId) {
 		this.con = con;
 		this.uploadPKId = uploadPKId;
 	}
@@ -118,7 +119,10 @@ public class OdbRsfContentHandler extends ContentHandlerHelper {
 				
 				// SETS THE VALUES OF QUERY ARGS
 				ps.setLong(1, uploadPKId);
-				ps.setLong(2, headerPKId);
+				if (headerPKId == null)
+					ps.setNull(2, Types.BIGINT);
+				else
+					ps.setLong(2, headerPKId);
 				ps.setString(3, getContentPath().getLast());
 				ps.setArray(4, argskeysarray);
 				ps.setArray(5, argsvaluesarray);
