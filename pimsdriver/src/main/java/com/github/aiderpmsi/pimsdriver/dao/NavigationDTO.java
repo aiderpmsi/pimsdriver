@@ -37,7 +37,6 @@ public class NavigationDTO {
 			// FILLS THE LIST OF ELEMENTS
 			List<String> finesses = new ArrayList<>();
 			while (rs.next()) {
-				rs.next();
 				finesses.add(rs.getString(1));
 			}
 			
@@ -54,7 +53,7 @@ public class NavigationDTO {
 		}
 	}
 
-	public List<YM> getYM(String status, String finess) {
+	public List<YM> getYM(PmsiUploadedElementModel.Status status, String finess) {
 		Connection con = null;
 		
 		try {
@@ -63,8 +62,8 @@ public class NavigationDTO {
 
 			// CREATES THE QUERY
 			String query = 
-					"SELECT DISTINCT(plud_year, plud_month) FROM plud_pimsupload "
-					+ "WHERE processed = ?::public.plud_status AND finess = ? ORDER BY plud_year DESC, plud_month DESC";
+					"SELECT DISTINCT ON (plud_year, plud_month) plud_year, plud_month FROM plud_pmsiupload "
+					+ "WHERE plud_processed = ?::public.plud_status AND plud_finess = ? ORDER BY plud_year DESC, plud_month DESC";
 			PreparedStatement ps = con.prepareStatement(query);
 			ps.setString(1, status.toString());
 			ps.setString(2, finess);

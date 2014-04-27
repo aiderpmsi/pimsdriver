@@ -80,10 +80,12 @@ public class FinessPanel extends Panel {
 				}
 				// IF WE EXPAND A FINESS NODE
 				else if (eventDepth == 1) {
-					String filter = (hc.getParent(event.getItemId()) == idsuccess ? "processed" : "failed");
+					PmsiUploadedElementModel.Status status =
+							(hc.getParent(event.getItemId()) == idsuccess ? PmsiUploadedElementModel.Status.successed : 
+								PmsiUploadedElementModel.Status.failed);
 					String finess = (String) hc.getContainerProperty(event.getItemId(), "caption").getValue();
 					// FILL THE FINESS TREE :
-					List<NavigationDTO.YM> yms = (new NavigationDTO()).getYM(filter, finess);
+					List<NavigationDTO.YM> yms = (new NavigationDTO()).getYM(status, finess);
 					// WHEN YMS IS NULL, IT MEANS THIS ITEM DOESN'T EXIST ANYMORE, REMOVE IT FROM THE TREE
 					if (yms == null) {
 						hc.removeItemRecursively(event.getItemId());
@@ -110,16 +112,19 @@ public class FinessPanel extends Panel {
 				}
 				// IF WE EXPAND A YEAR / MONTH NODE
 				else if (eventDepth == 2) {
-					String filter = (hc.getParent(hc.getParent(event.getItemId())) == idsuccess ? "processed" : "failed");
+					PmsiUploadedElementModel.Status status =
+							(hc.getParent(hc.getParent(event.getItemId())) == idsuccess ?
+									PmsiUploadedElementModel.Status.successed : 
+										PmsiUploadedElementModel.Status.failed);
 					String finess = (String) hc.getContainerProperty(hc.getParent(event.getItemId()), "caption").getValue();
 					Integer year = (Integer) hc.getContainerProperty(event.getItemId(), "year").getValue();
 					Integer month = (Integer) hc.getContainerProperty(event.getItemId(), "month").getValue();
-					Object[] arguments = new Object[] {filter, finess, year, month};
+					Object[] arguments = new Object[] {status.toString(), finess, year, month};
 					UploadedElementsDTO ued = new UploadedElementsDTO();
 					// FILLS THE DATEENVOI TREE
 					List<PmsiUploadedElementModel> models = 
 							ued.getUploadedElements(
-									"SELECT * FROM PmsiUpload WHERE processed = ? AND finess = ? AND year = ? AND month = ? ORDER BY dateenvoi DESC",
+									"SELECT plud_id, plud_processed, plud_finess, plud_year, plud_month, plud_dateenvoi FROM plud_pmsiupload WHERE plud_processed = ?::plud_status AND finess = ? AND year = ? AND month = ? ORDER BY dateenvoi DESC",
 									arguments);
 					// IF WE HAVE NO RESULT, IT MEANS THIS ITEM DOESN'T EXIST ANYMORE, REMOVE IT FROM THE TREE
 					if (models.size() == 0) {
