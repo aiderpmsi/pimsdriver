@@ -106,7 +106,7 @@ public class RssContentHandler extends ContentHandlerHelper {
 		else if (getContentPath().size() == 2 && inElement.matcher(getPath()).matches()) {
 			// GENERATES THE QUERY
 			String query = "INSERT INTO pmel_pmsielement (pmel_root, pmel_parent, pmel_type, pmel_attributes) "
-					+ "VALUES(?, ?, ?, hstore(?, ?)) RETURNING pmel_id";
+					+ "VALUES(?, ?, ?, hstore(?::text[], ?::text[])) RETURNING pmel_id";
 
 			try {
 				PreparedStatement ps = con.prepareStatement(query);

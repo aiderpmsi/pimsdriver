@@ -77,7 +77,7 @@ public class ProcessImpl implements Callable<Boolean> {
 					throw new SAXException("RSF : " + rsfreh.getErrors().get(0).getMessage());
 					
 				// GET THE REAL FINESS FROM RSF
-				String realrsffinessquery = "SELECT pims_attributes->finess AS finess FROM pmel_pmsi_element WHERE pmel_root = ? AND pmel_type = 'rsfheader'";
+				String realrsffinessquery = "SELECT pmel_attributes -> 'Finess' AS finess FROM pmel_pmsielement WHERE pmel_root = ? AND pmel_type = 'rsfheader'";
 				PreparedStatement realrsffinessps = con.prepareStatement(realrsffinessquery);
 				realrsffinessps.setLong(1, element.getRecordId());
 				ResultSet realrsffinessrs = realrsffinessps.executeQuery();
@@ -106,7 +106,7 @@ public class ProcessImpl implements Callable<Boolean> {
 					throw new SAXException("RSS : " + rssreh.getErrors().get(0).getMessage());
 				
 				// GET THE REAL FINESS FROM RSS
-				String realrssfinessquery = "SELECT pims_attributes->finess AS finess FROM pmel_pmsi_element WHERE pmel_root = ? AND pmel_type = 'rssheader'";
+				String realrssfinessquery = "SELECT pmel_attributes -> 'Finess' AS finess FROM pmel_pmsielement WHERE pmel_root = ? AND pmel_type = 'rssheader'";
 				PreparedStatement realrssfinessps = con.prepareStatement(realrssfinessquery);
 				realrssfinessps.setLong(1, element.getRecordId());
 				ResultSet realrssfinessrs = realrssfinessps.executeQuery();
@@ -120,7 +120,7 @@ public class ProcessImpl implements Callable<Boolean> {
 				throw new IOException("Finess dans RSF et RSS ne correspondent pas");
 						
 			// UPDATE STATUS AND REAL FINESS
-			String updatequery = "UPDATE plud_pmsiupload SET plud_processed = 'processed', plud_finess = ? WHERE plud_id = ?";
+			String updatequery = "UPDATE plud_pmsiupload SET plud_processed = 'successed'::plud_status, plud_finess = ? WHERE plud_id = ?";
 			PreparedStatement updateps = con.prepareStatement(updatequery);
 			updateps.setString(1, rsfFiness);
 			updateps.setLong(2, element.getRecordId());
@@ -132,12 +132,13 @@ public class ProcessImpl implements Callable<Boolean> {
 			try {
 				// IF WE HAVE AN ERROR, ROLLBACK TRANSACTION AND STORE THE REASON FOR THE FAILURE
 				con.rollback();
-				String updatequery = "UPDATE plud_pmsiupload SET plud_processed = 'failed', plud_arguments = plud_arguments || hstore(?, ?) WHERE plud_id = ?";
+				String updatequery = "UPDATE plud_pmsiupload SET plud_processed = 'failed'::plud_status, plud_arguments = plud_arguments || hstore(?, ?) WHERE plud_id = ?";
 				PreparedStatement updateps = con.prepareStatement(updatequery);
 				updateps.setString(1, "error");
 				updateps.setString(2, e.getMessage() == null ? e.getClass().toString() : e.getMessage());
 				updateps.setLong(3, element.getRecordId());
 				updateps.execute();
+				con.commit();
 			} catch (SQLException e2) { e2.addSuppressed(e); throw new RuntimeException(e2); }
 			throw new TransactionException("Erreur de gestion du fichier pmsi", e);
 		} finally {
