@@ -124,7 +124,7 @@ public class FinessPanel extends Panel {
 					// FILLS THE DATEENVOI TREE
 					List<PmsiUploadedElementModel> models = 
 							ued.getUploadedElements(
-									"SELECT plud_id, plud_processed, plud_finess, plud_year, plud_month, plud_dateenvoi FROM plud_pmsiupload WHERE plud_processed = ?::plud_status AND finess = ? AND year = ? AND month = ? ORDER BY dateenvoi DESC",
+									"SELECT plud_id, plud_processed, plud_finess, plud_year, plud_month, plud_dateenvoi FROM plud_pmsiupload WHERE plud_processed = ?::plud_status AND plud_finess = ? AND plud_year = ? AND plud_month = ? ORDER BY plud_dateenvoi DESC",
 									arguments);
 					// IF WE HAVE NO RESULT, IT MEANS THIS ITEM DOESN'T EXIST ANYMORE, REMOVE IT FROM THE TREE
 					if (models.size() == 0) {
@@ -137,7 +137,7 @@ public class FinessPanel extends Panel {
 							SimpleDateFormat sdf = new SimpleDateFormat("DD/mm/YYYY HH:MM:SS");
 							prop.setValue(sdf.format(model.getDateenvoi()));
 							@SuppressWarnings("unchecked")
-							Property<Long> proprid = (Property<Long>) hc.getContainerProperty(id, "RID");
+							Property<Long> proprid = (Property<Long>) hc.getContainerProperty(id, "recordid");
 							proprid.setValue(model.getRecordId());
 							@SuppressWarnings("unchecked")
 							Property<Integer> depth = (Property<Integer>) hc.getContainerProperty(id, "depth");
