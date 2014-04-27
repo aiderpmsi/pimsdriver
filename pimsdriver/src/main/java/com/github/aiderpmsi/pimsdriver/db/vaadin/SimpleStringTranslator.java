@@ -1,5 +1,6 @@
 package com.github.aiderpmsi.pimsdriver.db.vaadin;
 
+import java.util.HashMap;
 import java.util.List;
 
 import com.vaadin.data.Container.Filter;
@@ -15,7 +16,7 @@ public class SimpleStringTranslator implements DBTranslator {
 	}
 
 	@Override
-	public String getWhereStringForFilter(Filter filter, List<Object> arguments) {
+	public String getWhereStringForFilter(Filter filter, HashMap<String, String> tableFieldsMapping, List<Object> arguments) {
 		SimpleStringFilter ssf = (SimpleStringFilter) filter;
 
 		String likeStr =
@@ -23,7 +24,7 @@ public class SimpleStringTranslator implements DBTranslator {
 	                : "%" + ssf.getFilterString() + "%");
 		Like like = new Like(ssf.getPropertyId().toString(), likeStr);
 		like.setCaseSensitive(!ssf.isIgnoreCase());
-		return new LikeTranslator().getWhereStringForFilter(like, arguments);
+		return new LikeTranslator().getWhereStringForFilter(like, tableFieldsMapping, arguments);
 
 	}
 

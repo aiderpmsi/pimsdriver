@@ -1,5 +1,6 @@
 package com.github.aiderpmsi.pimsdriver.db.vaadin;
 
+import java.util.HashMap;
 import java.util.List;
 
 import com.vaadin.data.Container.Filter;
@@ -14,11 +15,11 @@ public class BetweenTranslator implements DBTranslator {
 	}
 
 	@Override
-	public String getWhereStringForFilter(Filter filter, List<Object> arguments) {
+	public String getWhereStringForFilter(Filter filter, HashMap<String, String> tableFieldsMapping, List<Object> arguments) {
         Between between = (Between) filter;
         arguments.add(between.getStartValue());
         arguments.add(between.getEndValue());
-        return (String) between.getPropertyId() + " BETWEEN ? AND ?";
+        return (String) tableFieldsMapping.get(between.getPropertyId()) + " BETWEEN ? AND ?";
 	}
 
 }

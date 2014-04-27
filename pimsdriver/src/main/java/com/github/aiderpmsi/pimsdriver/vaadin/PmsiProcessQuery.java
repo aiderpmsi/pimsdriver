@@ -30,7 +30,9 @@ public class PmsiProcessQuery implements Query{
 	public PmsiProcessQuery(QueryDefinition qd) {
 		
 		StringBuilder countQueryBuilder = new StringBuilder("SELECT COUNT(*) as nbrows FROM plud_pmsiupload ");
-		StringBuilder contentQueryBuilder = new StringBuilder("SELECT * FROM plud_pmsiupload ");
+		StringBuilder contentQueryBuilder = new StringBuilder(
+				"SELECT plud_id, plud_processed, plud_finess, plud_year, plud_month, plud_dateenvoi "
+				+ "FROM plud_pmsiupload ");
 		
 		// ADDS THE FILTERS
 		List<Filter> filters = new LinkedList<>(qd.getFilters());

@@ -43,7 +43,6 @@ public class PmsiProcessWindow extends Window {
         lqc.addContainerProperty("year", Integer.class, null, true, true);
         lqc.addContainerProperty("month", Integer.class, null, true, true);
         lqc.addContainerProperty("dateenvoi", Date.class, new Date(), true, true);
-        lqc.addContainerProperty("comment", String.class, "", true, true);
         processtable.setContainerDataSource(lqc);
         processtable.setVisibleColumns(new Object[] {"finess", "year", "month", "dateenvoi", "comment"});
         processtable.setColumnHeaders(new String[] {"Finess", "Année", "Mois", "Date d'envoi", "Commentaire"} );
