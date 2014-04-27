@@ -1,10 +1,10 @@
 package com.github.aiderpmsi.pimsdriver.odb;
 
-import java.io.FileNotFoundException;
 import java.sql.Array;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -102,32 +102,35 @@ public class OdbRsfContentHandler extends ContentHandlerHelper {
 			// GENERATES THE QUERY
 			String query = "INSERT INTO pmel_pmsielement (pmel_root, pmel_parent, pmel_type, pmel_attributes) "
 					+ "VALUES(?, ?, ?, hstore(?, ?)) RETURNING pmel_id";
-
-			PreparedStatement ps = con.prepareStatement(query);
-			
-			// CREATES THE ARRAY OF ARGUMENTS (KEYS AND VALUES) FOUND IN RSF
-			List<String> argskeys = new ArrayList<>(properties.size());
-			List<String> argsvalues = new ArrayList<>(properties.size());
-			for (Entry<String, String> property : properties.entrySet()) {
-				argskeys.add(property.getKey());
-				argsvalues.add(property.getValue());
-			}
-
-			Array argskeysarray = con.createArrayOf("text", argskeys.toArray(new String[properties.size()]));
-			Array argsvaluesarray = con.createArrayOf("text", argsvalues.toArray(new String[properties.size()]));
-			
-			// SETS THE VALUES OF QUERY ARGS
-			ps.setLong(1, uploadPKId);
-			ps.setLong(2, headerPKId);
-			ps.setString(3, getContentPath().getLast());
-			ps.setArray(4, argskeysarray);
-			ps.setArray(5, argsvaluesarray);
-			
-			ResultSet rs = ps.executeQuery();
-			
-			// IF THIS ELEMENT IS THE HEADER, USE THIS ELEMENT ID AS PARENT ID (HEADER ID)
-			if (getContentPath().getLast().equals("rsfheader")) {
-				headerPKId = rs.getLong(1);
+			try {
+				PreparedStatement ps = con.prepareStatement(query);
+				
+				// CREATES THE ARRAY OF ARGUMENTS (KEYS AND VALUES) FOUND IN RSF
+				List<String> argskeys = new ArrayList<>(properties.size());
+				List<String> argsvalues = new ArrayList<>(properties.size());
+				for (Entry<String, String> property : properties.entrySet()) {
+					argskeys.add(property.getKey());
+					argsvalues.add(property.getValue());
+				}
+	
+				Array argskeysarray = con.createArrayOf("text", argskeys.toArray(new String[properties.size()]));
+				Array argsvaluesarray = con.createArrayOf("text", argsvalues.toArray(new String[properties.size()]));
+				
+				// SETS THE VALUES OF QUERY ARGS
+				ps.setLong(1, uploadPKId);
+				ps.setLong(2, headerPKId);
+				ps.setString(3, getContentPath().getLast());
+				ps.setArray(4, argskeysarray);
+				ps.setArray(5, argsvaluesarray);
+				
+				ResultSet rs = ps.executeQuery();
+				
+				// IF THIS ELEMENT IS THE HEADER, USE THIS ELEMENT ID AS PARENT ID (HEADER ID)
+				if (getContentPath().getLast().equals("rsfheader")) {
+					headerPKId = rs.getLong(1);
+				}
+			} catch (SQLException e) {
+				throw new SAXException(e);
 			}
 		}
 		
