@@ -3,6 +3,7 @@ package com.github.aiderpmsi.pimsdriver.jaxrs;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+
 import javax.annotation.security.PermitAll;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -10,11 +11,13 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang3.StringUtils;
 
 import com.github.aiderpmsi.pimsdriver.dao.UploadedElementsDTO;
 import com.github.aiderpmsi.pimsdriver.model.PmsiUploadedElementModel;
+import com.github.aiderpmsi.pimsdriver.model.PmsiUploadedElementsModel;
 
 @Path("/uploaded") 
 @PermitAll
@@ -32,7 +35,7 @@ public class UploadedPmsi {
 	@GET
     @Path("/list")
     @Produces({MediaType.APPLICATION_XML})
-	public List<PmsiUploadedElementModel> getPendingUploadedElements(
+	public Response getPendingUploadedElements(
 			@DefaultValue("0") @QueryParam("first") Integer first,
 			@DefaultValue("20") @QueryParam("rows") Integer rows,
 			@QueryParam("orderelts") List<String> orderelts,
@@ -42,7 +45,7 @@ public class UploadedPmsi {
 		StringBuilder query = new StringBuilder(
 				"SELECT plud_id, plud_processed, plud_finess, "
 				+ "plud_year, plud_month, plud_dateenvoi, plud_rsf_oid oid, "
-				+ "plud_rss_oid, plud_arguments FROM PmsiUpload WHERE processed='pending' ");
+				+ "plud_rss_oid, plud_arguments FROM plud_pmsiupload WHERE plud_processed='pending'::plud_status ");
 
 		// ORDER RESULTS
 		List<String> orderquery = new LinkedList<>();
@@ -71,10 +74,14 @@ public class UploadedPmsi {
 
 		// DEFINES THE WINDOW
 		query.append("offset ").append(first).append(" limit ").append(rows + 1);
-		
+
 		// EXECUTES THE QUERY
 		UploadedElementsDTO ued = new UploadedElementsDTO();
-		return ued.getUploadedElements(query.toString(), new Object[]{});
+		List<PmsiUploadedElementModel> pued = ued.getUploadedElements(query.toString(), new Object[]{});
+		PmsiUploadedElementsModel pueds = new PmsiUploadedElementsModel();
+		pueds.setElements(pued);
+		
+		return Response.ok(pueds).build();
 	}
 	
 }
