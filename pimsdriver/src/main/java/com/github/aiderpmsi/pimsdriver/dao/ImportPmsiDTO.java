@@ -39,7 +39,7 @@ public class ImportPmsiDTO {
 			Long rssoid = null;
 			if (rss != null) {
 				rssoid = lom.createLO(LargeObjectManager.READ | LargeObjectManager.WRITE);
-				LargeObject rssobj = lom.open(rsfoid, LargeObjectManager.WRITE);
+				LargeObject rssobj = lom.open(rssoid, LargeObjectManager.WRITE);
 				store(rssobj, rss);
 			}
 
