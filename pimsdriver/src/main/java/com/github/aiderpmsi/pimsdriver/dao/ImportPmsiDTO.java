@@ -125,7 +125,7 @@ public class ImportPmsiDTO {
 				
 				// DELETE ELEMENTS FROM PMSI UPLOAD
 				String deletePmsiUploadQuery =
-						"DELETE FROM plud_psiupload WHERE plud_id =  ?";
+						"DELETE FROM plud_pmsiupload WHERE plud_id =  ?";
 				PreparedStatement deletePmsiUploadPs = con.prepareStatement(deletePmsiUploadQuery);
 				deletePmsiUploadPs.setLong(1, uploadId);
 				deletePmsiUploadPs.execute();

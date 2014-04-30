@@ -1,5 +1,7 @@
 package com.github.aiderpmsi.pimsdriver.vaadin.main.finesspanel;
 
+import java.util.Collection;
+
 import com.github.aiderpmsi.pimsdriver.dao.NavigationDTO;
 import com.github.aiderpmsi.pimsdriver.model.PmsiUploadedElementModel;
 import com.github.aiderpmsi.pimsdriver.vaadin.main.RootWindow;
@@ -19,6 +21,10 @@ public class FinessPanel extends Panel {
 		new Object[] {"Fichiers en erreur", PmsiUploadedElementModel.Status.failed}
 	};
 	
+	private Tree finessTree;
+	
+	private HierarchicalContainer hc;
+	
 	@SuppressWarnings("unused")
 	private FinessPanel() {};
 	
@@ -32,7 +38,7 @@ public class FinessPanel extends Panel {
 		NavigationDTO navigationDTO = new NavigationDTO();
 		
 		// SETS THE HIERARCHICAL CONTAINER PROPERTIES
-		final HierarchicalContainer hc = new HierarchicalContainer();
+		hc = new HierarchicalContainer();
 		hc.addContainerProperty("caption", String.class, "");
 		hc.addContainerProperty("finess", String.class, null);
 		hc.addContainerProperty("depth", Integer.class, null);
@@ -57,25 +63,38 @@ public class FinessPanel extends Panel {
 		}
 		
 		// TREE WIDGET
-		Tree finessTree = new Tree();
+		finessTree = new Tree();
 		finessTree.setContainerDataSource(hc);
 		finessTree.setItemCaptionPropertyId("caption");
 
 		// ADDS THE LISTENERS
-		ExpandListener el = new ExpandListener(hc, navigationDTO);
+		ExpandListener el = new ExpandListener(hc, this, navigationDTO);
 		CollapseListener cl = new CollapseListener(hc);
 		ItemClickListener icl = new ItemClickListener(rootElement, hc);
 
 		finessTree.addExpandListener(el);
 		finessTree.addCollapseListener(cl);
 		finessTree.addItemClickListener(icl);
-		
+
 		// ADD THE ACTION HANDLERS
-		finessTree.addActionHandler(new DeleteHandler(hc));
+		finessTree.addActionHandler(new DeleteHandler(hc, this));
 		
 		// SETS THE CONTENT OF THIS PANEL
 		setContent(finessTree);
 
 	}
 	
+	public void removeItem(Object itemId) {
+		// GETS THE PARENT ID
+		Object parentId = hc.getParent(itemId);
+		hc.removeItemRecursively(itemId);
+		// CHECK IF PARENT HAS NO CHILDREN AFTER ITEM REMOVING
+		if (parentId != null) {
+			@SuppressWarnings("unchecked")
+			Collection<Object> children = (Collection<Object>) hc.getChildren(parentId);
+			if (children.size() == 0) {
+				removeItem(parentId);
+			}
+		}
+	}
 }

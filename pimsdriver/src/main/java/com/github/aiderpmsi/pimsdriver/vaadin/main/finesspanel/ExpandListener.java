@@ -18,14 +18,17 @@ public class ExpandListener implements Tree.ExpandListener {
 
 	private HierarchicalContainer hc;
 	
+	private FinessPanel fp;
+	
 	private NavigationDTO navigationDTO;
 	
 	@SuppressWarnings("unused")
 	private ExpandListener() {}
 	
-	public ExpandListener(HierarchicalContainer hc, NavigationDTO navigationDTO) {
+	public ExpandListener(HierarchicalContainer hc, FinessPanel fp, NavigationDTO navigationDTO) {
 		this.hc = hc;
 		this.navigationDTO = navigationDTO;
+		this.fp = fp;
 	}
 	
 	private Object createNode(Object[][] elements) {
@@ -77,7 +80,7 @@ public class ExpandListener implements Tree.ExpandListener {
 
 			// WHEN YMS IS NULL, IT MEANS THIS ITEM DOESN'T EXIST ANYMORE, REMOVE IT FROM THE TREE
 			if (yms == null) {
-				hc.removeItemRecursively(event.getItemId());
+				fp.removeItem(event.getItemId());
 				// SHOW THAT THIS ITEM DOESN'T EXIST ANYMORE
 				Notification.show("Le finess sélectionné n'existe plus", Notification.Type.WARNING_MESSAGE);
 			} else {
@@ -112,7 +115,7 @@ public class ExpandListener implements Tree.ExpandListener {
 
 			// IF WE HAVE NO RESULT, IT MEANS THIS ITEM DOESN'T EXIST ANYMORE, REMOVE IT FROM THE TREE
 			if (models.size() == 0) {
-				hc.removeItemRecursively(event.getItemId());
+				fp.removeItem(event.getItemId());
 				// SHOW THAT THIS ITEM DOESN'T EXIST ANYMORE
 				Notification.show("L'élément sélectionné n'existe plus", Notification.Type.WARNING_MESSAGE);
 			} else {

@@ -13,13 +13,16 @@ public class DeleteHandler implements Action.Handler {
 	static final Action[] ACTIONS = new Action[] { ACTION_DELETE };
 	static final Action[] NO_ACTION = new Action[] {};
 	
-	public HierarchicalContainer hc;
+	private HierarchicalContainer hc;
+	
+	private FinessPanel fp;
 	
 	@SuppressWarnings("unused")
 	private DeleteHandler() {}
 	
-	public DeleteHandler(HierarchicalContainer hc) {
+	public DeleteHandler(HierarchicalContainer hc, FinessPanel fp) {
 		this.hc = hc;
+		this.fp = fp;
 	}
 	
 	public Action[] getActions(Object target, Object sender) {
@@ -43,7 +46,7 @@ public class DeleteHandler implements Action.Handler {
 				// DELETES THE UPLOAD
 				(new ImportPmsiDTO()).deleteUpload(model.getRecordId());
 				// REMOVE THE ITEM
-				hc.removeItemRecursively(target);
+				fp.removeItem(target);
 			}
 		}
 	}
