@@ -1,4 +1,4 @@
-package com.github.aiderpmsi.pimsdriver.vaadin;
+package com.github.aiderpmsi.pimsdriver.vaadin.utils;
 
 
 import org.vaadin.addons.lazyquerycontainer.Query;

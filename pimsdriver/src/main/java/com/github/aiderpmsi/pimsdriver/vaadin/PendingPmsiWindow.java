@@ -6,16 +6,17 @@ import java.util.Locale;
 import org.vaadin.addons.lazyquerycontainer.LazyQueryContainer;
 import org.vaadin.addons.lazyquerycontainer.LazyQueryDefinition;
 
+import com.github.aiderpmsi.pimsdriver.vaadin.utils.PmsiProcessQueryFactory;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
-public class PmsiProcessWindow extends Window {
+public class PendingPmsiWindow extends Window {
 
 	/** Generated serial Id */
 	private static final long serialVersionUID = -7803472921198470202L;
 
-	public PmsiProcessWindow() {
+	public PendingPmsiWindow() {
 		// TITLE
 		super("Fichiers pmsi en cours de traitement");
 		

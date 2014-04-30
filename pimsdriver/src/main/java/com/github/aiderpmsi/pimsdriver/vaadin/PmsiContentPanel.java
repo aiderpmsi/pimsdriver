@@ -1,28 +1,27 @@
 package com.github.aiderpmsi.pimsdriver.vaadin;
 
 import com.github.aiderpmsi.pimsdriver.dao.NavigationDTO;
-import com.vaadin.ui.GridLayout;
+import com.github.aiderpmsi.pimsdriver.model.PmsiUploadedElementModel;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
 
-public class PmsiWorkPanel extends Panel {
+public class PmsiContentPanel extends Panel {
 
 	/** Generated serial id */
 	private static final long serialVersionUID = 9173237483341882407L;
 
-	public void setUpload(Long recordId) {
-		// IF RECORDID IS NULL, WE HAVE TO REMOVE EVERYTHIN OF THIS PANEL
-		if (recordId == null) {
+	public void setUpload(PmsiUploadedElementModel model, PmsiUploadedElementModel.Status status) {
+		// IF STATUS IS FAILED, WE HAVE TO REMOVE EVERYTHIN OF THIS PANEL
+		if (status == PmsiUploadedElementModel.Status.failed) {
 			this.removeAllActionHandlers();
 			this.setContent(new VerticalLayout());
-
 		}
 		else {
 			// GETS THE DATAS TO WRITE
-			NavigationDTO.RsfSynthesis rsfs = (new NavigationDTO()).rsfSynthesis(recordId);
-			NavigationDTO.RssSynthesis rsss =  (new NavigationDTO()).rssSynthesis(recordId);
+			NavigationDTO.RsfSynthesis rsfs = (new NavigationDTO()).rsfSynthesis(model.getRecordId());
+			NavigationDTO.RssSynthesis rsss =  (new NavigationDTO()).rssSynthesis(model.getRecordId());
 			
 			// SETS THE LAYOUT
 			VerticalLayout principallayout = new VerticalLayout();

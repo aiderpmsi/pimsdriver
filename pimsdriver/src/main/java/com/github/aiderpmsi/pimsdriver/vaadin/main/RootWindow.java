@@ -1,5 +1,9 @@
-package com.github.aiderpmsi.pimsdriver.vaadin;
+package com.github.aiderpmsi.pimsdriver.vaadin.main;
 
+import com.github.aiderpmsi.pimsdriver.model.PmsiUploadedElementModel;
+import com.github.aiderpmsi.pimsdriver.vaadin.PendingPmsiWindow;
+import com.github.aiderpmsi.pimsdriver.vaadin.PmsiContentPanel;
+import com.github.aiderpmsi.pimsdriver.vaadin.UploadPmsiWindow;
 import com.github.aiderpmsi.pimsdriver.vaadin.finesspanel.FinessPanel;
 import com.vaadin.annotations.Theme;
 import com.vaadin.server.VaadinRequest;
@@ -14,7 +18,7 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
 @Theme("pimsdriver")
-public class GuiUI extends UI {
+public class RootWindow extends UI {
 
 	/** Generated Serial */
 	private static final long serialVersionUID = 3109715875916629911L;
@@ -69,15 +73,24 @@ public class GuiUI extends UI {
 		// ADDS THE PANEL WITH THE CONTENT ON THE RIGHT
 		VerticalLayout rightPanelLayout = new VerticalLayout();
 		hsplit.setSecondComponent(rightPanelLayout);
-		PmsiWorkPanel pwp = new PmsiWorkPanel();
+		PmsiContentPanel pwp = new PmsiContentPanel();
 		rightPanelLayout.addComponent(pwp);
 		
 		// ADDS THE PANEL WITH THE FINESS TREE ON THE LEFT
 		VerticalLayout leftPanelLayout = new VerticalLayout();
 		hsplit.setFirstComponent(leftPanelLayout);
-		leftPanelLayout.addComponent(new FinessPanel(pwp));
+		leftPanelLayout.addComponent(new FinessPanel(this));
 		
+		// REGISTER A FINESS SELECTED LISTENER WHEN A FINESS CHANGES
+		addListener(new FinessSelectedListener(pwp));
 		
+	}
+	
+	public void fireFinessSelected(PmsiUploadedElementModel model, PmsiUploadedElementModel.Status status) {
+		FinessSelectedEvent fse = new FinessSelectedEvent(this);
+		fse.setModel(model);
+		fse.setStatus(status);
+		fireEvent(fse);
 	}
 	
 	private class AddPmsi implements Command {
@@ -87,7 +100,7 @@ public class GuiUI extends UI {
 		@Override
 		public void menuSelected(MenuItem selectedItem) {
 			// CREATE WINDOW
-			final Window wHelp = new PmsiUploadWindow();
+			final Window wHelp = new UploadPmsiWindow();
 	        
 			UI.getCurrent().addWindow(wHelp);
 		}
@@ -100,7 +113,7 @@ public class GuiUI extends UI {
 		@Override
 		public void menuSelected(MenuItem selectedItem) {
 			// CREATE WINDOW
-			final Window wProcess = new PmsiProcessWindow();
+			final Window wProcess = new PendingPmsiWindow();
 	        
 			UI.getCurrent().addWindow(wProcess);
 		}

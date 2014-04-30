@@ -3,6 +3,7 @@ package com.github.aiderpmsi.pimsdriver.vaadin;
 import com.github.aiderpmsi.pimsdriver.dao.ImportPmsiDTO;
 import com.github.aiderpmsi.pimsdriver.dao.TransactionException;
 import com.github.aiderpmsi.pimsdriver.model.PmsiUploadElementModel;
+import com.github.aiderpmsi.pimsdriver.vaadin.utils.FileUploader;
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitEvent;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
@@ -16,14 +17,14 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.Upload;
 import com.vaadin.ui.Window;
 
-public class PmsiUploadWindow extends Window {
+public class UploadPmsiWindow extends Window {
 
 	private static final long serialVersionUID = -2583394688969956613L;
 	
 	private FileUploader rsf;
 	private FileUploader rss;
 
-	public PmsiUploadWindow() {
+	public UploadPmsiWindow() {
 		// TITLE
 		super("Ajouter un fichier Pmsi");
 		

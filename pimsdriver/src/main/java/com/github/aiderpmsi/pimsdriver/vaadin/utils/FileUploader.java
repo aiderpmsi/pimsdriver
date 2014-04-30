@@ -1,4 +1,4 @@
-package com.github.aiderpmsi.pimsdriver.vaadin;
+package com.github.aiderpmsi.pimsdriver.vaadin.utils;
 
 import java.io.File;
 import java.io.FileInputStream;

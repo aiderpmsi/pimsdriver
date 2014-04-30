@@ -1,4 +1,4 @@
-package com.github.aiderpmsi.pimsdriver.vaadin;
+package com.github.aiderpmsi.pimsdriver.vaadin.utils;
 
 import java.util.ArrayList;
 import java.util.HashMap;

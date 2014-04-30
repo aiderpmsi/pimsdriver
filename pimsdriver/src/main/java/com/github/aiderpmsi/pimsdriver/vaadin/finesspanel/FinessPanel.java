@@ -1,195 +1,70 @@
 package com.github.aiderpmsi.pimsdriver.vaadin.finesspanel;
 
-import java.text.SimpleDateFormat;
-import java.util.Collection;
-import java.util.List;
-
 import com.github.aiderpmsi.pimsdriver.dao.NavigationDTO;
-import com.github.aiderpmsi.pimsdriver.dao.UploadedElementsDTO;
 import com.github.aiderpmsi.pimsdriver.model.PmsiUploadedElementModel;
-import com.github.aiderpmsi.pimsdriver.vaadin.PmsiWorkPanel;
+import com.github.aiderpmsi.pimsdriver.vaadin.main.RootWindow;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.HierarchicalContainer;
-import com.vaadin.event.ItemClickEvent;
-import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.Tree;
-import com.vaadin.ui.Tree.CollapseEvent;
-import com.vaadin.ui.Tree.ExpandEvent;
 
 public class FinessPanel extends Panel {
 
 	/** Generated serial id */
 	private static final long serialVersionUID = 5192397393504372354L;
 	
-	public FinessPanel(final PmsiWorkPanel pwp) {
+	private static final Object[][] rootElts =
+			new Object[][] {
+		new Object[] {"Finess", PmsiUploadedElementModel.Status.successed},
+		new Object[] {"Fichiers en erreur", PmsiUploadedElementModel.Status.failed}
+	};
+	
+	@SuppressWarnings("unused")
+	private FinessPanel() {};
+	
+	public FinessPanel(RootWindow rootElement) {
+	
+		// SETS THE NAVIGATION DTO (REUSABLE)
+		NavigationDTO navigationDTO = new NavigationDTO();
 		
 		// SETS THE HIERARCHICAL CONTAINER PROPERTIES
 		final HierarchicalContainer hc = new HierarchicalContainer();
 		hc.addContainerProperty("caption", String.class, "");
+		hc.addContainerProperty("finess", String.class, null);
 		hc.addContainerProperty("depth", Integer.class, null);
 		hc.addContainerProperty("year", Integer.class, null);
 		hc.addContainerProperty("month", Integer.class, null);
-		hc.addContainerProperty("recordid", Long.class, null);
+		hc.addContainerProperty("status", PmsiUploadedElementModel.Status.class, null);
+		hc.addContainerProperty("model", PmsiUploadedElementModel.class, null);
 		
-		// SUCESS ROOT
-		final Object idsuccess = hc.addItem();
-		@SuppressWarnings("unchecked")
-		Property<String> propsucess = (Property<String>) hc.getContainerProperty(idsuccess, "caption");
-		propsucess.setValue("Finess");
-		@SuppressWarnings("unchecked")
-		Property<Integer> propsucessdepth = (Property<Integer>) hc.getContainerProperty(idsuccess, "depth");
-		propsucessdepth.setValue(0);
+		// FILLS THE ROOT ELEMENTS FROM ELEMENTS LIST
+		for (Object[] rootElt : rootElts) {
+			Object idItem = hc.addItem();
+			@SuppressWarnings("unchecked")
+			Property<String> captionProperty = (Property<String>) hc.getContainerProperty(idItem, "caption");
+			captionProperty.setValue((String) rootElt[0]);
+			@SuppressWarnings("unchecked")
+			Property<PmsiUploadedElementModel.Status> statusProperty = (Property<PmsiUploadedElementModel.Status>) hc.getContainerProperty(idItem, "status");
+			statusProperty.setValue((PmsiUploadedElementModel.Status) rootElt[1]);
+		}
 		
-		// ERRORS ROOT
-		final Object idfail = hc.addItem();
-		@SuppressWarnings("unchecked")
-		Property<String> propfail = (Property<String>) hc.getContainerProperty(idfail, "caption");
-		propfail.setValue("Fichiers en erreur");
-		@SuppressWarnings("unchecked")
-		Property<Integer> propfaildepth = (Property<Integer>) hc.getContainerProperty(idfail, "depth");
-		propfaildepth.setValue(0);
-
 		// TREE WIDGET
 		Tree finessTree = new Tree();
 		finessTree.setContainerDataSource(hc);
 		finessTree.setItemCaptionPropertyId("caption");
+
+		// ADDS THE LISTENERS
+		ExpandListener el = new ExpandListener(hc, navigationDTO);
+		CollapseListener cl = new CollapseListener(hc);
+		ItemClickListener icl = new ItemClickListener(rootElement, hc);
+
+		finessTree.addExpandListener(el);
+		finessTree.addCollapseListener(cl);
+		finessTree.addItemClickListener(icl);
+		
+		// SETS THE CONTENT OF THIS PANEL
 		setContent(finessTree);
 
-		finessTree.addItemClickListener(new ItemClickEvent.ItemClickListener() {
-			/** Generated Serial Id  */
-			private static final long serialVersionUID = 721980390763381775L;
-			@Override
-			public void itemClick(ItemClickEvent event) {
-				// GETS THE EVENT NODE DEPTH
-				Integer eventDepth = (Integer) hc.getContainerProperty(event.getItemId(), "depth").getValue();
-				// DEPTH AT 3 MEANS AN UPLOAD HAS BEEN SELECTED
-				if (eventDepth == 3) {
-					// CHECK IF WE ARE IN A SUCCEDED UPLOAD
-					if (hc.getParent(hc.getParent(hc.getParent(event.getItemId()))) == idsuccess) {
-						// WE PREVENT THE WORK PANEL THAT A NEW PMSI HAS BEEN SELECTED
-						Long recordId  = (Long) hc.getContainerProperty(event.getItemId(), "recordid").getValue();
-						pwp.setUpload(recordId);
-					}
-					// ELSE UPDATE PMSIWORKPANEL WITH NULL
-					else {
-						pwp.setUpload(null);
-					}
-				}
-			}
-		}
-		);
-		
-		finessTree.addExpandListener(new Tree.ExpandListener() {
-			/** Generated serial id */
-			private static final long serialVersionUID = 7235194562779113128L;
-			@Override
-			public synchronized void nodeExpand(ExpandEvent event) {
-				// GETS THE EVENT NODE DEPTH
-				Integer eventDepth = (Integer) hc.getContainerProperty(event.getItemId(), "depth").getValue();
-				// IF WE EXPAND A ROOT NODE
-				if (eventDepth == 0) {
-					PmsiUploadedElementModel.Status filter =
-							(event.getItemId() == idsuccess ? PmsiUploadedElementModel.Status.successed : PmsiUploadedElementModel.Status.failed);
-					// FILL THE SUCCESS TREE
-					List<String> finesses = (new NavigationDTO()).getFiness(filter);
-					for (String finess : finesses) {
-						Object id = hc.addItem();
-						@SuppressWarnings("unchecked")
-						Property<String> prop = (Property<String>) hc.getContainerProperty(id, "caption");
-						prop.setValue(finess);
-						@SuppressWarnings("unchecked")
-						Property<Integer> depth = (Property<Integer>) hc.getContainerProperty(id, "depth");
-						depth.setValue(1);
-						hc.setParent(id, event.getItemId());
-					}
-				}
-				// IF WE EXPAND A FINESS NODE
-				else if (eventDepth == 1) {
-					PmsiUploadedElementModel.Status status =
-							(hc.getParent(event.getItemId()) == idsuccess ? PmsiUploadedElementModel.Status.successed : 
-								PmsiUploadedElementModel.Status.failed);
-					String finess = (String) hc.getContainerProperty(event.getItemId(), "caption").getValue();
-					// FILL THE FINESS TREE :
-					List<NavigationDTO.YM> yms = (new NavigationDTO()).getYM(status, finess);
-					// WHEN YMS IS NULL, IT MEANS THIS ITEM DOESN'T EXIST ANYMORE, REMOVE IT FROM THE TREE
-					if (yms == null) {
-						hc.removeItemRecursively(event.getItemId());
-						// SHOW THAT THIS ITEM DOESN'T EXIST ANYMORE
-						Notification.show("Le finess sélectionné n'existe plus", Notification.Type.WARNING_MESSAGE);
-					} else {
-						for (NavigationDTO.YM ym : yms) {
-							Object id = hc.addItem();
-							@SuppressWarnings("unchecked")
-							Property<String> prop = (Property<String>) hc.getContainerProperty(id, "caption");
-							prop.setValue(ym.year + " M" + ym.month);
-							@SuppressWarnings("unchecked")
-							Property<Integer> propyear = (Property<Integer>) hc.getContainerProperty(id, "year");
-							propyear.setValue(ym.year);
-							@SuppressWarnings("unchecked")
-							Property<Integer> propmonth = (Property<Integer>) hc.getContainerProperty(id, "month");
-							propmonth.setValue(ym.month);
-							@SuppressWarnings("unchecked")
-							Property<Integer> depth = (Property<Integer>) hc.getContainerProperty(id, "depth");
-							depth.setValue(2);
-							hc.setParent(id, event.getItemId());
-						}
-					}
-				}
-				// IF WE EXPAND A YEAR / MONTH NODE
-				else if (eventDepth == 2) {
-					PmsiUploadedElementModel.Status status =
-							(hc.getParent(hc.getParent(event.getItemId())) == idsuccess ?
-									PmsiUploadedElementModel.Status.successed : 
-										PmsiUploadedElementModel.Status.failed);
-					String finess = (String) hc.getContainerProperty(hc.getParent(event.getItemId()), "caption").getValue();
-					Integer year = (Integer) hc.getContainerProperty(event.getItemId(), "year").getValue();
-					Integer month = (Integer) hc.getContainerProperty(event.getItemId(), "month").getValue();
-					Object[] arguments = new Object[] {status.toString(), finess, year, month};
-					UploadedElementsDTO ued = new UploadedElementsDTO();
-					// FILLS THE DATEENVOI TREE
-					List<PmsiUploadedElementModel> models = 
-							ued.getUploadedElements(
-									"SELECT plud_id, plud_processed, plud_finess, plud_year, plud_month, plud_dateenvoi FROM plud_pmsiupload WHERE plud_processed = ?::plud_status AND plud_finess = ? AND plud_year = ? AND plud_month = ? ORDER BY plud_dateenvoi DESC",
-									arguments);
-					// IF WE HAVE NO RESULT, IT MEANS THIS ITEM DOESN'T EXIST ANYMORE, REMOVE IT FROM THE TREE
-					if (models.size() == 0) {
-						hc.removeItemRecursively(event.getItemId());
-					} else {
-						for (PmsiUploadedElementModel model : models) {
-							Object id = hc.addItem();
-							@SuppressWarnings("unchecked")
-							Property<String> prop = (Property<String>) hc.getContainerProperty(id, "caption");
-							SimpleDateFormat sdf = new SimpleDateFormat("dd/mm/YYYY HH:MM:ss");
-							prop.setValue(sdf.format(model.getDateenvoi()));
-							@SuppressWarnings("unchecked")
-							Property<Long> proprid = (Property<Long>) hc.getContainerProperty(id, "recordid");
-							proprid.setValue(model.getRecordId());
-							@SuppressWarnings("unchecked")
-							Property<Integer> depth = (Property<Integer>) hc.getContainerProperty(id, "depth");
-							depth.setValue(3);
-							hc.setParent(id, event.getItemId());
-							hc.setChildrenAllowed(id, false);
-						}
-					}
-				}
-			}
-		});
-		
-		finessTree.addCollapseListener(new Tree.CollapseListener() {
-			/** Generated serial id */
-			private static final long serialVersionUID = -8083420762047096032L;
-			public synchronized void nodeCollapse(CollapseEvent event) {
-				// REMOVE ALL CHILDREN OF THIS COLLAPSING ITEM IF NOT NULL
-				@SuppressWarnings("unchecked")
-				Collection<Object> childrenCollection = (Collection<Object>) hc.getChildren(event.getItemId());
-				if (childrenCollection != null) {
-					for (Object child : childrenCollection.toArray()) {
-						hc.removeItemRecursively(child);
-					}
-				}
-			}
-		});
 	}
 	
 }
