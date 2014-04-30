@@ -116,7 +116,7 @@ public class ProcessImpl implements Callable<Boolean> {
 			}
 
 			// VERIFY THAT RSF AND RSS FINESS MATCH
-			if (rsfFiness != null && rssFiness != null && rsfFiness != rssFiness)
+			if (rsfFiness != null && rssFiness != null && !rsfFiness.equals(rssFiness))
 				throw new IOException("Finess dans RSF et RSS ne correspondent pas");
 						
 			// UPDATE STATUS AND REAL FINESS
