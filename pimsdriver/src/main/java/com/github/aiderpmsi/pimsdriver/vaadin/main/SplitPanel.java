@@ -19,12 +19,12 @@ public class SplitPanel extends HorizontalSplitPanel{
 		setSplitPosition(.25f, Unit.PERCENTAGE);
 
 		// CREATES THE SUB COMPONENTS
-		PmsiContentPanel pwp = new PmsiContentPanel();
-		FinessPanel fp = new FinessPanel(rootWindow);
+		contentPanel = new PmsiContentPanel();
+		finessPanel = new FinessPanel(rootWindow);
 
 		// CREATES AND FILLS THE LEFT AND RIGHT LAYOUTS
-		setFirstComponent(new VerticalLayout(fp));
-		setSecondComponent(new VerticalLayout(pwp));
+		setFirstComponent(new VerticalLayout(finessPanel));
+		setSecondComponent(new VerticalLayout(contentPanel));
 
 	}
 

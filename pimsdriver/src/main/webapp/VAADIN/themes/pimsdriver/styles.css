@@ -1,6 +1,6 @@
 @import '../reindeer/legacy-styles.css';
 
-.v-label-header {
+.pims-main-header {
 	width: 100%;
 	background-color: #3399FF;
 	text-align: center;
@@ -8,7 +8,14 @@
 	padding: 1px 0px;
 }
 
-.v-menubar-mymenubar {
+.pims-main-menubar {
 	width: 100%;
 }
 
+.pims-contentpanel-headerpanel-layout {
+	background-color: yellow;
+	border-style: solid;
+	border-radius: 5px 5px 5px 5px;	
+	padding: 1px;
+	margin: 3px 10px;
+}

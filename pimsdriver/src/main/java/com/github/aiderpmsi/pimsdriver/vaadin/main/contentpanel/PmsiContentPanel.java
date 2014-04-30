@@ -12,11 +12,16 @@ public class PmsiContentPanel extends Panel {
 	/** Generated serial id */
 	private static final long serialVersionUID = 9173237483341882407L;
 
+	public PmsiContentPanel() {
+		setVisible(false);
+	}
+	
 	public void setUpload(PmsiUploadedElementModel model, PmsiUploadedElementModel.Status status) {
 		// IF STATUS IS FAILED, WE HAVE TO REMOVE EVERYTHIN OF THIS PANEL
 		if (status == PmsiUploadedElementModel.Status.failed) {
 			this.removeAllActionHandlers();
 			this.setContent(new VerticalLayout());
+			setVisible(false);
 		}
 		else {
 			// GETS THE DATAS TO WRITE
@@ -28,49 +33,60 @@ public class PmsiContentPanel extends Panel {
 			setContent(principallayout);
 			
 			HorizontalLayout headerlayout = new HorizontalLayout();
+			principallayout.addStyleName("pims-contentpanel-headerlayout");
 			principallayout.addComponent(headerlayout);
 			
 			// RSF PANEL
-			Panel rsfPanel = new Panel();
-			VerticalLayout rsfLayout = new VerticalLayout();
-			rsfPanel.setContent(rsfLayout);
-			
-			Label rsfHeader = new Label("RSF");
-			rsfLayout.addComponent(rsfHeader);
-			Label rsfa = new Label("Nb lignes A : " + rsfs.rsfa);
-			Label rsfb = new Label("Nb lignes B : " + rsfs.rsfb);
-			Label rsfc = new Label("Nb lignes C : " + rsfs.rsfc);
-			Label rsfh = new Label("Nb lignes H : " + rsfs.rsfh);
-			Label rsfi = new Label("Nb lignes I : " + rsfs.rsfi);
-			Label rsfl = new Label("Nb lignes L : " + rsfs.rsfa);
-			Label rsfm = new Label("Nb lignes M : " + rsfs.rsfa);
-			
-			rsfLayout.addComponents(rsfa, rsfb, rsfc, rsfh, rsfi, rsfl, rsfm);
-
+			Panel rsfPanel = createPanel("RSF", new String[][] {
+					new String[] {"Nb lignes A", rsfs.rsfa.toString()},
+					new String[] {"Nb lignes B", rsfs.rsfb.toString()},
+					new String[] {"Nb lignes C", rsfs.rsfc.toString()},
+					new String[] {"Nb lignes H", rsfs.rsfh.toString()},
+					new String[] {"Nb lignes I", rsfs.rsfi.toString()},
+					new String[] {"Nb lignes L", rsfs.rsfl.toString()},
+					new String[] {"Nb lignes M", rsfs.rsfm.toString()},
+			});
 			headerlayout.addComponent(rsfPanel);
 			
 			// RSS PANEL
-			Panel rssPanel = new Panel();
-			VerticalLayout rssLayout = new VerticalLayout();
-			rssPanel.setContent(rssLayout);
-			// NO RSS
+			Panel rssPanel;
 			if (rsss == null) {
-				Label rssHeader = new Label("Absence de RSS");
-				rssLayout.addComponent(rssHeader);
-			}
-			// ONE RSS
-			else {
-				Label rssHeader = new Label("RSS");
-				rssLayout.addComponent(rssHeader);
-				Label rsssmain = new Label("Nb lignes : " + rsss.main);
-				Label rsssacte = new Label("Nb d'actes : " + rsss.acte);
-				Label rsssda = new Label("Nb de diagnostics : " + rsss.da);
-				Label rssdad = new Label("Nb de diagnostics documentaires : " + rsss.dad);
-				Label rssseances = new Label("Nb de séances : " + rsss.seances);
-				rssLayout.addComponents(rsssmain, rsssacte, rsssda, rssdad, rssseances);
+				// THERE IS NO RSS FILE
+				rssPanel = createPanel("Absence de RSS", new String[][] {});
+			} else {
+				// FILLS THE RSS CONTENT
+				rssPanel = createPanel("RSS", new String[][]{
+						new String[] {"Nb lignes", rsss.main.toString()},
+						new String[] {"Nb actes", rsss.acte.toString()},
+						new String[] {"Nb diagnostics associés", rsss.da.toString()},
+						new String[] {"Nb diagnostics documentaires", rsss.dad.toString()},
+						new String[] {"Nb séances", rsss.seances.toString()}
+				});
 			}
 			headerlayout.addComponent(rssPanel);
+			
+			setVisible(true);
 		}
+	}
+	
+	private Panel createPanel(String header, String[][] elements) {
+		Panel panel = new Panel();
+		panel.addStyleName("pims-contentpanel-headerpanel");
+		VerticalLayout layout = new VerticalLayout();
+		layout.addStyleName("pims-contentpanel-headerpanel-layout");
+		panel.setContent(layout);
+
+		// TITLE
+		Label title = new Label(header);
+		title.addStyleName("pims-contentpanel-headerpanel-headerlabel");
+		layout.addComponent(title);
+		
+		// CONTENT
+		for (String[] element : elements) {
+			Label label = new Label(element[0] + " : " + element[1]);
+			layout.addComponent(label);
+		}
+		return panel;
 	}
 	
 }

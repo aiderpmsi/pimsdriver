@@ -4,7 +4,6 @@ import com.github.aiderpmsi.pimsdriver.model.PmsiUploadedElementModel;
 import com.vaadin.annotations.Theme;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.ui.Layout;
-import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
@@ -21,7 +20,9 @@ public class RootWindow extends UI {
 	
 	@Override
 	protected void init(VaadinRequest request) {
+		setSizeFull();
 		layout = createLayout();
+		layout.setSizeFull();
 		setContent(layout);
 		
 		// ADDS EACH WIDGET INSIDE LAYOUT
@@ -29,7 +30,10 @@ public class RootWindow extends UI {
 		layout.addComponent(new MenuBar());
 		splitPanel = new SplitPanel(this);
 		layout.addComponent(splitPanel);
-		
+		// SPLIT PANEL EXPANDS MAX If LAYOUT IS VERTICAL LAYOUT
+		if (layout instanceof VerticalLayout)
+			((VerticalLayout) layout).setExpandRatio(splitPanel, 1f);
+
 		// REGISTER A FINESS SELECTED LISTENER WHEN A FINESS CHANGES
 		addListener(new FinessSelectedListener(splitPanel.getContentPanel()));
 	}
