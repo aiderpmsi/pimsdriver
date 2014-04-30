@@ -7,8 +7,10 @@ import java.util.List;
 import com.github.aiderpmsi.pimsdriver.dao.NavigationDTO;
 import com.github.aiderpmsi.pimsdriver.dao.UploadedElementsDTO;
 import com.github.aiderpmsi.pimsdriver.model.PmsiUploadedElementModel;
+import com.github.aiderpmsi.pimsdriver.vaadin.PmsiWorkPanel;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.HierarchicalContainer;
+import com.vaadin.event.ItemClickEvent;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.Tree;
@@ -19,8 +21,8 @@ public class FinessPanel extends Panel {
 
 	/** Generated serial id */
 	private static final long serialVersionUID = 5192397393504372354L;
-
-	public FinessPanel() {
+	
+	public FinessPanel(final PmsiWorkPanel pwp) {
 		
 		// SETS THE HIERARCHICAL CONTAINER PROPERTIES
 		final HierarchicalContainer hc = new HierarchicalContainer();
@@ -53,6 +55,30 @@ public class FinessPanel extends Panel {
 		finessTree.setContainerDataSource(hc);
 		finessTree.setItemCaptionPropertyId("caption");
 		setContent(finessTree);
+
+		finessTree.addItemClickListener(new ItemClickEvent.ItemClickListener() {
+			/** Generated Serial Id  */
+			private static final long serialVersionUID = 721980390763381775L;
+			@Override
+			public void itemClick(ItemClickEvent event) {
+				// GETS THE EVENT NODE DEPTH
+				Integer eventDepth = (Integer) hc.getContainerProperty(event.getItemId(), "depth").getValue();
+				// DEPTH AT 3 MEANS AN UPLOAD HAS BEEN SELECTED
+				if (eventDepth == 3) {
+					// CHECK IF WE ARE IN A SUCCEDED UPLOAD
+					if (hc.getParent(hc.getParent(hc.getParent(event.getItemId()))) == idsuccess) {
+						// WE PREVENT THE WORK PANEL THAT A NEW PMSI HAS BEEN SELECTED
+						Long recordId  = (Long) hc.getContainerProperty(event.getItemId(), "recordid").getValue();
+						pwp.setUpload(recordId);
+					}
+					// ELSE UPDATE PMSIWORKPANEL WITH NULL
+					else {
+						pwp.setUpload(null);
+					}
+				}
+			}
+		}
+		);
 		
 		finessTree.addExpandListener(new Tree.ExpandListener() {
 			/** Generated serial id */
@@ -143,6 +169,7 @@ public class FinessPanel extends Panel {
 							Property<Integer> depth = (Property<Integer>) hc.getContainerProperty(id, "depth");
 							depth.setValue(3);
 							hc.setParent(id, event.getItemId());
+							hc.setChildrenAllowed(id, false);
 						}
 					}
 				}

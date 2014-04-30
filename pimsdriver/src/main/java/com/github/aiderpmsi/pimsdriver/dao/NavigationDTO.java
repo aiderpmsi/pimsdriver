@@ -17,6 +17,14 @@ public class NavigationDTO {
 		public Integer month;
 	}
 	
+	public class RsfSynthesis {
+		public Integer rsfa, rsfb, rsfc, rsfh, rsfi, rsfl, rsfm;
+	}
+
+	public class RssSynthesis {
+		public Integer main, da, dad, acte, seances;
+	}
+	
 	public List<String> getFiness(PmsiUploadedElementModel.Status status) {
 		Connection con = null;
 		
@@ -94,5 +102,160 @@ public class NavigationDTO {
 
 	}
 	
-	
+	public RsfSynthesis rsfSynthesis(Long uploadedId) {
+		Connection con = null;
+		
+		try {
+			// GETS THE DB CONNECTION
+			con = DataSourceSingleton.getInstance().getConnection();
+
+			// CREATES THE QUERY
+			String query = 
+					"WITH RECURSIVE all_lines AS ( \n"
+					+ "SELECT pmel_id, pmel_parent, pmel_type, pmel_attributes \n"
+					+ "FROM pmel_pmsielement WHERE pmel_root = ? AND pmel_type = 'rsfheader' \n"
+					+ "UNION \n"
+					+ "SELECT pmel.pmel_id, pmel.pmel_parent, pmel.pmel_type, pmel.pmel_attributes \n"
+					+ "FROM pmel_pmsielement pmel \n"
+					+ "JOIN all_lines al \n"
+					+ "ON (al.pmel_id = pmel.pmel_parent) \n"
+					+ "), \n"
+					+ "rsfa AS ( \n"
+					+ "SELECT COUNT(*) AS nbrows FROM all_lines WHERE pmel_type = 'rsfa' \n"
+					+ "), \n"
+					+ "rsfb AS ( \n"
+					+ "SELECT COUNT(*) AS nbrows FROM all_lines WHERE pmel_type = 'rsfb' \n"
+					+ "), \n"
+					+ "rsfc AS ( \n"
+					+ "SELECT COUNT(*) AS nbrows FROM all_lines WHERE pmel_type = 'rsfc' \n"
+					+ "), \n"
+					+ "rsfh AS ( \n"
+					+ "SELECT COUNT(*) AS nbrows FROM all_lines WHERE pmel_type = 'rsfh' \n"
+					+ "), \n"
+					+ "rsfi AS ( \n"
+					+ "SELECT COUNT(*) AS nbrows FROM all_lines WHERE pmel_type = 'rsfi' \n"
+					+ "), \n"
+					+ "rsfl AS ( \n"
+					+ "SELECT COUNT(*) AS nbrows FROM all_lines WHERE pmel_type = 'rsfl' \n"
+					+ "), \n"
+					+ "rsfm AS ( \n"
+					+ "SELECT COUNT(*) AS nbrows FROM all_lines WHERE pmel_type = 'rsfm' \n"
+					+ ") \n"
+					+ "SELECT rsfa.nbrows rsfa , rsfb.nbrows rsfb, rsfc.nbrows rsfc, rsfh.nbrows rsfh, rsfi.nbrows rsfi, rsfl.nbrows rsfl, rsfm.nbrows rsfm \n"
+					+ "FROM rsfa rsfa \n"
+					+ "CROSS JOIN rsfb rsfb \n"
+					+ "CROSS JOIN rsfc rsfc \n"
+					+ "CROSS JOIN rsfh rsfh \n"
+					+ "CROSS JOIN rsfi rsfi \n"
+					+ "CROSS JOIN rsfl rsfl \n"
+					+ "CROSS JOIN rsfm rsfm";
+			PreparedStatement ps = con.prepareStatement(query);
+			ps.setLong(1, uploadedId);
+			
+			// EXECUTE QUERY
+			ResultSet rs = ps.executeQuery();
+			
+			// FILLS THE ITEMS
+			RsfSynthesis rsfs = new RsfSynthesis();
+			rs.next();
+			rsfs.rsfa = (int) rs.getLong(1);
+			rsfs.rsfb = (int) rs.getLong(2);
+			rsfs.rsfc = (int) rs.getLong(3);
+			rsfs.rsfh = (int) rs.getLong(4);
+			rsfs.rsfi = (int) rs.getLong(5);
+			rsfs.rsfl = (int) rs.getLong(6);
+			rsfs.rsfm = (int) rs.getLong(7);
+			
+			// COMMIT
+			con.commit();
+			
+			return rsfs;
+		} catch (SQLException e) {
+			try { con.rollback(); } catch (SQLException e2) { e2.addSuppressed(e); throw new RuntimeException(e2); }
+			throw new TransactionException("Erreur de récupération du nombre de lignes dans le rsf", e);
+		} finally {
+			if (con != null)
+				try { con.close(); } catch (SQLException e) { throw new RuntimeException(e); }
+		}
+	}
+
+	public RssSynthesis rssSynthesis(Long uploadedId) {
+		Connection con = null;
+		
+		try {
+			// GETS THE DB CONNECTION
+			con = DataSourceSingleton.getInstance().getConnection();
+
+			// FIRST CHECK THAT ONE RSSHEADER IS AVAILABLE
+			String ckeckQuery = "SELECT COUNT(pmel_id) as nbrows FROM pmel_pmsielement WHERE pmel_root = ? AND pmel_type = 'rssheader'";
+			PreparedStatement pscheck = con.prepareStatement(ckeckQuery);
+			pscheck.setLong(1, uploadedId);
+			
+			// EXECUTE QUERY
+			ResultSet checkrs = pscheck.executeQuery();
+			
+			checkrs.next();
+			if (checkrs.getLong(1) == 0L)
+				return null;
+			
+			// ONE RSS HEADER IS AVAILABLE, COUNT THE NUMBER OF LINES
+			// CREATES THE QUERY
+			String query = 
+					"WITH RECURSIVE all_lines AS ( \n"
+					+ "SELECT pmel_id, pmel_parent, pmel_type, pmel_attributes \n"
+					+ "FROM pmel_pmsielement WHERE pmel_root = ? AND pmel_type = 'rssheader' \n"
+					+ "UNION \n"
+					+ "SELECT pmel.pmel_id, pmel.pmel_parent, pmel.pmel_type, pmel.pmel_attributes \n"
+					+ "FROM pmel_pmsielement pmel \n"
+					+ "JOIN all_lines al \n"
+					+ "ON (al.pmel_id = pmel.pmel_parent) \n"
+					+ "), \n"
+					+ "rssmain AS ( \n"
+					+ "SELECT COUNT(*) AS nbrows FROM all_lines WHERE pmel_type = 'rssmain' \n"
+					+ "), \n"
+					+ "rssacte AS ( \n"
+					+ "SELECT COUNT(*) AS nbrows FROM all_lines WHERE pmel_type = 'rssacte' \n"
+					+ "), \n"
+					+ "rssda AS ( \n"
+					+ "SELECT COUNT(*) AS nbrows FROM all_lines WHERE pmel_type = 'rssda' \n"
+					+ "), \n"
+					+ "rssdad AS ( \n"
+					+ "SELECT COUNT(*) AS nbrows FROM all_lines WHERE pmel_type = 'rssdad' \n"
+					+ "), \n"
+					+ "rssseances AS ( \n"
+					+ "SELECT SUM((pmel_attributes -> 'NbSeances')::int) AS nbseances FROM all_lines \n"
+					+ ") \n"
+					+ "SELECT rssmain.nbrows rssmain , rssacte.nbrows rssacte, rssda.nbrows rssda, rssdad.nbrows rssdad, rssseances.nbseances nbseances \n"
+					+ "FROM rssmain rssmain \n"
+					+ "CROSS JOIN rssacte rssacte \n"
+					+ "CROSS JOIN rssda rssda \n"
+					+ "CROSS JOIN rssdad rssdad \n"
+					+ "CROSS JOIN rssseances rssseances";
+			PreparedStatement ps = con.prepareStatement(query);
+			ps.setLong(1, uploadedId);
+			
+			// EXECUTE QUERY
+			ResultSet rs = ps.executeQuery();
+			
+			// FILLS THE ITEMS
+			RssSynthesis rsss = new RssSynthesis();
+			rs.next();
+			rsss.main = (int) rs.getLong(1);
+			rsss.acte = (int) rs.getLong(2);
+			rsss.da = (int) rs.getLong(3);
+			rsss.dad = (int) rs.getLong(4);
+			rsss.seances = (int) rs.getLong(5);
+			
+			// COMMIT
+			con.commit();
+			
+			return rsss;
+		} catch (SQLException e) {
+			try { con.rollback(); } catch (SQLException e2) { e2.addSuppressed(e); throw new RuntimeException(e2); }
+			throw new TransactionException("Erreur de récupération du nombre de lignes dans le rss", e);
+		} finally {
+			if (con != null)
+				try { con.close(); } catch (SQLException e) { throw new RuntimeException(e); }
+		}
+	}
 }

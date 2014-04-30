@@ -86,7 +86,9 @@ public class RssContentHandler extends ContentHandlerHelper {
 		// FINDS IF THIS ELEMENT IS A NEW ELEMENT AND MUST REINIT THE PROPERTIES AND MAINID
 		if (getContentPath().size() == 2 && inElement.matcher(getPath()).matches()) {
 			properties = new HashMap<String, String>();
-			mainPKId = null;
+			// WE ENTER IN A NEW RSSMAIN, WE HAVE TO SET THE MAIN ID TO NULL
+			if (getContentPath().getLast().equals("rssmain"))
+				mainPKId = null;
 		}
 		// IF WE ARE AT DEPTH 2 AND IN AN ELEMENT, GET THE PROPERTY NAME
 		else if (getContentPath().size() == 3 && inProperty.matcher(getPath()).matches()) {
@@ -124,7 +126,7 @@ public class RssContentHandler extends ContentHandlerHelper {
 			
 				// SETS THE VALUES OF QUERY ARGS
 				ps.setLong(1, uploadPKId);
-				Long parentId = mainPKId == null ? headerPKId : mainPKId;
+				Long parentId = (mainPKId == null ? headerPKId : mainPKId);
 				if (parentId == null)
 					ps.setNull(2, Types.BIGINT);
 				else
@@ -140,7 +142,7 @@ public class RssContentHandler extends ContentHandlerHelper {
 					rs.next();
 					headerPKId = rs.getLong(1);
 				}
-				// IF THIS ELEMENT IS A MAIN ELEMENT, STORE THE INSERTES ID AS MAINID
+				// IF THIS ELEMENT IS A MAIN ELEMENT, STORE THE INSERTED ID AS MAINID
 				else if (getContentPath().getLast().equals("rssmain")) {
 					rs.next();
 					mainPKId = rs.getLong(1);
