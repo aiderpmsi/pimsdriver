@@ -70,7 +70,7 @@ public class GuiUI extends UI {
 		VerticalLayout rightPanelLayout = new VerticalLayout();
 		hsplit.setSecondComponent(rightPanelLayout);
 		PmsiWorkPanel pwp = new PmsiWorkPanel();
-		rightPanelLayout.addComponent(rightPanelLayout);
+		rightPanelLayout.addComponent(pwp);
 		
 		// ADDS THE PANEL WITH THE FINESS TREE ON THE LEFT
 		VerticalLayout leftPanelLayout = new VerticalLayout();

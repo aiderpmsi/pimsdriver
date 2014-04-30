@@ -2,6 +2,7 @@ package com.github.aiderpmsi.pimsdriver.vaadin;
 
 import com.github.aiderpmsi.pimsdriver.dao.NavigationDTO;
 import com.vaadin.ui.GridLayout;
+import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
@@ -27,12 +28,11 @@ public class PmsiWorkPanel extends Panel {
 			VerticalLayout principallayout = new VerticalLayout();
 			setContent(principallayout);
 			
-			GridLayout headerlayout = new GridLayout(2, 1);
+			HorizontalLayout headerlayout = new HorizontalLayout();
 			principallayout.addComponent(headerlayout);
 			
 			// RSF PANEL
 			Panel rsfPanel = new Panel();
-			headerlayout.addComponent(rsfPanel);
 			VerticalLayout rsfLayout = new VerticalLayout();
 			rsfPanel.setContent(rsfLayout);
 			
@@ -47,12 +47,13 @@ public class PmsiWorkPanel extends Panel {
 			Label rsfm = new Label("Nb lignes M : " + rsfs.rsfa);
 			
 			rsfLayout.addComponents(rsfa, rsfb, rsfc, rsfh, rsfi, rsfl, rsfm);
-	
+
+			headerlayout.addComponent(rsfPanel);
+			
 			// RSS PANEL
 			Panel rssPanel = new Panel();
-			headerlayout.addComponent(rssPanel);
 			VerticalLayout rssLayout = new VerticalLayout();
-			rsfPanel.setContent(rssLayout);
+			rssPanel.setContent(rssLayout);
 			// NO RSS
 			if (rsss == null) {
 				Label rssHeader = new Label("Absence de RSS");
@@ -69,6 +70,7 @@ public class PmsiWorkPanel extends Panel {
 				Label rssseances = new Label("Nb de séances : " + rsss.seances);
 				rssLayout.addComponents(rsssmain, rsssacte, rsssda, rssdad, rssseances);
 			}
+			headerlayout.addComponent(rssPanel);
 		}
 	}
 	
