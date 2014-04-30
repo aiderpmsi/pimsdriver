@@ -1,4 +1,4 @@
-package com.github.aiderpmsi.pimsdriver.vaadin.finesspanel;
+package com.github.aiderpmsi.pimsdriver.vaadin.main.finesspanel;
 
 import com.github.aiderpmsi.pimsdriver.dao.NavigationDTO;
 import com.github.aiderpmsi.pimsdriver.model.PmsiUploadedElementModel;

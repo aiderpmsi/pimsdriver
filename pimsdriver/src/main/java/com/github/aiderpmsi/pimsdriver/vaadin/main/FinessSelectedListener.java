@@ -1,6 +1,6 @@
 package com.github.aiderpmsi.pimsdriver.vaadin.main;
 
-import com.github.aiderpmsi.pimsdriver.vaadin.PmsiContentPanel;
+import com.github.aiderpmsi.pimsdriver.vaadin.main.contentpanel.PmsiContentPanel;
 import com.vaadin.ui.Component.Event;
 import com.vaadin.ui.Component.Listener;
 

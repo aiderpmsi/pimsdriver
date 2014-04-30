@@ -1,4 +1,4 @@
-package com.github.aiderpmsi.pimsdriver.vaadin.finesspanel;
+package com.github.aiderpmsi.pimsdriver.vaadin.main.finesspanel;
 
 import java.util.Collection;
 

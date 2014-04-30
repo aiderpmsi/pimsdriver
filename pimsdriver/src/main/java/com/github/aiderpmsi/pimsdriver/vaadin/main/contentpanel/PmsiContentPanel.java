@@ -1,4 +1,4 @@
-package com.github.aiderpmsi.pimsdriver.vaadin;
+package com.github.aiderpmsi.pimsdriver.vaadin.main.contentpanel;
 
 import com.github.aiderpmsi.pimsdriver.dao.NavigationDTO;
 import com.github.aiderpmsi.pimsdriver.model.PmsiUploadedElementModel;
