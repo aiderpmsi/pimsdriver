@@ -24,6 +24,10 @@ public class FinessPanel extends Panel {
 	
 	public FinessPanel(RootWindow rootElement) {
 	
+		super();
+		setCaption(null);
+		addStyleName("pims-finesspanel");
+		
 		// SETS THE NAVIGATION DTO (REUSABLE)
 		NavigationDTO navigationDTO = new NavigationDTO();
 		
@@ -49,6 +53,7 @@ public class FinessPanel extends Panel {
 			@SuppressWarnings("unchecked")
 			Property<Integer> depthProperty = (Property<Integer>) hc.getContainerProperty(idItem, "depth");
 			depthProperty.setValue(0);
+			
 		}
 		
 		// TREE WIDGET
@@ -64,6 +69,9 @@ public class FinessPanel extends Panel {
 		finessTree.addExpandListener(el);
 		finessTree.addCollapseListener(cl);
 		finessTree.addItemClickListener(icl);
+		
+		// ADD THE ACTION HANDLERS
+		finessTree.addActionHandler(new DeleteHandler(hc));
 		
 		// SETS THE CONTENT OF THIS PANEL
 		setContent(finessTree);

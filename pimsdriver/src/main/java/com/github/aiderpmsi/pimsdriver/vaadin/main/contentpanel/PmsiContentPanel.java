@@ -11,8 +11,10 @@ public class PmsiContentPanel extends Panel {
 
 	/** Generated serial id */
 	private static final long serialVersionUID = 9173237483341882407L;
-
+	
 	public PmsiContentPanel() {
+		super();
+		setCaption(null);
 		setVisible(false);
 	}
 	

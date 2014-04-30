@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.sql.Array;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 
@@ -72,6 +73,69 @@ public class ImportPmsiDTO {
 		} catch (IOException | SQLException e) {
 			try { con.rollback(); } catch (SQLException e2) { e2.addSuppressed(e); throw new RuntimeException(e2); }
 			throw new TransactionException("Erreur de stockage de fichier pmsi", e);
+		} finally {
+			if (con != null)
+				try { con.close(); } catch (SQLException e) { throw new RuntimeException(e); }
+		}
+		
+	}
+	
+	public void deleteUpload(Long uploadId) {
+		Connection con = null;
+		
+		try {
+			// GETS THE DB CONNECTION
+			con = DataSourceSingleton.getInstance().getConnection();
+			
+			// USE THE LARGE OBJECT INTERFACE FOR FILES
+			@SuppressWarnings("unchecked")
+			Connection conn = ((DelegatingConnection<Connection>) con).getInnermostDelegateInternal();
+			LargeObjectManager lom = ((org.postgresql.PGConnection)conn).getLargeObjectAPI();
+
+			// GETS THE RSFOID, RSSOID AND CHECKS THAT THIS UPLOADID EXISTS
+			String checkQuery = 
+					"SELECT plud_id, plud_rsf_oid, plud_rss_oid FROM plud_pmsiupload "
+					+ "WHERE plud_id = ?";
+			PreparedStatement checkPs = con.prepareStatement(checkQuery);
+			checkPs.setLong(1, uploadId);
+			ResultSet checkRs = checkPs.executeQuery();
+			
+			// IF THERE IS NO RESULT, THIS ID DOESN'T EXISTS
+			if (!checkRs.next()) {
+				throw new IOException("UploadId " + uploadId + " doesn't exist");
+			} else {
+				Long rsfoid = checkRs.getLong(2);
+				Long rssoid = checkRs.getLong(3);
+				if (checkRs.wasNull()) {
+					rssoid = null;
+				}
+				
+				// DELETE ELEMENTS FROM PMSI ELEMENTS
+				String deletePmsiElementQuery =
+						"DELETE FROM pmel_pmsielement WHERE pmel_root =  ?";
+				PreparedStatement deletePmsiElementPs = con.prepareStatement(deletePmsiElementQuery);
+				deletePmsiElementPs.setLong(1, uploadId);
+				deletePmsiElementPs.execute();
+				
+				// DELETE ELEMENTS FROM LARGE OBJECTS
+				lom.delete(rsfoid);
+				if (rssoid != null) {
+					lom.delete(rssoid);
+				}
+				
+				// DELETE ELEMENTS FROM PMSI UPLOAD
+				String deletePmsiUploadQuery =
+						"DELETE FROM plud_psiupload WHERE plud_id =  ?";
+				PreparedStatement deletePmsiUploadPs = con.prepareStatement(deletePmsiUploadQuery);
+				deletePmsiUploadPs.setLong(1, uploadId);
+				deletePmsiUploadPs.execute();
+				
+				// VALIDATES THE OPERATIONS
+				con.commit();
+			}
+		} catch (IOException | SQLException e) {
+			try { con.rollback(); } catch (SQLException e2) { e2.addSuppressed(e); throw new RuntimeException(e2); }
+			throw new TransactionException("Erreur de suppression de fichier pmsi", e);
 		} finally {
 			if (con != null)
 				try { con.close(); } catch (SQLException e) { throw new RuntimeException(e); }

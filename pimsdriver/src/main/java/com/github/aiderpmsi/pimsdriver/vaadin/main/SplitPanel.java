@@ -13,18 +13,26 @@ public class SplitPanel extends HorizontalSplitPanel{
 	
 	private FinessPanel finessPanel;
 	
+	@SuppressWarnings("unused")
+	private SplitPanel() {};
+	
 	public SplitPanel(RootWindow rootWindow) {
 		// CREATES THE SPLIT PANEL
 		super();
 		setSplitPosition(.25f, Unit.PERCENTAGE);
+		addStyleName("pims-splitpanel");
 
 		// CREATES THE SUB COMPONENTS
 		contentPanel = new PmsiContentPanel();
 		finessPanel = new FinessPanel(rootWindow);
 
 		// CREATES AND FILLS THE LEFT AND RIGHT LAYOUTS
-		setFirstComponent(new VerticalLayout(finessPanel));
-		setSecondComponent(new VerticalLayout(contentPanel));
+		VerticalLayout layout1 = new VerticalLayout(finessPanel);
+		layout1.addStyleName("pims-splitpanel-leftlayout");
+		setFirstComponent(layout1);
+		VerticalLayout layout2 = new VerticalLayout(contentPanel);
+		layout2.addStyleName("pims-splitpanel-rightlayout");
+		setSecondComponent(layout2);
 
 	}
 

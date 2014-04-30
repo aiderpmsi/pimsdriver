@@ -131,6 +131,8 @@ public class ExpandListener implements Tree.ExpandListener {
 					// ATTACHES THE NODE
 					hc.setParent(id, event.getItemId());
 					hc.setChildrenAllowed(id, false);
+					
+					
 				}
 			}
 		}
