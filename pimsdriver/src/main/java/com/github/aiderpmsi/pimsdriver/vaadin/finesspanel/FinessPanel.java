@@ -46,6 +46,9 @@ public class FinessPanel extends Panel {
 			@SuppressWarnings("unchecked")
 			Property<PmsiUploadedElementModel.Status> statusProperty = (Property<PmsiUploadedElementModel.Status>) hc.getContainerProperty(idItem, "status");
 			statusProperty.setValue((PmsiUploadedElementModel.Status) rootElt[1]);
+			@SuppressWarnings("unchecked")
+			Property<Integer> depthProperty = (Property<Integer>) hc.getContainerProperty(idItem, "depth");
+			depthProperty.setValue(0);
 		}
 		
 		// TREE WIDGET
