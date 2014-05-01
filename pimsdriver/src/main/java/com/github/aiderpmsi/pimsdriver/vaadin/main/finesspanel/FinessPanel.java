@@ -85,14 +85,18 @@ public class FinessPanel extends Panel {
 	}
 	
 	public void removeItem(Object itemId) {
-		// GETS THE PARENT ID
+		// CHECKS THE DEPTH
+		Integer eventDepth =
+				(Integer) hc.getContainerProperty(
+						itemId, "depth").getValue();
 		Object parentId = hc.getParent(itemId);
+
 		hc.removeItemRecursively(itemId);
-		// CHECK IF PARENT HAS NO CHILDREN AFTER ITEM REMOVING
-		if (parentId != null) {
+		// CHECK IF PARENT HAS NO CHILDREN AFTER ITEM REMOVING AND IF DEPTH IS SUPERIOR TO 1
+		if (parentId != null && eventDepth > 1) {
 			@SuppressWarnings("unchecked")
 			Collection<Object> children = (Collection<Object>) hc.getChildren(parentId);
-			if (children.size() == 0) {
+			if (children == null || children.size() == 0) {
 				removeItem(parentId);
 			}
 		}

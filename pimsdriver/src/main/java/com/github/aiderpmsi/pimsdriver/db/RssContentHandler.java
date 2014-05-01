@@ -107,7 +107,7 @@ public class RssContentHandler extends ContentHandlerHelper {
 		// IF WE ARE LEAVING AN ELEMENT, STORE IT IN DB
 		else if (getContentPath().size() == 2 && inElement.matcher(getPath()).matches()) {
 			// GENERATES THE QUERY
-			String query = "INSERT INTO pmel_pmsielement (pmel_root, pmel_parent, pmel_type, pmel_attributes) "
+			String query = "INSERT INTO pmel.pmel_" + uploadPKId + " (pmel_root, pmel_parent, pmel_type, pmel_attributes) "
 					+ "VALUES(?, ?, ?, hstore(?::text[], ?::text[])) RETURNING pmel_id";
 
 			try {

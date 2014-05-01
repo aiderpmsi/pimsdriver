@@ -55,6 +55,20 @@ public class ProcessImpl implements Callable<Boolean> {
 			ResultSet rs = selectps.executeQuery();
 			rs.next();
 
+			// CREATE THE PARTITION TO INSERT THE DATAS
+			String createPartitionQuery = 
+					"CREATE TABLE pmel.pmel_" + element.getRecordId() + " ( \n"
+							+ "CONSTRAINT pmel_inherited_" + element.getRecordId() + "_pkey PRIMARY KEY (pmel_id), \n"
+							+ "CONSTRAINT pmel_inherited_" + element.getRecordId() + "_pmel_parent_fkey FOREIGN KEY (pmel_parent) \n"
+							+ "  REFERENCES pmel.pmel_" + element.getRecordId() + " (pmel_id) MATCH SIMPLE \n"
+							+ "  ON UPDATE NO ACTION ON DELETE NO ACTION DEFERRABLE INITIALLY DEFERRED, \n"
+							+ "CONSTRAINT pmel_inherited_" + element.getRecordId() + "_pmel_root_fkey FOREIGN KEY (pmel_root) \n"
+							+ "  REFERENCES public.plud_pmsiupload (plud_id) MATCH SIMPLE \n"
+							+ "  ON UPDATE NO ACTION ON DELETE NO ACTION DEFERRABLE INITIALLY DEFERRED \n"
+							+ ") INHERITS (public.pmel_pmsielement)";
+			PreparedStatement createPartitionPs = con.prepareStatement(createPartitionQuery);
+			createPartitionPs.execute();
+			
 			// RSF AND RSS FINESSES
 			String rsfFiness = null, rssFiness = null;
 			

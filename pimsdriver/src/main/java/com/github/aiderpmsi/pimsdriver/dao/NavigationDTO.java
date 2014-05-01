@@ -1,10 +1,12 @@
 package com.github.aiderpmsi.pimsdriver.dao;
 
+import java.sql.Array;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import com.github.aiderpmsi.pimsdriver.db.DataSourceSingleton;
@@ -23,6 +25,70 @@ public class NavigationDTO {
 
 	public class RssSynthesis {
 		public Integer main, da, dad, acte, seances;
+	}
+	
+	public class RssContent {
+		public HashMap<String, String> rssmain;
+		public List<HashMap<String, String>> rssacte = new ArrayList<>();
+		public List<HashMap<String, String>> rssda = new ArrayList<>();
+		public List<HashMap<String, String>> rssdad = new ArrayList<>();
+	}
+
+	public RssContent getRssContent(Long mainId) {
+		Connection con = null;
+		
+		try {
+			// GETS THE DB CONNECTION
+			con = DataSourceSingleton.getInstance().getConnection();
+			
+			// CREATES THE QUERY
+			String query = 
+					"WITH RECURSIVE rss AS ( \n"
+					+ "SELECT pmel_id, pmel_root, pmel_parent, pmel_type, pmel_attributes \n"
+					+ "  FROM pmel_pmsielement WHERE pmel_id = ? \n"
+					+ "UNION \n"
+					+ "SELECT pmel.pmel_id, pmel.pmel_root, pmel.pmel_parent, pmel.pmel_type, pmel.pmel_attributes \n"
+					+ "FROM pmel_pmsielement pmel \n"
+					+ "JOIN rss rss ON (rss.pmel_id = pmel.pmel_parent) \n"
+					+ ") \n"
+					+ "SELECT pmel_id, pmel_root, pmel_parent, pmel_type, hstore_to_array(pmel_attributes) FROM rss \n";
+
+			PreparedStatement ps = con.prepareStatement(query);
+			ps.setLong(1, mainId);
+
+			// EXECUTE QUERY
+			ResultSet rs = ps.executeQuery();
+			
+			// FILLS THE RSS CONTENT
+			RssContent rssContent = new RssContent();
+			while (rs.next()) {
+				// CREATE ONE HASHMAP FROM PMEL_ATTRIBUTES
+				Array attributes = rs.getArray(5);
+				String[] atts = (String[]) attributes.getArray();
+				HashMap<String, String> hm = new HashMap<>();
+				for (int i = 0 ; i < atts.length ; i = i + 2) {
+					hm.put(atts[i], atts[i + 1]);
+				}
+				String type = rs.getString(4);
+				switch(type) {
+				case "rssmain" : rssContent.rssmain = hm; break;
+				case "rssacte" : rssContent.rssacte.add(hm); break;
+				case "rssda" : rssContent.rssda.add(hm); break;
+				case "rssdad" : rssContent.rssdad.add(hm); break;
+				}
+			}
+			
+			// COMMIT
+			con.commit();
+			
+			return rssContent;
+		} catch (SQLException e) {
+			try { con.rollback(); } catch (SQLException e2) { e2.addSuppressed(e); throw new RuntimeException(e2); }
+			throw new TransactionException("Erreur de récupération des différents finess", e);
+		} finally {
+			if (con != null)
+				try { con.close(); } catch (SQLException e) { throw new RuntimeException(e); }
+		}
 	}
 	
 	public List<String> getFiness(PmsiUploadedElementModel.Status status) {
@@ -258,4 +324,6 @@ public class NavigationDTO {
 				try { con.close(); } catch (SQLException e) { throw new RuntimeException(e); }
 		}
 	}
+	
+	
 }

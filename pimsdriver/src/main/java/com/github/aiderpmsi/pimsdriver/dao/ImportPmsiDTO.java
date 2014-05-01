@@ -94,7 +94,7 @@ public class ImportPmsiDTO {
 
 			// GETS THE RSFOID, RSSOID AND CHECKS THAT THIS UPLOADID EXISTS
 			String checkQuery = 
-					"SELECT plud_id, plud_rsf_oid, plud_rss_oid FROM plud_pmsiupload "
+					"SELECT plud_id, plud_rsf_oid, plud_rss_oid, plud_processed FROM plud_pmsiupload "
 					+ "WHERE plud_id = ?";
 			PreparedStatement checkPs = con.prepareStatement(checkQuery);
 			checkPs.setLong(1, uploadId);
@@ -110,12 +110,13 @@ public class ImportPmsiDTO {
 					rssoid = null;
 				}
 				
-				// DELETE ELEMENTS FROM PMSI ELEMENTS
-				String deletePmsiElementQuery =
-						"DELETE FROM pmel_pmsielement WHERE pmel_root =  ?";
-				PreparedStatement deletePmsiElementPs = con.prepareStatement(deletePmsiElementQuery);
-				deletePmsiElementPs.setLong(1, uploadId);
-				deletePmsiElementPs.execute();
+				// DELETE ELEMENTS FROM PMSI ELEMENTS IF STATUS IS SUCESSED
+				if (checkRs.getString(4).equals("successed")) {
+					String deletePmsiElementQuery =
+							"DROP TABLE pmel.pmel_" + uploadId;
+					PreparedStatement deletePmsiElementPs = con.prepareStatement(deletePmsiElementQuery);
+					deletePmsiElementPs.execute();
+				}
 				
 				// DELETE ELEMENTS FROM LARGE OBJECTS
 				lom.delete(rsfoid);
