@@ -45,7 +45,7 @@ public class NavigationDTO {
 			String query = 
 					"WITH RECURSIVE rss AS ( \n"
 					+ "SELECT pmel_id, pmel_root, pmel_parent, pmel_type, pmel_attributes \n"
-					+ "  FROM pmel_pmsielement WHERE pmel_id = ? \n"
+					+ "  FROM pmel.pmel_pmsielement WHERE pmel_id = ? \n"
 					+ "UNION \n"
 					+ "SELECT pmel.pmel_id, pmel.pmel_root, pmel.pmel_parent, pmel.pmel_type, pmel.pmel_attributes \n"
 					+ "FROM pmel_pmsielement pmel \n"
@@ -179,10 +179,10 @@ public class NavigationDTO {
 			String query = 
 					"WITH RECURSIVE all_lines AS ( \n"
 					+ "SELECT pmel_id, pmel_parent, pmel_type, pmel_attributes \n"
-					+ "FROM pmel_pmsielement WHERE pmel_root = ? AND pmel_type = 'rsfheader' \n"
+					+ "FROM pmel.pmel_" + uploadedId + " WHERE pmel_type = 'rsfheader' \n"
 					+ "UNION \n"
 					+ "SELECT pmel.pmel_id, pmel.pmel_parent, pmel.pmel_type, pmel.pmel_attributes \n"
-					+ "FROM pmel_pmsielement pmel \n"
+					+ "FROM pmel.pmel_" + uploadedId + " pmel \n"
 					+ "JOIN all_lines al \n"
 					+ "ON (al.pmel_id = pmel.pmel_parent) \n"
 					+ "), \n"
@@ -216,7 +216,6 @@ public class NavigationDTO {
 					+ "CROSS JOIN rsfl rsfl \n"
 					+ "CROSS JOIN rsfm rsfm";
 			PreparedStatement ps = con.prepareStatement(query);
-			ps.setLong(1, uploadedId);
 			
 			// EXECUTE QUERY
 			ResultSet rs = ps.executeQuery();
@@ -253,9 +252,8 @@ public class NavigationDTO {
 			con = DataSourceSingleton.getInstance().getConnection();
 
 			// FIRST CHECK THAT ONE RSSHEADER IS AVAILABLE
-			String ckeckQuery = "SELECT COUNT(pmel_id) as nbrows FROM pmel_pmsielement WHERE pmel_root = ? AND pmel_type = 'rssheader'";
+			String ckeckQuery = "SELECT COUNT(pmel_id) as nbrows FROM pmel.pmel_" + uploadedId + " WHERE pmel_type = 'rssheader'";
 			PreparedStatement pscheck = con.prepareStatement(ckeckQuery);
-			pscheck.setLong(1, uploadedId);
 			
 			// EXECUTE QUERY
 			ResultSet checkrs = pscheck.executeQuery();
@@ -269,10 +267,10 @@ public class NavigationDTO {
 			String query = 
 					"WITH RECURSIVE all_lines AS ( \n"
 					+ "SELECT pmel_id, pmel_parent, pmel_type, pmel_attributes \n"
-					+ "FROM pmel_pmsielement WHERE pmel_root = ? AND pmel_type = 'rssheader' \n"
+					+ "FROM pmel.pmel_" + uploadedId + " WHERE pmel_type = 'rssheader' \n"
 					+ "UNION \n"
 					+ "SELECT pmel.pmel_id, pmel.pmel_parent, pmel.pmel_type, pmel.pmel_attributes \n"
-					+ "FROM pmel_pmsielement pmel \n"
+					+ "FROM pmel.pmel_" + uploadedId + " pmel \n"
 					+ "JOIN all_lines al \n"
 					+ "ON (al.pmel_id = pmel.pmel_parent) \n"
 					+ "), \n"

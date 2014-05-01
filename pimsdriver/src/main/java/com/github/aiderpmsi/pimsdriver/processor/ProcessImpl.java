@@ -57,15 +57,7 @@ public class ProcessImpl implements Callable<Boolean> {
 
 			// CREATE THE PARTITION TO INSERT THE DATAS
 			String createPartitionQuery = 
-					"CREATE TABLE pmel.pmel_" + element.getRecordId() + " ( \n"
-							+ "CONSTRAINT pmel_inherited_" + element.getRecordId() + "_pkey PRIMARY KEY (pmel_id), \n"
-							+ "CONSTRAINT pmel_inherited_" + element.getRecordId() + "_pmel_parent_fkey FOREIGN KEY (pmel_parent) \n"
-							+ "  REFERENCES pmel.pmel_" + element.getRecordId() + " (pmel_id) MATCH SIMPLE \n"
-							+ "  ON UPDATE NO ACTION ON DELETE NO ACTION DEFERRABLE INITIALLY DEFERRED, \n"
-							+ "CONSTRAINT pmel_inherited_" + element.getRecordId() + "_pmel_root_fkey FOREIGN KEY (pmel_root) \n"
-							+ "  REFERENCES public.plud_pmsiupload (plud_id) MATCH SIMPLE \n"
-							+ "  ON UPDATE NO ACTION ON DELETE NO ACTION DEFERRABLE INITIALLY DEFERRED \n"
-							+ ") INHERITS (public.pmel_pmsielement)";
+					"CREATE TABLE pmel.pmel_" + element.getRecordId() + " () INHERITS (public.pmel_pmsielement)";
 			PreparedStatement createPartitionPs = con.prepareStatement(createPartitionQuery);
 			createPartitionPs.execute();
 			
@@ -91,9 +83,8 @@ public class ProcessImpl implements Callable<Boolean> {
 					throw new SAXException("RSF : " + rsfreh.getErrors().get(0).getMessage());
 					
 				// GET THE REAL FINESS FROM RSF
-				String realrsffinessquery = "SELECT pmel_attributes -> 'Finess' AS finess FROM pmel_pmsielement WHERE pmel_root = ? AND pmel_type = 'rsfheader'";
+				String realrsffinessquery = "SELECT pmel_attributes -> 'Finess' AS finess FROM pmel.pmel_" + element.getRecordId() + " WHERE pmel_type = 'rsfheader'";
 				PreparedStatement realrsffinessps = con.prepareStatement(realrsffinessquery);
-				realrsffinessps.setLong(1, element.getRecordId());
 				ResultSet realrsffinessrs = realrsffinessps.executeQuery();
 				if (!realrsffinessrs.next() || realrsffinessrs.getString(1) == null)
 					throw new SAXException("RSF : impossible de trouver le finess dans l'entête");
@@ -120,9 +111,8 @@ public class ProcessImpl implements Callable<Boolean> {
 					throw new SAXException("RSS : " + rssreh.getErrors().get(0).getMessage());
 				
 				// GET THE REAL FINESS FROM RSS
-				String realrssfinessquery = "SELECT pmel_attributes -> 'Finess' AS finess FROM pmel_pmsielement WHERE pmel_root = ? AND pmel_type = 'rssheader'";
+				String realrssfinessquery = "SELECT pmel_attributes -> 'Finess' AS finess FROM pmel.pmel_" + element.getRecordId() + " WHERE pmel_type = 'rssheader'";
 				PreparedStatement realrssfinessps = con.prepareStatement(realrssfinessquery);
-				realrssfinessps.setLong(1, element.getRecordId());
 				ResultSet realrssfinessrs = realrssfinessps.executeQuery();
 				if (!realrssfinessrs.next() || realrssfinessrs.getString(1) == null)
 					throw new SAXException("RSS : impossible de trouver le finess dans l'entête");
@@ -139,6 +129,22 @@ public class ProcessImpl implements Callable<Boolean> {
 			updateps.setString(1, rsfFiness);
 			updateps.setLong(2, element.getRecordId());
 			updateps.execute();
+
+			// CREATE CONSTRAINTS ON PMEL TABLE
+			String createPartitionConstraints = 
+					"ALTER TABLE pmel.pmel_" + element.getRecordId() + " \n"
+					+ "ADD CONSTRAINT pmel_inherited_" + element.getRecordId() + "_pkey PRIMARY KEY (pmel_id); \n"
+					+ "ALTER TABLE pmel.pmel_" + element.getRecordId() + " \n"
+					+ "ADD CONSTRAINT pmel_inherited_" + element.getRecordId() + "_pmel_parent_fkey FOREIGN KEY (pmel_parent) \n"
+					+ "  REFERENCES pmel.pmel_" + element.getRecordId() + " (pmel_id) MATCH SIMPLE \n"
+					+ "  ON UPDATE NO ACTION ON DELETE NO ACTION DEFERRABLE INITIALLY DEFERRED; \n"
+					+ "ALTER TABLE pmel.pmel_" + element.getRecordId() + " \n"
+					+ "ADD CONSTRAINT pmel_inherited_" + element.getRecordId() + "_pmel_root_fkey FOREIGN KEY (pmel_root) \n"
+					+ "  REFERENCES public.plud_pmsiupload (plud_id) MATCH SIMPLE \n"
+					+ "  ON UPDATE NO ACTION ON DELETE NO ACTION DEFERRABLE INITIALLY DEFERRED; \n"
+					+ "CREATE INDEX pmel_inherited_" + element.getRecordId() + "pmel_root_idx ON pmel.pmel_" + element.getRecordId() + " USING btree (pmel_root);";
+			PreparedStatement createPartitionConstraintsPs = con.prepareStatement(createPartitionConstraints);
+			createPartitionConstraintsPs.execute();
 			
 			// EVERYTHING WENT FINE, COMMIT
 			con.commit();

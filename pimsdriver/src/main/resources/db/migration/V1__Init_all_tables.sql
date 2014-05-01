@@ -22,5 +22,3 @@ CREATE TABLE public.pmel_pmsielement (
   pmel_type character varying NOT NULL,
   pmel_attributes hstore NOT NULL
 );
-
-CREATE INDEX pmel_pmsielement_pmel_root_idx ON public.pmel_pmsielement USING btree (pmel_root);
