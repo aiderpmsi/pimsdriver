@@ -2,7 +2,7 @@ package com.github.aiderpmsi.pimsdriver.db.vaadin;
 
 import java.util.List;
 
-import com.github.aiderpmsi.pimsdriver.dao.model.UploadedPmsi;
+import com.github.aiderpmsi.pimsdriver.dto.model.UploadedPmsi;
 import com.vaadin.data.Container.Filter;
 import com.vaadin.data.util.filter.Compare;
 

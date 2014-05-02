@@ -1,7 +1,7 @@
 package com.github.aiderpmsi.pimsdriver.jaxrs;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 
 import javax.annotation.security.PermitAll;
@@ -12,12 +12,14 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
-import org.apache.commons.lang3.StringUtils;
-
-import com.github.aiderpmsi.pimsdriver.dao.UploadPmsiDTOB;
-import com.github.aiderpmsi.pimsdriver.dao.model.UploadedPmsi;
-import com.github.aiderpmsi.pimsdriver.dao.model.UploadedPmsis;
+import com.github.aiderpmsi.pimsdriver.db.actions.ActionException;
+import com.github.aiderpmsi.pimsdriver.db.actions.NavigationActions;
+import com.github.aiderpmsi.pimsdriver.dto.model.UploadedPmsis;
+import com.vaadin.data.Container.Filter;
+import com.vaadin.data.util.filter.Compare;
+import com.vaadin.data.util.sqlcontainer.query.OrderBy;
 
 @Path("/uploaded") 
 @PermitAll
@@ -41,47 +43,28 @@ public class UploadedPmsi {
 			@QueryParam("orderelts") List<String> orderelts,
 			@QueryParam("order") List<Boolean> order) {
 
-		// CREATE QUERY
-		StringBuilder query = new StringBuilder(
-				"SELECT plud_id, plud_processed, plud_finess, "
-				+ "plud_year, plud_month, plud_dateenvoi, plud_rsf_oid oid, "
-				+ "plud_rss_oid, plud_arguments FROM plud_pmsiupload WHERE plud_processed='pending'::plud_status ");
-
-		// ORDER RESULTS
-		List<String> orderquery = new LinkedList<>();
-		// IF SOME ORDER IS DEFINED
-		if (order != null && order.size() != 0) {
-			for (int i = 0 ; i < orderelts.size() ; i++) {
-				// SEARCHES IF THIS INDEX IS DEFINED IN orderindex
-				String orderfield = orderelts.get(i);
-				if (orderindex.containsKey(orderfield)) {
-					// THIS FIELD IS KNOWN, WE HAVE TO KNOW IF THE ORDER IS ASCENDING OR DESCENDING
-					if (order != null && order.size() >= i && order.get(i)) {
-						orderquery.add(orderindex.get(orderfield) + " DESC");
-					} else {
-						orderquery.add(orderindex.get(orderfield) + " ASC");
-					}
-
-				}
+		// CREATE FILTERS AND ORDERS
+		List<Filter> filters = new ArrayList<>(1);
+		filters.add(new Compare.Equal("plud_processed", "pending"));
+		List<OrderBy> orders = new ArrayList<>(orderelts.size());
+		for (int i = 0 ; i < orderelts.size() ; i++) {
+			if (orderindex.containsKey(orderelts.get(i))) {
+				OrderBy orderelt = new OrderBy(orderindex.get(orderelts.get(i)), 
+						order.size() < i ? true : order.get(i));
+				orders.add(orderelt);
 			}
 		}
-		// IF THE DEFINED ORDERS HAVE TO BE TRANSCRIPTED IN QUERY
-		if (orderquery.size() != 0) {
-			query.append("order by ");
-			query.append(StringUtils.join(orderquery, ", "));
-			query.append(" ");
+
+		NavigationActions na = new NavigationActions();
+		try {
+			List<com.github.aiderpmsi.pimsdriver.dto.model.UploadedPmsi> pued =
+					na.getUploadedPmsi(filters, orders, first, rows);
+			UploadedPmsis pueds = new UploadedPmsis();
+			pueds.setElements(pued);
+			return Response.ok(pueds).build();
+		} catch (ActionException e) {
+			return Response.status(Status.INTERNAL_SERVER_ERROR).build();
 		}
-
-		// DEFINES THE WINDOW
-		query.append("offset ").append(first).append(" limit ").append(rows + 1);
-
-		// EXECUTES THE QUERY
-		UploadPmsiDTOB ued = new UploadPmsiDTOB();
-		List<UploadedPmsi> pued = ued.getUploadedElements(query.toString(), new Object[]{});
-		UploadedPmsis pueds = new UploadedPmsis();
-		pueds.setElements(pued);
-		
-		return Response.ok(pueds).build();
 	}
 	
 }

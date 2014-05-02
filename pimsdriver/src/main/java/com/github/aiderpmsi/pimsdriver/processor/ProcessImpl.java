@@ -16,11 +16,10 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import com.github.aiderpmsi.pims.utils.Parser;
-import com.github.aiderpmsi.pimsdriver.dao.TransactionException;
-import com.github.aiderpmsi.pimsdriver.dao.model.UploadedPmsi;
 import com.github.aiderpmsi.pimsdriver.db.DataSourceSingleton;
 import com.github.aiderpmsi.pimsdriver.db.RsfContentHandler;
 import com.github.aiderpmsi.pimsdriver.db.RssContentHandler;
+import com.github.aiderpmsi.pimsdriver.dto.model.UploadedPmsi;
 import com.github.aiderpmsi.pimsdriver.pmsi.RecorderErrorHandler;
 
 public class ProcessImpl implements Callable<Boolean> {
@@ -32,7 +31,7 @@ public class ProcessImpl implements Callable<Boolean> {
 	}
 
 	@Override
-	public Boolean call() {
+	public Boolean call() throws Exception {
 		Connection con = null;
 		
 		try {
@@ -43,17 +42,6 @@ public class ProcessImpl implements Callable<Boolean> {
 			@SuppressWarnings("unchecked")
 			Connection conn = ((DelegatingConnection<Connection>) con).getInnermostDelegateInternal();
 			LargeObjectManager lom = ((org.postgresql.PGConnection)conn).getLargeObjectAPI();
-			
-			// FIRST GET ALL FIELDS OF PLUD
-			String selectquery = 
-					"SELECT plud_processed, plud_finess, plud_year, plud_month, "
-					+ "plud_dateenvoi, plud_rsf_oid, plud_rss_oid, plud_arguments "
-					+ "FROM plud_pmsiupload WHERE plud_id = ?";
-			PreparedStatement selectps = con.prepareStatement(selectquery);
-			selectps.setLong(1, element.getRecordid());
-			
-			ResultSet rs = selectps.executeQuery();
-			rs.next();
 			
 			// CREATE THE TEMP TABLE TO INSERT THE DATAS
 			String createTempTableQuery =
@@ -71,8 +59,7 @@ public class ProcessImpl implements Callable<Boolean> {
 			String rsfFiness = null, rssFiness = null;
 			
 			// GETS RSF INPUTSTREAM
-			Long rsfoid = rs.getLong(6);
-			InputStream rsfis = lom.open(rsfoid).getInputStream();
+			InputStream rsfis = lom.open(element.getRsfoid()).getInputStream();
 			
 			// PROCESS RSF
 			{
@@ -97,12 +84,9 @@ public class ProcessImpl implements Callable<Boolean> {
 				rsfFiness = realrsffinessrs.getString(1);
 			}
 			
-			// GETS RSS OID
-			Long rssoid = rs.getLong(7);
-
 			// IF RSS IS DEFINED, GET ITS CONTENT AND PROCESS IT
-			if (!rs.wasNull()) {
-				InputStream rssis = lom.open(rssoid, LargeObjectManager.READ).getInputStream();
+			if (element.getRssoid() != null) {
+				InputStream rssis = lom.open(element.getRssoid(), LargeObjectManager.READ).getInputStream();
 			
 				ContentHandler rssch = new RssContentHandler(con, element.getRecordid());
 				RecorderErrorHandler rssreh = new RecorderErrorHandler();
@@ -169,31 +153,30 @@ public class ProcessImpl implements Callable<Boolean> {
 			con.commit();
 		} catch (IOException | SQLException | SAXException e) {
 			// IF THE EXCEPTION IS DUE TO A SERIALIZATION EXCEPTION, WE HAVE TO RETRY THIS TREATMENT
-			if (e instanceof SQLException) {
-				if (((SQLException) e).getSQLState().equals("40001")) {
-					// ROLLBACK, BUT RETRY LATER
-					try {con.rollback();} catch (SQLException e2) { throw new RuntimeException(e); }
-					return false;
-				}
+			if (e instanceof SQLException && ((SQLException) e).getSQLState().equals("40001")) {
+				// ROLLBACK, BUT RETRY LATER
+				try {con.rollback();} catch (SQLException e2) { throw new RuntimeException(e); }
+				return false;
+			} else {
+				try {
+					// IF WE HAVE AN ERROR, ROLLBACK TRANSACTION AND STORE THE REASON FOR THE FAILURE
+					con.rollback();
+					String updatequery = "UPDATE plud_pmsiupload SET plud_processed = 'failed'::plud_status, plud_arguments = plud_arguments || hstore(?, ?) WHERE plud_id = ?";
+					PreparedStatement updateps = con.prepareStatement(updatequery);
+					updateps.setString(1, "error");
+					updateps.setString(2, e.getMessage() == null ? e.getClass().toString() : e.getMessage());
+					updateps.setLong(3, element.getRecordid());
+					updateps.execute();
+					con.commit();
+				} catch (SQLException e2) { e2.addSuppressed(e); throw new RuntimeException(e2); }
+					throw new Exception("Erreur de gestion du fichier pmsi", e);
 			}
-			try {
-				// IF WE HAVE AN ERROR, ROLLBACK TRANSACTION AND STORE THE REASON FOR THE FAILURE
-				con.rollback();
-				String updatequery = "UPDATE plud_pmsiupload SET plud_processed = 'failed'::plud_status, plud_arguments = plud_arguments || hstore(?, ?) WHERE plud_id = ?";
-				PreparedStatement updateps = con.prepareStatement(updatequery);
-				updateps.setString(1, "error");
-				updateps.setString(2, e.getMessage() == null ? e.getClass().toString() : e.getMessage());
-				updateps.setLong(3, element.getRecordid());
-				updateps.execute();
-				con.commit();
-			} catch (SQLException e2) { e2.addSuppressed(e); throw new RuntimeException(e2); }
-			throw new TransactionException("Erreur de gestion du fichier pmsi", e);
 		} finally {
 			if (con != null)
 				try { con.close(); } catch (SQLException e) { throw new RuntimeException(e); }
 		}
 
-		return null;
+		return true;
 	}
 
 }

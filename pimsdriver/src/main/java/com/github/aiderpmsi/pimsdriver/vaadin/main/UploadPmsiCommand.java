@@ -1,6 +1,6 @@
 package com.github.aiderpmsi.pimsdriver.vaadin.main;
 
-import com.github.aiderpmsi.pimsdriver.vaadin.UploadPmsiWindow;
+import com.github.aiderpmsi.pimsdriver.vaadin.upload.UploadWindow;
 import com.vaadin.ui.MenuBar.Command;
 import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.UI;
@@ -13,7 +13,7 @@ public class UploadPmsiCommand implements Command {
 	@Override
 	public void menuSelected(MenuItem selectedItem) {
 		// CREATE WINDOW
-		final Window wProcess = new UploadPmsiWindow();
+		final Window wProcess = new UploadWindow();
 		        
 		UI.getCurrent().addWindow(wProcess);
 	}

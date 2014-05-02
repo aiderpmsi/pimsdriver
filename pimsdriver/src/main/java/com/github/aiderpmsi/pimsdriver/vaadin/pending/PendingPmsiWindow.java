@@ -1,4 +1,4 @@
-package com.github.aiderpmsi.pimsdriver.vaadin;
+package com.github.aiderpmsi.pimsdriver.vaadin.pending;
 
 import java.util.Date;
 import java.util.Locale;
@@ -6,7 +6,6 @@ import java.util.Locale;
 import org.vaadin.addons.lazyquerycontainer.LazyQueryContainer;
 import org.vaadin.addons.lazyquerycontainer.LazyQueryDefinition;
 
-import com.github.aiderpmsi.pimsdriver.vaadin.utils.PmsiProcessQueryFactory;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
@@ -39,7 +38,7 @@ public class PendingPmsiWindow extends Window {
         processtable.setLocale(Locale.FRANCE);
         LazyQueryContainer lqc = new LazyQueryContainer(
         		new LazyQueryDefinition(false, 1000, "recordId"),
-        		new PmsiProcessQueryFactory());
+        		new PmsiQueryFactory());
         lqc.addContainerProperty("finess", String.class, "", true, true);
         lqc.addContainerProperty("year", Integer.class, null, true, true);
         lqc.addContainerProperty("month", Integer.class, null, true, true);

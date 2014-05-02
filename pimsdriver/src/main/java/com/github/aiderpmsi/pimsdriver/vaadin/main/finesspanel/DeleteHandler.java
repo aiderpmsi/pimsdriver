@@ -1,9 +1,11 @@
 package com.github.aiderpmsi.pimsdriver.vaadin.main.finesspanel;
 
-import com.github.aiderpmsi.pimsdriver.dao.ImportPmsiDTO;
-import com.github.aiderpmsi.pimsdriver.dao.model.UploadedPmsi;
+import com.github.aiderpmsi.pimsdriver.db.actions.ActionException;
+import com.github.aiderpmsi.pimsdriver.db.actions.IOActions;
+import com.github.aiderpmsi.pimsdriver.dto.model.UploadedPmsi;
 import com.vaadin.data.util.HierarchicalContainer;
 import com.vaadin.event.Action;
+import com.vaadin.ui.Notification;
 
 public class DeleteHandler implements Action.Handler {
 	
@@ -44,9 +46,14 @@ public class DeleteHandler implements Action.Handler {
 				// GETS THE ASSOCIATED MODEL
 				UploadedPmsi model = (UploadedPmsi) hc.getContainerProperty(target, "model").getValue();
 				// DELETES THE UPLOAD
-				(new ImportPmsiDTO()).deleteUpload(model.getRecordid());
-				// REMOVE THE ITEM
-				fp.removeItem(target);
+				IOActions ioActions = new IOActions();
+				try {
+					ioActions.deletePmsi(model);
+					// REMOVE THE ITEM
+					fp.removeItem(target);
+				} catch (ActionException e) {
+					Notification.show("Erreur de suppression du fichier", Notification.Type.WARNING_MESSAGE);
+				}
 			}
 		}
 	}

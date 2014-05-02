@@ -1,4 +1,4 @@
-package com.github.aiderpmsi.pimsdriver.dao;
+package com.github.aiderpmsi.pimsdriver.dto;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -11,8 +11,8 @@ import java.util.List;
 import org.apache.commons.dbcp2.DelegatingConnection;
 import org.postgresql.largeobject.LargeObjectManager;
 
-import com.github.aiderpmsi.pimsdriver.dao.model.UploadedPmsi;
 import com.github.aiderpmsi.pimsdriver.db.vaadin.DBQueryBuilder;
+import com.github.aiderpmsi.pimsdriver.dto.model.UploadedPmsi;
 import com.vaadin.data.Container.Filter;
 import com.vaadin.data.util.sqlcontainer.query.OrderBy;
 
@@ -63,6 +63,11 @@ public class UploadedPmsiDTO {
 		// CREATES THE FILTERS, THE ORDERS AND FILLS THE ARGUMENTS
 		query.append(DBQueryBuilder.getWhereStringForFilters(filters, queryArgs)).
 			append(DBQueryBuilder.getOrderStringForOrderBys(orders, queryArgs));
+		// OFFSET AND LIMIT
+		if (first != null)
+			query.append(" OFFSET ").append(first.toString()).append(" ");
+		if (rows != null && rows != 0)
+			query.append(" LIMIT ").append(first.toString()).append(" ");
 		
 		// CREATE THE DB STATEMENT	
 		PreparedStatement ps = con.prepareStatement(query.toString());
@@ -109,7 +114,7 @@ public class UploadedPmsiDTO {
 		return upeltslist;
 	}
 
-	public long listSize(Connection con, List<Filter> filters, List<OrderBy> orders) throws SQLException {
+	public long listSize(Connection con, List<Filter> filters) throws SQLException {
 		// PREPARE THE QUERY :
 		StringBuilder query = new StringBuilder(
 				"SELECT COUNT(*) FROM plud_pmsiupload ");

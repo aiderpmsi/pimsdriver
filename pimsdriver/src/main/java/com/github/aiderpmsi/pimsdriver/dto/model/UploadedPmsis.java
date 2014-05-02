@@ -1,4 +1,4 @@
-package com.github.aiderpmsi.pimsdriver.dao.model;
+package com.github.aiderpmsi.pimsdriver.dto.model;
 
 import java.util.List;
 

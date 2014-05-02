@@ -2,7 +2,7 @@ package com.github.aiderpmsi.pimsdriver.processor;
 
 import java.util.concurrent.Callable;
 
-import com.github.aiderpmsi.pimsdriver.dao.ImportPmsiDTO;
+import com.github.aiderpmsi.pimsdriver.db.actions.CleanupActions;
 
 public class CleanupImpl implements Callable<Boolean> {
 
@@ -14,7 +14,11 @@ public class CleanupImpl implements Callable<Boolean> {
 
 	@Override
 	public Boolean call() throws Exception {
-		(new ImportPmsiDTO()).cleanup(pludId);
+		CleanupActions cua = new CleanupActions();
+		
+		// DON'T CARE IF SOMETHING GOT WRONG, WE WILL RETRY LATER
+		cua.cleanup(pludId);
+
 		return true;
 	}
 	

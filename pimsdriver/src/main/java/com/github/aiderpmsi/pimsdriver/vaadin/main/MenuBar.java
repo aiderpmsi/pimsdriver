@@ -1,5 +1,6 @@
 package com.github.aiderpmsi.pimsdriver.vaadin.main;
 
+
 public class MenuBar extends com.vaadin.ui.MenuBar {
 
 	private static final long serialVersionUID = 8541452935763539785L;

@@ -1,4 +1,4 @@
-package com.github.aiderpmsi.pimsdriver.dao.model.navigation;
+package com.github.aiderpmsi.pimsdriver.dto.model.navigation;
 
 import java.util.ArrayList;
 import java.util.HashMap;

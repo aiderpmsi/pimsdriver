@@ -1,4 +1,4 @@
-package com.github.aiderpmsi.pimsdriver.dao.model.navigation;
+package com.github.aiderpmsi.pimsdriver.dto.model.navigation;
 
 public class RssOverview {
 	private Long main, da, dad, acte, seances;

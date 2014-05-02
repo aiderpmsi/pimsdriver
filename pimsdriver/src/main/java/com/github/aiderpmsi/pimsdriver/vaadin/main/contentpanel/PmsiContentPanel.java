@@ -1,9 +1,11 @@
 package com.github.aiderpmsi.pimsdriver.vaadin.main.contentpanel;
 
-import com.github.aiderpmsi.pimsdriver.dao.NavigationDTO;
-import com.github.aiderpmsi.pimsdriver.dao.model.UploadedPmsi;
+import com.github.aiderpmsi.pimsdriver.db.actions.ActionException;
+import com.github.aiderpmsi.pimsdriver.db.actions.NavigationActions;
+import com.github.aiderpmsi.pimsdriver.dto.model.UploadedPmsi;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
 
@@ -26,48 +28,52 @@ public class PmsiContentPanel extends Panel {
 			setVisible(false);
 		}
 		else {
-			// GETS THE DATAS TO WRITE
-			NavigationDTO.RsfOverview rsfs = (new NavigationDTO()).rsfSynthesis(model.getRecordid());
-			NavigationDTO.RssOverview rsss =  (new NavigationDTO()).rssSynthesis(model.getRecordid());
-			
-			// SETS THE LAYOUT
-			VerticalLayout principallayout = new VerticalLayout();
-			setContent(principallayout);
-			
-			HorizontalLayout headerlayout = new HorizontalLayout();
-			principallayout.addStyleName("pims-contentpanel-headerlayout");
-			principallayout.addComponent(headerlayout);
-			
-			// RSF PANEL
-			Panel rsfPanel = createPanel("RSF", new String[][] {
-					new String[] {"Nb lignes A", rsfs.rsfa.toString()},
-					new String[] {"Nb lignes B", rsfs.rsfb.toString()},
-					new String[] {"Nb lignes C", rsfs.rsfc.toString()},
-					new String[] {"Nb lignes H", rsfs.rsfh.toString()},
-					new String[] {"Nb lignes I", rsfs.rsfi.toString()},
-					new String[] {"Nb lignes L", rsfs.rsfl.toString()},
-					new String[] {"Nb lignes M", rsfs.rsfm.toString()},
-			});
-			headerlayout.addComponent(rsfPanel);
-			
-			// RSS PANEL
-			Panel rssPanel;
-			if (rsss == null) {
-				// THERE IS NO RSS FILE
-				rssPanel = createPanel("Absence de RSS", new String[][] {});
-			} else {
-				// FILLS THE RSS CONTENT
-				rssPanel = createPanel("RSS", new String[][]{
-						new String[] {"Nb lignes", rsss.main.toString()},
-						new String[] {"Nb actes", rsss.acte.toString()},
-						new String[] {"Nb diagnostics associés", rsss.da.toString()},
-						new String[] {"Nb diagnostics documentaires", rsss.dad.toString()},
-						new String[] {"Nb séances", rsss.seances.toString()}
+			try {
+				NavigationActions na = new NavigationActions();
+				// GETS THE OVERVIEW OF RSF AND RSS
+				NavigationActions.Overview overview = na.getOverview(model);
+
+				// SETS THE LAYOUT
+				VerticalLayout principallayout = new VerticalLayout();
+				setContent(principallayout);
+				
+				HorizontalLayout headerlayout = new HorizontalLayout();
+				principallayout.addStyleName("pims-contentpanel-headerlayout");
+				principallayout.addComponent(headerlayout);
+				
+				// RSF PANEL
+				Panel rsfPanel = createPanel("RSF", new String[][] {
+						new String[] {"Nb lignes A", overview.rsf.getRsfa().toString()},
+						new String[] {"Nb lignes B", overview.rsf.getRsfb().toString()},
+						new String[] {"Nb lignes C", overview.rsf.getRsfc().toString()},
+						new String[] {"Nb lignes H", overview.rsf.getRsfh().toString()},
+						new String[] {"Nb lignes I", overview.rsf.getRsfi().toString()},
+						new String[] {"Nb lignes L", overview.rsf.getRsfl().toString()},
+						new String[] {"Nb lignes M", overview.rsf.getRsfm().toString()},
 				});
+				headerlayout.addComponent(rsfPanel);
+				
+				// RSS PANEL
+				Panel rssPanel;
+				if (model.getRssoid() == null) {
+					// THERE IS NO RSS FILE
+					rssPanel = createPanel("Absence de RSS", new String[][] {});
+				} else {
+					// FILLS THE RSS CONTENT
+					rssPanel = createPanel("RSS", new String[][]{
+							new String[] {"Nb lignes", overview.rss.getMain().toString()},
+							new String[] {"Nb actes", overview.rss.getActe().toString()},
+							new String[] {"Nb diagnostics associés", overview.rss.getDa().toString()},
+							new String[] {"Nb diagnostics documentaires", overview.rss.getDad().toString()},
+							new String[] {"Nb séances", overview.rss.getSeances().toString()}
+					});
+				}
+				headerlayout.addComponent(rssPanel);
+				
+				setVisible(true);
+			} catch (ActionException e) {
+				Notification.show("Erreur lors de la récupération des éléments des rsf et rss ", Notification.Type.WARNING_MESSAGE);
 			}
-			headerlayout.addComponent(rssPanel);
-			
-			setVisible(true);
 		}
 	}
 	

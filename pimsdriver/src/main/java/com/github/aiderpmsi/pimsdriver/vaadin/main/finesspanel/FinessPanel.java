@@ -2,8 +2,7 @@ package com.github.aiderpmsi.pimsdriver.vaadin.main.finesspanel;
 
 import java.util.Collection;
 
-import com.github.aiderpmsi.pimsdriver.dao.NavigationDTO;
-import com.github.aiderpmsi.pimsdriver.dao.model.UploadedPmsi;
+import com.github.aiderpmsi.pimsdriver.dto.model.UploadedPmsi;
 import com.github.aiderpmsi.pimsdriver.vaadin.main.RootWindow;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.HierarchicalContainer;
@@ -33,9 +32,6 @@ public class FinessPanel extends Panel {
 		super();
 		setCaption(null);
 		addStyleName("pims-finesspanel");
-		
-		// SETS THE NAVIGATION DTO (REUSABLE)
-		NavigationDTO navigationDTO = new NavigationDTO();
 		
 		// SETS THE HIERARCHICAL CONTAINER PROPERTIES
 		hc = new HierarchicalContainer();
@@ -68,7 +64,7 @@ public class FinessPanel extends Panel {
 		finessTree.setItemCaptionPropertyId("caption");
 
 		// ADDS THE LISTENERS
-		ExpandListener el = new ExpandListener(hc, this, navigationDTO);
+		ExpandListener el = new ExpandListener(hc, this);
 		CollapseListener cl = new CollapseListener(hc);
 		ItemClickListener icl = new ItemClickListener(rootElement, hc);
 

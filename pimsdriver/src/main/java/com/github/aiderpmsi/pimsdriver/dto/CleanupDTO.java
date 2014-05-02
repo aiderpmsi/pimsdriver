@@ -1,4 +1,4 @@
-package com.github.aiderpmsi.pimsdriver.dao;
+package com.github.aiderpmsi.pimsdriver.dto;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

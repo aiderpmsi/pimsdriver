@@ -1,4 +1,4 @@
-package com.github.aiderpmsi.pimsdriver.dao;
+package com.github.aiderpmsi.pimsdriver.dto;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,8 +13,8 @@ import org.apache.commons.dbcp2.DelegatingConnection;
 import org.postgresql.largeobject.LargeObject;
 import org.postgresql.largeobject.LargeObjectManager;
 
-import com.github.aiderpmsi.pimsdriver.dao.model.UploadPmsi;
-import com.github.aiderpmsi.pimsdriver.dao.model.UploadedPmsi;
+import com.github.aiderpmsi.pimsdriver.dto.model.UploadPmsi;
+import com.github.aiderpmsi.pimsdriver.dto.model.UploadedPmsi;
 
 public class UploadPmsiDTO {
 

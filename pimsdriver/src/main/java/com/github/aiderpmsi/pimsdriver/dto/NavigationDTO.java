@@ -1,4 +1,4 @@
-package com.github.aiderpmsi.pimsdriver.dao;
+package com.github.aiderpmsi.pimsdriver.dto;
 
 import java.sql.Array;
 import java.sql.Connection;
@@ -9,11 +9,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import com.github.aiderpmsi.pimsdriver.dao.model.UploadedPmsi;
-import com.github.aiderpmsi.pimsdriver.dao.model.navigation.RsfOverview;
-import com.github.aiderpmsi.pimsdriver.dao.model.navigation.RssContent;
-import com.github.aiderpmsi.pimsdriver.dao.model.navigation.RssOverview;
-import com.github.aiderpmsi.pimsdriver.dao.model.navigation.YM;
+import com.github.aiderpmsi.pimsdriver.dto.model.UploadedPmsi;
+import com.github.aiderpmsi.pimsdriver.dto.model.navigation.RsfOverview;
+import com.github.aiderpmsi.pimsdriver.dto.model.navigation.RssContent;
+import com.github.aiderpmsi.pimsdriver.dto.model.navigation.RssOverview;
+import com.github.aiderpmsi.pimsdriver.dto.model.navigation.YM;
 
 public class NavigationDTO {
 
