@@ -16,8 +16,8 @@ import javax.ws.rs.core.Response;
 import org.apache.commons.lang3.StringUtils;
 
 import com.github.aiderpmsi.pimsdriver.dao.UploadedElementsDTO;
-import com.github.aiderpmsi.pimsdriver.model.PmsiUploadedElementModel;
-import com.github.aiderpmsi.pimsdriver.model.PmsiUploadedElementsModel;
+import com.github.aiderpmsi.pimsdriver.dao.model.UploadedPmsi;
+import com.github.aiderpmsi.pimsdriver.dao.model.UploadedPmsis;
 
 @Path("/uploaded") 
 @PermitAll
@@ -77,8 +77,8 @@ public class UploadedPmsi {
 
 		// EXECUTES THE QUERY
 		UploadedElementsDTO ued = new UploadedElementsDTO();
-		List<PmsiUploadedElementModel> pued = ued.getUploadedElements(query.toString(), new Object[]{});
-		PmsiUploadedElementsModel pueds = new PmsiUploadedElementsModel();
+		List<UploadedPmsi> pued = ued.getUploadedElements(query.toString(), new Object[]{});
+		UploadedPmsis pueds = new UploadedPmsis();
 		pueds.setElements(pued);
 		
 		return Response.ok(pueds).build();

@@ -1,6 +1,6 @@
 package com.github.aiderpmsi.pimsdriver.vaadin.main.finesspanel;
 
-import com.github.aiderpmsi.pimsdriver.model.PmsiUploadedElementModel;
+import com.github.aiderpmsi.pimsdriver.dao.model.UploadedPmsi;
 import com.github.aiderpmsi.pimsdriver.vaadin.main.RootWindow;
 import com.vaadin.data.util.HierarchicalContainer;
 import com.vaadin.event.ItemClickEvent;
@@ -29,15 +29,15 @@ public class ItemClickListener implements ItemClickEvent.ItemClickListener {
 				(Integer) hc.getContainerProperty(
 						event.getItemId(), "depth").getValue();
 		// GETS THE STATUS OF THE NODE (SUCCESSED OR FAILED)
-		PmsiUploadedElementModel.Status eventStatus =
-				(PmsiUploadedElementModel.Status) hc.getContainerProperty(
+		UploadedPmsi.Status eventStatus =
+				(UploadedPmsi.Status) hc.getContainerProperty(
 						event.getItemId(), "status").getValue();
 
 		// DEPTH AT 3 MEANS AN UPLOAD HAS BEEN SELECTED
 		if (eventDepth == 3) {
 			//  PREVENT GUIUI THAT AN UPLOAD HAS BEEN SELECTED
 			rootElement.fireFinessSelected(
-					(PmsiUploadedElementModel) hc.getContainerProperty(event.getItemId(), "model").getValue(),
+					(UploadedPmsi) hc.getContainerProperty(event.getItemId(), "model").getValue(),
 					eventStatus);
 		}
 	}

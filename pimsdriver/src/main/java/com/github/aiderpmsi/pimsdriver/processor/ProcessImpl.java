@@ -17,17 +17,17 @@ import org.xml.sax.SAXException;
 
 import com.github.aiderpmsi.pims.utils.Parser;
 import com.github.aiderpmsi.pimsdriver.dao.TransactionException;
+import com.github.aiderpmsi.pimsdriver.dao.model.UploadedPmsi;
 import com.github.aiderpmsi.pimsdriver.db.DataSourceSingleton;
 import com.github.aiderpmsi.pimsdriver.db.RsfContentHandler;
 import com.github.aiderpmsi.pimsdriver.db.RssContentHandler;
-import com.github.aiderpmsi.pimsdriver.model.PmsiUploadedElementModel;
 import com.github.aiderpmsi.pimsdriver.pmsi.RecorderErrorHandler;
 
 public class ProcessImpl implements Callable<Boolean> {
 	
-	private PmsiUploadedElementModel element;
+	private UploadedPmsi element;
 	
-	public ProcessImpl(PmsiUploadedElementModel element) {
+	public ProcessImpl(UploadedPmsi element) {
 		this.element = element;
 	}
 
@@ -50,16 +50,22 @@ public class ProcessImpl implements Callable<Boolean> {
 					+ "plud_dateenvoi, plud_rsf_oid, plud_rss_oid, plud_arguments "
 					+ "FROM plud_pmsiupload WHERE plud_id = ?";
 			PreparedStatement selectps = con.prepareStatement(selectquery);
-			selectps.setLong(1, element.getRecordId());
+			selectps.setLong(1, element.getRecordid());
 			
 			ResultSet rs = selectps.executeQuery();
 			rs.next();
-
-			// CREATE THE PARTITION TO INSERT THE DATAS
-			String createPartitionQuery = 
-					"CREATE TABLE pmel.pmel_" + element.getRecordId() + " () INHERITS (public.pmel_pmsielement)";
-			PreparedStatement createPartitionPs = con.prepareStatement(createPartitionQuery);
-			createPartitionPs.execute();
+			
+			// CREATE THE TEMP TABLE TO INSERT THE DATAS
+			String createTempTableQuery =
+					"CREATE TEMPORARY TABLE pmel_temp ( \n"
+					+ " pmel_id bigint NOT NULL DEFAULT nextval('plud_pmsiupload_plud_id_seq'::regclass), \n"
+					+ " pmel_root bigint NOT NULL, \n"
+					+ " pmel_parent bigint, \n"
+					+ " pmel_type character varying NOT NULL, \n"
+					+ " pmel_attributes hstore NOT NULL \n"
+					+ ") ON COMMIT DROP";
+			PreparedStatement createTempTablePs = con.prepareStatement(createTempTableQuery);
+			createTempTablePs.execute();
 			
 			// RSF AND RSS FINESSES
 			String rsfFiness = null, rssFiness = null;
@@ -70,7 +76,7 @@ public class ProcessImpl implements Callable<Boolean> {
 			
 			// PROCESS RSF
 			{
-				ContentHandler rsfch = new RsfContentHandler(con, element.getRecordId());
+				ContentHandler rsfch = new RsfContentHandler(con, element.getRecordid());
 				RecorderErrorHandler rsfreh = new RecorderErrorHandler();
 				Parser psfpars = new Parser();
 				psfpars.setStartState("headerrsf");
@@ -83,7 +89,7 @@ public class ProcessImpl implements Callable<Boolean> {
 					throw new SAXException("RSF : " + rsfreh.getErrors().get(0).getMessage());
 					
 				// GET THE REAL FINESS FROM RSF
-				String realrsffinessquery = "SELECT pmel_attributes -> 'Finess' AS finess FROM pmel.pmel_" + element.getRecordId() + " WHERE pmel_type = 'rsfheader'";
+				String realrsffinessquery = "SELECT pmel_attributes -> 'Finess' AS finess FROM pmel_temp WHERE pmel_type = 'rsfheader'";
 				PreparedStatement realrsffinessps = con.prepareStatement(realrsffinessquery);
 				ResultSet realrsffinessrs = realrsffinessps.executeQuery();
 				if (!realrsffinessrs.next() || realrsffinessrs.getString(1) == null)
@@ -98,7 +104,7 @@ public class ProcessImpl implements Callable<Boolean> {
 			if (!rs.wasNull()) {
 				InputStream rssis = lom.open(rssoid, LargeObjectManager.READ).getInputStream();
 			
-				ContentHandler rssch = new RssContentHandler(con, element.getRecordId());
+				ContentHandler rssch = new RssContentHandler(con, element.getRecordid());
 				RecorderErrorHandler rssreh = new RecorderErrorHandler();
 				Parser rsspars = new Parser();
 				rsspars.setStartState("headerrss");
@@ -111,7 +117,7 @@ public class ProcessImpl implements Callable<Boolean> {
 					throw new SAXException("RSS : " + rssreh.getErrors().get(0).getMessage());
 				
 				// GET THE REAL FINESS FROM RSS
-				String realrssfinessquery = "SELECT pmel_attributes -> 'Finess' AS finess FROM pmel.pmel_" + element.getRecordId() + " WHERE pmel_type = 'rssheader'";
+				String realrssfinessquery = "SELECT pmel_attributes -> 'Finess' AS finess FROM pmel_temp WHERE pmel_type = 'rssheader'";
 				PreparedStatement realrssfinessps = con.prepareStatement(realrssfinessquery);
 				ResultSet realrssfinessrs = realrssfinessps.executeQuery();
 				if (!realrssfinessrs.next() || realrssfinessrs.getString(1) == null)
@@ -123,32 +129,53 @@ public class ProcessImpl implements Callable<Boolean> {
 			if (rsfFiness != null && rssFiness != null && !rsfFiness.equals(rssFiness))
 				throw new IOException("Finess dans RSF et RSS ne correspondent pas");
 						
+			// CREATE THE PARTITION TO INSERT THE DATAS
+			String createPartitionQuery = 
+					"CREATE TABLE pmel.pmel_" + element.getRecordid() + " () INHERITS (public.pmel_pmsielement)";
+			PreparedStatement createPartitionPs = con.prepareStatement(createPartitionQuery);
+			createPartitionPs.execute();
+			
+			// COPY TEMP TABLE INTO PMEL TABLE
+			String copyQuery = 
+					"INSERT INTO pmel.pmel_" + element.getRecordid() + " (pmel_id, pmel_root, pmel_parent, pmel_type, pmel_attributes) \n"
+					+ "SELECT pmel_id, pmel_root, pmel_parent, pmel_type, pmel_attributes FROM pmel_temp";
+			PreparedStatement copyPs = con.prepareStatement(copyQuery);
+			copyPs.execute();
+			
 			// UPDATE STATUS AND REAL FINESS
 			String updatequery = "UPDATE plud_pmsiupload SET plud_processed = 'successed'::plud_status, plud_finess = ? WHERE plud_id = ?";
 			PreparedStatement updateps = con.prepareStatement(updatequery);
 			updateps.setString(1, rsfFiness);
-			updateps.setLong(2, element.getRecordId());
+			updateps.setLong(2, element.getRecordid());
 			updateps.execute();
 
 			// CREATE CONSTRAINTS ON PMEL TABLE
 			String createPartitionConstraints = 
-					"ALTER TABLE pmel.pmel_" + element.getRecordId() + " \n"
-					+ "ADD CONSTRAINT pmel_inherited_" + element.getRecordId() + "_pkey PRIMARY KEY (pmel_id); \n"
-					+ "ALTER TABLE pmel.pmel_" + element.getRecordId() + " \n"
-					+ "ADD CONSTRAINT pmel_inherited_" + element.getRecordId() + "_pmel_parent_fkey FOREIGN KEY (pmel_parent) \n"
-					+ "  REFERENCES pmel.pmel_" + element.getRecordId() + " (pmel_id) MATCH SIMPLE \n"
+					"ALTER TABLE pmel.pmel_" + element.getRecordid() + " \n"
+					+ "ADD CONSTRAINT pmel_inherited_" + element.getRecordid() + "_pkey PRIMARY KEY (pmel_id); \n"
+					+ "ALTER TABLE pmel.pmel_" + element.getRecordid() + " \n"
+					+ "ADD CONSTRAINT pmel_inherited_" + element.getRecordid() + "_pmel_parent_fkey FOREIGN KEY (pmel_parent) \n"
+					+ "  REFERENCES pmel.pmel_" + element.getRecordid() + " (pmel_id) MATCH SIMPLE \n"
 					+ "  ON UPDATE NO ACTION ON DELETE NO ACTION DEFERRABLE INITIALLY DEFERRED; \n"
-					+ "ALTER TABLE pmel.pmel_" + element.getRecordId() + " \n"
-					+ "ADD CONSTRAINT pmel_inherited_" + element.getRecordId() + "_pmel_root_fkey FOREIGN KEY (pmel_root) \n"
+					+ "ALTER TABLE pmel.pmel_" + element.getRecordid() + " \n"
+					+ "ADD CONSTRAINT pmel_inherited_" + element.getRecordid() + "_pmel_root_fkey FOREIGN KEY (pmel_root) \n"
 					+ "  REFERENCES public.plud_pmsiupload (plud_id) MATCH SIMPLE \n"
 					+ "  ON UPDATE NO ACTION ON DELETE NO ACTION DEFERRABLE INITIALLY DEFERRED; \n"
-					+ "CREATE INDEX pmel_inherited_" + element.getRecordId() + "pmel_root_idx ON pmel.pmel_" + element.getRecordId() + " USING btree (pmel_root);";
+					+ "CREATE INDEX pmel_inherited_" + element.getRecordid() + "pmel_root_idx ON pmel.pmel_" + element.getRecordid() + " USING btree (pmel_root);";
 			PreparedStatement createPartitionConstraintsPs = con.prepareStatement(createPartitionConstraints);
 			createPartitionConstraintsPs.execute();
 			
 			// EVERYTHING WENT FINE, COMMIT
 			con.commit();
 		} catch (IOException | SQLException | SAXException e) {
+			// IF THE EXCEPTION IS DUE TO A SERIALIZATION EXCEPTION, WE HAVE TO RETRY THIS TREATMENT
+			if (e instanceof SQLException) {
+				if (((SQLException) e).getSQLState().equals("40001")) {
+					// ROLLBACK, BUT RETRY LATER
+					try {con.rollback();} catch (SQLException e2) { throw new RuntimeException(e); }
+					return false;
+				}
+			}
 			try {
 				// IF WE HAVE AN ERROR, ROLLBACK TRANSACTION AND STORE THE REASON FOR THE FAILURE
 				con.rollback();
@@ -156,7 +183,7 @@ public class ProcessImpl implements Callable<Boolean> {
 				PreparedStatement updateps = con.prepareStatement(updatequery);
 				updateps.setString(1, "error");
 				updateps.setString(2, e.getMessage() == null ? e.getClass().toString() : e.getMessage());
-				updateps.setLong(3, element.getRecordId());
+				updateps.setLong(3, element.getRecordid());
 				updateps.execute();
 				con.commit();
 			} catch (SQLException e2) { e2.addSuppressed(e); throw new RuntimeException(e2); }

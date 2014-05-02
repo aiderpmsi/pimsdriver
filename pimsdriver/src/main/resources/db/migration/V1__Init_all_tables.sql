@@ -22,3 +22,7 @@ CREATE TABLE public.pmel_pmsielement (
   pmel_type character varying NOT NULL,
   pmel_attributes hstore NOT NULL
 );
+
+CREATE TABLE pmel.pmel_cleanup (
+  plud_id bigint NOT NULL
+);

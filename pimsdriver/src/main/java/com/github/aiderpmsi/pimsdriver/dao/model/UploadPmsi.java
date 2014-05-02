@@ -1,4 +1,4 @@
-package com.github.aiderpmsi.pimsdriver.model;
+package com.github.aiderpmsi.pimsdriver.dao.model;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -7,11 +7,13 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
 
-@XmlAccessorType(XmlAccessType.PUBLIC_MEMBER)
-public class PmsiUploadElementModel {
+/**
+ * Represents the uploading of a new pmsi
+ * @author jpc
+ *
+ */
+public class UploadPmsi {
 
 	/** Pmsi Month. Must be between 1 and 12 */
 	@Min(1)	@Max(12)

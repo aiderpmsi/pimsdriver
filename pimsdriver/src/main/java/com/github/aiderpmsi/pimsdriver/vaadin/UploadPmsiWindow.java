@@ -2,7 +2,7 @@ package com.github.aiderpmsi.pimsdriver.vaadin;
 
 import com.github.aiderpmsi.pimsdriver.dao.ImportPmsiDTO;
 import com.github.aiderpmsi.pimsdriver.dao.TransactionException;
-import com.github.aiderpmsi.pimsdriver.model.PmsiUploadElementModel;
+import com.github.aiderpmsi.pimsdriver.dao.model.UploadPmsi;
 import com.github.aiderpmsi.pimsdriver.vaadin.utils.FileUploader;
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitEvent;
@@ -67,10 +67,10 @@ public class UploadPmsiWindow extends Window {
         fl.addComponent(rssFeedBack);
         
         // ADD FORM FIELDS (FINESS, YEAR AND MONTH)
-        PmsiUploadElementModel model = new PmsiUploadElementModel();
+        UploadPmsi model = new UploadPmsi();
         model.initDefaultValues();
-        final BeanFieldGroup<PmsiUploadElementModel> binder =
-        		new BeanFieldGroup<PmsiUploadElementModel>(PmsiUploadElementModel.class);
+        final BeanFieldGroup<UploadPmsi> binder =
+        		new BeanFieldGroup<UploadPmsi>(UploadPmsi.class);
         binder.setItemDataSource(model);
 
         TextField yearField = binder.buildAndBind("Année", "year", TextField.class);
@@ -137,10 +137,10 @@ public class UploadPmsiWindow extends Window {
 	private class Validate implements Button.ClickListener {
 		
 		private static final long serialVersionUID = 1L;
-		private BeanFieldGroup<PmsiUploadElementModel> binder;
+		private BeanFieldGroup<UploadPmsi> binder;
 		private Window uploadWindow;
 		
-		public Validate(BeanFieldGroup<PmsiUploadElementModel> binder, Window uploadWindow) {
+		public Validate(BeanFieldGroup<UploadPmsi> binder, Window uploadWindow) {
 			this.binder = binder;
 			this.uploadWindow = uploadWindow;
 		}
@@ -151,7 +151,7 @@ public class UploadPmsiWindow extends Window {
 				binder.commit();
 
 				// NO ERROR : STORE THE ELEMENTS
-				PmsiUploadElementModel model = binder.getItemDataSource().getBean();
+				UploadPmsi model = binder.getItemDataSource().getBean();
 				
 				try {
 					new ImportPmsiDTO().importPmsi(

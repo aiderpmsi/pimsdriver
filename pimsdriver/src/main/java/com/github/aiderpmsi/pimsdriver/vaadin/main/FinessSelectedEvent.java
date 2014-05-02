@@ -1,6 +1,6 @@
 package com.github.aiderpmsi.pimsdriver.vaadin.main;
 
-import com.github.aiderpmsi.pimsdriver.model.PmsiUploadedElementModel;
+import com.github.aiderpmsi.pimsdriver.dao.model.UploadedPmsi;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Component.Event;
 
@@ -8,27 +8,27 @@ public class FinessSelectedEvent extends Event {
 
 	private static final long serialVersionUID = 2570810408567300226L;
 
-	private PmsiUploadedElementModel model;
+	private UploadedPmsi model;
 	
-	private PmsiUploadedElementModel.Status status;
+	private UploadedPmsi.Status status;
 	
 	public FinessSelectedEvent(Component source) {
 		super(source);
 	}
 
-	public PmsiUploadedElementModel getModel() {
+	public UploadedPmsi getModel() {
 		return model;
 	}
 
-	public void setModel(PmsiUploadedElementModel model) {
+	public void setModel(UploadedPmsi model) {
 		this.model = model;
 	}
 
-	public PmsiUploadedElementModel.Status getStatus() {
+	public UploadedPmsi.Status getStatus() {
 		return status;
 	}
 
-	public void setStatus(PmsiUploadedElementModel.Status status) {
+	public void setStatus(UploadedPmsi.Status status) {
 		this.status = status;
 	}
 	

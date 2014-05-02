@@ -1,6 +1,6 @@
 package com.github.aiderpmsi.pimsdriver.vaadin.main;
 
-import com.github.aiderpmsi.pimsdriver.model.PmsiUploadedElementModel;
+import com.github.aiderpmsi.pimsdriver.dao.model.UploadedPmsi;
 import com.vaadin.annotations.Theme;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.ui.Layout;
@@ -45,7 +45,7 @@ public class RootWindow extends UI {
 		return thisLayout;
 	}		
 	
-	public void fireFinessSelected(PmsiUploadedElementModel model, PmsiUploadedElementModel.Status status) {
+	public void fireFinessSelected(UploadedPmsi model, UploadedPmsi.Status status) {
 		FinessSelectedEvent fse = new FinessSelectedEvent(this);
 		fse.setModel(model);
 		fse.setStatus(status);

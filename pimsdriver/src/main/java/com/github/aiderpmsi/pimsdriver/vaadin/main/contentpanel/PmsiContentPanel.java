@@ -1,7 +1,7 @@
 package com.github.aiderpmsi.pimsdriver.vaadin.main.contentpanel;
 
 import com.github.aiderpmsi.pimsdriver.dao.NavigationDTO;
-import com.github.aiderpmsi.pimsdriver.model.PmsiUploadedElementModel;
+import com.github.aiderpmsi.pimsdriver.dao.model.UploadedPmsi;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
@@ -18,17 +18,17 @@ public class PmsiContentPanel extends Panel {
 		setVisible(false);
 	}
 	
-	public void setUpload(PmsiUploadedElementModel model, PmsiUploadedElementModel.Status status) {
+	public void setUpload(UploadedPmsi model, UploadedPmsi.Status status) {
 		// IF STATUS IS FAILED, WE HAVE TO REMOVE EVERYTHIN OF THIS PANEL
-		if (status == PmsiUploadedElementModel.Status.failed) {
+		if (status == UploadedPmsi.Status.failed) {
 			this.removeAllActionHandlers();
 			this.setContent(new VerticalLayout());
 			setVisible(false);
 		}
 		else {
 			// GETS THE DATAS TO WRITE
-			NavigationDTO.RsfSynthesis rsfs = (new NavigationDTO()).rsfSynthesis(model.getRecordId());
-			NavigationDTO.RssSynthesis rsss =  (new NavigationDTO()).rssSynthesis(model.getRecordId());
+			NavigationDTO.RsfSynthesis rsfs = (new NavigationDTO()).rsfSynthesis(model.getRecordid());
+			NavigationDTO.RssSynthesis rsss =  (new NavigationDTO()).rssSynthesis(model.getRecordid());
 			
 			// SETS THE LAYOUT
 			VerticalLayout principallayout = new VerticalLayout();

@@ -7,12 +7,12 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.github.aiderpmsi.pimsdriver.dao.model.UploadedPmsi;
 import com.github.aiderpmsi.pimsdriver.db.DataSourceSingleton;
-import com.github.aiderpmsi.pimsdriver.model.PmsiUploadedElementModel;
 
 public class UploadedElementsDTO {
 	
-	public List<PmsiUploadedElementModel> getUploadedElements (
+	public List<UploadedPmsi> getUploadedElements (
 			String query, Object[] arguments) {
 		Connection con = null;
 		
@@ -29,14 +29,14 @@ public class UploadedElementsDTO {
 			ResultSet rs = ps.executeQuery();
 			
 			// FILLS THE LIST OF ELEMENTS
-			List<PmsiUploadedElementModel> upeltslist = new ArrayList<>();
+			List<UploadedPmsi> upeltslist = new ArrayList<>();
 			while (rs.next()) {
 				// BEAN FOR THIS ITEM
-				PmsiUploadedElementModel element = new PmsiUploadedElementModel();
+				UploadedPmsi element = new UploadedPmsi();
 
 				// FILLS THE BEAN
-				element.setRecordId(rs.getLong(1));
-				element.setProcessed(PmsiUploadedElementModel.Status.valueOf(rs.getString(2)));
+				element.setRecordid(rs.getLong(1));
+				element.setProcessed(UploadedPmsi.Status.valueOf(rs.getString(2)));
 				element.setFiness(rs.getString(3));
 				element.setYear(rs.getInt(4));
 				element.setMonth(rs.getInt(5));

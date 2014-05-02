@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.github.aiderpmsi.pimsdriver.dao.NavigationDTO;
 import com.github.aiderpmsi.pimsdriver.dao.UploadedElementsDTO;
-import com.github.aiderpmsi.pimsdriver.model.PmsiUploadedElementModel;
+import com.github.aiderpmsi.pimsdriver.dao.model.UploadedPmsi;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.HierarchicalContainer;
 import com.vaadin.ui.Notification;
@@ -49,8 +49,8 @@ public class ExpandListener implements Tree.ExpandListener {
 				(Integer) hc.getContainerProperty(
 						event.getItemId(), "depth").getValue();
 		// GETS THE STATUS OF THE NODE (SUCCESSED OR FAILED)
-		PmsiUploadedElementModel.Status eventStatus =
-				(PmsiUploadedElementModel.Status) hc.getContainerProperty(
+		UploadedPmsi.Status eventStatus =
+				(UploadedPmsi.Status) hc.getContainerProperty(
 						event.getItemId(), "status").getValue();
 		
 		// IF WE EXPAND A ROOT NODE
@@ -108,7 +108,7 @@ public class ExpandListener implements Tree.ExpandListener {
 			
 			// CREATES THE QUERY TO GET THE UPLOADED ITEMS
 			UploadedElementsDTO ued = new UploadedElementsDTO();
-			List<PmsiUploadedElementModel> models = 
+			List<UploadedPmsi> models = 
 					ued.getUploadedElements(
 							"SELECT plud_id, plud_processed, plud_finess, plud_year, plud_month, plud_dateenvoi FROM plud_pmsiupload WHERE plud_processed = ?::plud_status AND plud_finess = ? AND plud_year = ? AND plud_month = ? ORDER BY plud_dateenvoi DESC",
 							new Object[] {eventStatus.toString(), finess, year, month});
@@ -120,7 +120,7 @@ public class ExpandListener implements Tree.ExpandListener {
 				Notification.show("L'élément sélectionné n'existe plus", Notification.Type.WARNING_MESSAGE);
 			} else {
 				SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/YYYY HH:mm:ss");
-				for (PmsiUploadedElementModel model : models) {
+				for (UploadedPmsi model : models) {
 					// CREATES THE NODE
 					Object id = createNode(new Object[][] {
 							new Object[] {"caption", sdf.format(model.getDateenvoi())},

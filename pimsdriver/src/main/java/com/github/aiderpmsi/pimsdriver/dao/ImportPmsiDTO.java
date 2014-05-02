@@ -8,18 +8,20 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.apache.commons.dbcp2.DelegatingConnection;
 import org.postgresql.largeobject.LargeObject;
 import org.postgresql.largeobject.LargeObjectManager;
 
+import com.github.aiderpmsi.pimsdriver.dao.model.UploadPmsi;
+import com.github.aiderpmsi.pimsdriver.dao.model.UploadedPmsi;
 import com.github.aiderpmsi.pimsdriver.db.DataSourceSingleton;
-import com.github.aiderpmsi.pimsdriver.model.PmsiUploadElementModel;
-import com.github.aiderpmsi.pimsdriver.model.PmsiUploadedElementModel;
 
 public class ImportPmsiDTO {
 
-	public void importPmsi(PmsiUploadElementModel model, InputStream rsf, InputStream rss) throws TransactionException {
+	public void importPmsi(UploadPmsi model, InputStream rsf, InputStream rss) throws TransactionException {
 		Connection con = null;
 		
 		try {
@@ -52,7 +54,7 @@ public class ImportPmsiDTO {
 					+ "VALUES (?::public.plud_status, ?, ?, ?, "
 					+ "transaction_timestamp(), ?, ?, hstore(?::text[], ?::text[]));";
 			PreparedStatement ps = con.prepareStatement(query);
-			ps.setString(1, PmsiUploadedElementModel.Status.pending.toString());
+			ps.setString(1, UploadedPmsi.Status.pending.toString());
 			ps.setString(2, model.getFiness());
 			ps.setInt(3, model.getYear());
 			ps.setInt(4, model.getMonth());
@@ -80,7 +82,7 @@ public class ImportPmsiDTO {
 		
 	}
 	
-	public void deleteUpload(Long uploadId) {
+	public void deleteUpload(Long uploadId) throws TransactionException {
 		Connection con = null;
 		
 		try {
@@ -112,12 +114,10 @@ public class ImportPmsiDTO {
 				// DELETE ELEMENTS FROM PMSI ELEMENTS IF STATUS IS SUCESSED
 				if (checkRs.getString(4).equals("successed")) {
 					String deletePmsiElementQuery =
-							"ALTER TABLE pmel.pmel_" + uploadId + " DROP CONSTRAINT pmel_inherited_" + uploadId + "_pmel_root_fkey; \n"
-							+ "ALTER TABLE pmel.pmel_" + uploadId + " DROP CONSTRAINT pmel_inherited_" + uploadId + "_pmel_parent_fkey; \n"
-							+ "ALTER TABLE pmel.pmel_" + uploadId + " DROP CONSTRAINT pmel_inherited_" + uploadId + "_pkey; \n"
-							+ "TRUNCATE TABLE pmel.pmel_" + uploadId + "; \n"
-							+ "DROP TABLE pmel.pmel_" + uploadId + ";";
+							"TRUNCATE TABLE pmel.pmel_" + uploadId + "; \n"
+							+ "INSERT INTO pmel.pmel_cleanup (plud_id) VALUES (?);";
 					PreparedStatement deletePmsiElementPs = con.prepareStatement(deletePmsiElementQuery);
+					deletePmsiElementPs.setLong(1, uploadId);
 					deletePmsiElementPs.execute();
 				}
 				
@@ -147,6 +147,64 @@ public class ImportPmsiDTO {
 		
 	}
 
+	public List<Long> getToCleanup() throws TransactionException {
+		Connection con = null;
+		
+		try {
+			// GETS THE DATABASE LINK
+			con = DataSourceSingleton.getInstance().getConnection();
+			
+			// GETS THE UPLOAD ID DELETED
+			String checkQuery = 
+					"SELECT plud_id FROM pmel.pmel_cleanup";
+			PreparedStatement checkPs = con.prepareStatement(checkQuery);
+			ResultSet checkRs = checkPs.executeQuery();
+			
+			// IF THERE IS NO RESULT, THIS ID DOESN'T EXISTS
+			List<Long> elements = new LinkedList<>();
+			
+			while (checkRs.next()) {
+				elements.add(checkRs.getLong(1));
+			}
+				
+			// VALIDATES THE OPERATIONS
+			con.commit();
+			
+			return elements;
+		} catch (SQLException e) {
+			try { con.rollback(); } catch (SQLException e2) { e2.addSuppressed(e); throw new RuntimeException(e2); }
+			throw new TransactionException("Erreur de sélection de table à nettoyer", e);
+		} finally {
+			if (con != null)
+				try { con.close(); } catch (SQLException e) { throw new RuntimeException(e); }
+		}
+	}
+	
+	public void cleanup(Long pludId) {
+		// NOTE THAT WE DON'T CARE IF THIS ID DOESN'T EXIST ANYMORE OR IF WE HAVE AN ERROR :
+		// WE WILL NOT TRY AGAIN IF THIS ID DOESN'T EXIST ANYMORE, AND TRY AGAIN IF IT EXISTS
+		Connection con = null;
+		
+		try {
+			// GETS THE DB LINK
+			con = DataSourceSingleton.getInstance().getConnection();
+			
+			String deleteTableQuery = "DROP TABLE pmel.pmel_" + pludId + "; \n"
+					+ "DELETE FROM pmel.pmel_cleanup WHERE plud_id = ?;";
+			PreparedStatement deleteTablePs = con.prepareStatement(deleteTableQuery);
+			deleteTablePs.setLong(1, pludId);
+			
+			deleteTablePs.execute();
+			
+			con.commit();
+		} catch (SQLException e) {
+			try { con.rollback(); } catch (SQLException e2) { /* Do Nothing, we should login */ }
+		} finally {
+			if (con != null)
+				try { con.close(); } catch (SQLException e) { throw new RuntimeException(e); }
+		}
+	}
+	
 	private void store(LargeObject lo, InputStream is) throws IOException, SQLException {
 		// COPY FROM INPUTSTREAM TO LARGEOBJECT
 		byte buf[] = new byte[2048];

@@ -3,7 +3,7 @@ package com.github.aiderpmsi.pimsdriver.vaadin.main.finesspanel;
 import java.util.Collection;
 
 import com.github.aiderpmsi.pimsdriver.dao.NavigationDTO;
-import com.github.aiderpmsi.pimsdriver.model.PmsiUploadedElementModel;
+import com.github.aiderpmsi.pimsdriver.dao.model.UploadedPmsi;
 import com.github.aiderpmsi.pimsdriver.vaadin.main.RootWindow;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.HierarchicalContainer;
@@ -17,8 +17,8 @@ public class FinessPanel extends Panel {
 	
 	private static final Object[][] rootElts =
 			new Object[][] {
-		new Object[] {"Finess", PmsiUploadedElementModel.Status.successed},
-		new Object[] {"Fichiers en erreur", PmsiUploadedElementModel.Status.failed}
+		new Object[] {"Finess", UploadedPmsi.Status.successed},
+		new Object[] {"Fichiers en erreur", UploadedPmsi.Status.failed}
 	};
 	
 	private Tree finessTree;
@@ -44,8 +44,8 @@ public class FinessPanel extends Panel {
 		hc.addContainerProperty("depth", Integer.class, null);
 		hc.addContainerProperty("year", Integer.class, null);
 		hc.addContainerProperty("month", Integer.class, null);
-		hc.addContainerProperty("status", PmsiUploadedElementModel.Status.class, null);
-		hc.addContainerProperty("model", PmsiUploadedElementModel.class, null);
+		hc.addContainerProperty("status", UploadedPmsi.Status.class, null);
+		hc.addContainerProperty("model", UploadedPmsi.class, null);
 		
 		// FILLS THE ROOT ELEMENTS FROM ELEMENTS LIST
 		for (Object[] rootElt : rootElts) {
@@ -54,8 +54,8 @@ public class FinessPanel extends Panel {
 			Property<String> captionProperty = (Property<String>) hc.getContainerProperty(idItem, "caption");
 			captionProperty.setValue((String) rootElt[0]);
 			@SuppressWarnings("unchecked")
-			Property<PmsiUploadedElementModel.Status> statusProperty = (Property<PmsiUploadedElementModel.Status>) hc.getContainerProperty(idItem, "status");
-			statusProperty.setValue((PmsiUploadedElementModel.Status) rootElt[1]);
+			Property<UploadedPmsi.Status> statusProperty = (Property<UploadedPmsi.Status>) hc.getContainerProperty(idItem, "status");
+			statusProperty.setValue((UploadedPmsi.Status) rootElt[1]);
 			@SuppressWarnings("unchecked")
 			Property<Integer> depthProperty = (Property<Integer>) hc.getContainerProperty(idItem, "depth");
 			depthProperty.setValue(0);

@@ -9,8 +9,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import com.github.aiderpmsi.pimsdriver.dao.model.UploadedPmsi;
 import com.github.aiderpmsi.pimsdriver.db.DataSourceSingleton;
-import com.github.aiderpmsi.pimsdriver.model.PmsiUploadedElementModel;
 
 public class NavigationDTO {
 
@@ -91,7 +91,7 @@ public class NavigationDTO {
 		}
 	}
 	
-	public List<String> getFiness(PmsiUploadedElementModel.Status status) {
+	public List<String> getFiness(UploadedPmsi.Status status) {
 		Connection con = null;
 		
 		try {
@@ -127,7 +127,7 @@ public class NavigationDTO {
 		}
 	}
 
-	public List<YM> getYM(PmsiUploadedElementModel.Status status, String finess) {
+	public List<YM> getYM(UploadedPmsi.Status status, String finess) {
 		Connection con = null;
 		
 		try {

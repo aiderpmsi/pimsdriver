@@ -3,7 +3,7 @@ package com.github.aiderpmsi.pimsdriver.db.vaadin;
 import java.util.HashMap;
 import java.util.List;
 
-import com.github.aiderpmsi.pimsdriver.model.PmsiUploadedElementModel;
+import com.github.aiderpmsi.pimsdriver.dao.model.UploadedPmsi;
 import com.vaadin.data.Container.Filter;
 import com.vaadin.data.util.filter.Compare;
 
@@ -24,9 +24,9 @@ public class CompareTranslator implements DBTranslator {
 
         // ADAPTS THE COMPARE PROPERTY TYPE
         Object compareValue = compare.getValue(); 
-        if (compareValue instanceof PmsiUploadedElementModel.Status) {
-        	PmsiUploadedElementModel.Status status =
-        			(PmsiUploadedElementModel.Status) compareValue;
+        if (compareValue instanceof UploadedPmsi.Status) {
+        	UploadedPmsi.Status status =
+        			(UploadedPmsi.Status) compareValue;
         	postfix = "::plud_status";
         	arguments.add(status.toString());
         } else {
