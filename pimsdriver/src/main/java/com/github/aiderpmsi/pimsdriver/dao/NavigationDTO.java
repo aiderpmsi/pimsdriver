@@ -296,7 +296,6 @@ public class NavigationDTO {
 					+ "CROSS JOIN rssdad rssdad \n"
 					+ "CROSS JOIN rssseances rssseances";
 			PreparedStatement ps = con.prepareStatement(query);
-			ps.setLong(1, uploadedId);
 			
 			// EXECUTE QUERY
 			ResultSet rs = ps.executeQuery();

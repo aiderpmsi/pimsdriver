@@ -89,6 +89,8 @@ public class DataSourceSingleton {
 		Connection con = dataSource.getConnection();
 		// FORCE AUTO COMMIT TO FALSE
 		con.setAutoCommit(false);
+		// SETS TRANSACTION ISOLATION
+		con.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
 		return con;
 	}
 	

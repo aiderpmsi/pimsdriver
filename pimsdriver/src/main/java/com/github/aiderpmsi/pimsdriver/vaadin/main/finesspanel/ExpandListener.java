@@ -119,7 +119,7 @@ public class ExpandListener implements Tree.ExpandListener {
 				// SHOW THAT THIS ITEM DOESN'T EXIST ANYMORE
 				Notification.show("L'élément sélectionné n'existe plus", Notification.Type.WARNING_MESSAGE);
 			} else {
-				SimpleDateFormat sdf = new SimpleDateFormat("dd/mm/YYYY HH:MM:ss");
+				SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/YYYY HH:mm:ss");
 				for (PmsiUploadedElementModel model : models) {
 					// CREATES THE NODE
 					Object id = createNode(new Object[][] {

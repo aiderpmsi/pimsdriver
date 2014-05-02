@@ -86,7 +86,6 @@ public class ImportPmsiDTO {
 		try {
 			// GETS THE DB CONNECTION
 			con = DataSourceSingleton.getInstance().getConnection();
-			
 			// USE THE LARGE OBJECT INTERFACE FOR FILES
 			@SuppressWarnings("unchecked")
 			Connection conn = ((DelegatingConnection<Connection>) con).getInnermostDelegateInternal();
@@ -113,7 +112,11 @@ public class ImportPmsiDTO {
 				// DELETE ELEMENTS FROM PMSI ELEMENTS IF STATUS IS SUCESSED
 				if (checkRs.getString(4).equals("successed")) {
 					String deletePmsiElementQuery =
-							"DROP TABLE pmel.pmel_" + uploadId;
+							"ALTER TABLE pmel.pmel_" + uploadId + " DROP CONSTRAINT pmel_inherited_" + uploadId + "_pmel_root_fkey; \n"
+							+ "ALTER TABLE pmel.pmel_" + uploadId + " DROP CONSTRAINT pmel_inherited_" + uploadId + "_pmel_parent_fkey; \n"
+							+ "ALTER TABLE pmel.pmel_" + uploadId + " DROP CONSTRAINT pmel_inherited_" + uploadId + "_pkey; \n"
+							+ "TRUNCATE TABLE pmel.pmel_" + uploadId + "; \n"
+							+ "DROP TABLE pmel.pmel_" + uploadId + ";";
 					PreparedStatement deletePmsiElementPs = con.prepareStatement(deletePmsiElementQuery);
 					deletePmsiElementPs.execute();
 				}
