@@ -15,7 +15,7 @@ import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.github.aiderpmsi.pimsdriver.dao.UploadedElementsDTO;
+import com.github.aiderpmsi.pimsdriver.dao.UploadPmsiDTOB;
 import com.github.aiderpmsi.pimsdriver.dao.model.UploadedPmsi;
 import com.github.aiderpmsi.pimsdriver.dao.model.UploadedPmsis;
 
@@ -76,7 +76,7 @@ public class UploadedPmsi {
 		query.append("offset ").append(first).append(" limit ").append(rows + 1);
 
 		// EXECUTES THE QUERY
-		UploadedElementsDTO ued = new UploadedElementsDTO();
+		UploadPmsiDTOB ued = new UploadPmsiDTOB();
 		List<UploadedPmsi> pued = ued.getUploadedElements(query.toString(), new Object[]{});
 		UploadedPmsis pueds = new UploadedPmsis();
 		pueds.setElements(pued);

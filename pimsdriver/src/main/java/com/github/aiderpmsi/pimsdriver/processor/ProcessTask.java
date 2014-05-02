@@ -9,7 +9,7 @@ import java.util.concurrent.Future;
 import java.util.logging.Logger;
 
 import com.github.aiderpmsi.pimsdriver.dao.ImportPmsiDTO;
-import com.github.aiderpmsi.pimsdriver.dao.UploadedElementsDTO;
+import com.github.aiderpmsi.pimsdriver.dao.UploadPmsiDTOB;
 import com.github.aiderpmsi.pimsdriver.dao.model.UploadedPmsi;
 
 public class ProcessTask implements Callable<Boolean> {
@@ -24,7 +24,7 @@ public class ProcessTask implements Callable<Boolean> {
 		// TRAITEMENT TANT QU'UNE INTERRUPTION N'A PAS EU LIEU
 		while (true) {
 			// RECUPERATION DES PMSI A TRAITER :
-			List<UploadedPmsi> elts = (new UploadedElementsDTO()).getUploadedElements(
+			List<UploadedPmsi> elts = (new UploadPmsiDTOB()).getUploadedElements(
 					"SELECT plud_id, plud_processed, plud_finess, "
 							+ "plud_year, plud_month, plud_dateenvoi, plud_rsf_oid oid, "
 							+ "plud_rss_oid, plud_arguments FROM plud_pmsiupload where plud_processed = 'pending'::plud_status", new Object[] {});

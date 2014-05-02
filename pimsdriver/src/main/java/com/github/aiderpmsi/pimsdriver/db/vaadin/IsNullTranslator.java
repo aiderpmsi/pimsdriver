@@ -1,6 +1,5 @@
 package com.github.aiderpmsi.pimsdriver.db.vaadin;
 
-import java.util.HashMap;
 import java.util.List;
 
 import com.vaadin.data.Container.Filter;
@@ -15,9 +14,9 @@ public class IsNullTranslator implements DBTranslator {
 	}
 
 	@Override
-	public String getWhereStringForFilter(Filter filter, HashMap<String, String> tableFieldsMapping, List<Object> arguments) {
+	public String getWhereStringForFilter(Filter filter, List<Object> arguments) {
         IsNull in = (IsNull) filter;
-        return tableFieldsMapping.get((String) in.getPropertyId()) + " IS NULL";
+        return (String) in.getPropertyId() + " IS NULL";
 	}
 
 }

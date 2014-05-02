@@ -1,6 +1,5 @@
 package com.github.aiderpmsi.pimsdriver.db.vaadin;
 
-import java.util.HashMap;
 import java.util.List;
 
 import com.github.aiderpmsi.pimsdriver.dao.model.UploadedPmsi;
@@ -16,7 +15,7 @@ public class CompareTranslator implements DBTranslator {
 	}
 
 	@Override
-	public String getWhereStringForFilter(Filter filter, HashMap<String, String> tableFieldsMapping, List<Object> arguments) {
+	public String getWhereStringForFilter(Filter filter, List<Object> arguments) {
 		// USED TO CONSTRUCT EXPRESSION
 		String prefix, postfix;
 		
@@ -34,7 +33,7 @@ public class CompareTranslator implements DBTranslator {
         	arguments.add(compareValue.toString());
         }
         
-        prefix = tableFieldsMapping.get((String) compare.getPropertyId());
+        prefix = (String) compare.getPropertyId();
 
         switch (compare.getOperation()) {
         case EQUAL:

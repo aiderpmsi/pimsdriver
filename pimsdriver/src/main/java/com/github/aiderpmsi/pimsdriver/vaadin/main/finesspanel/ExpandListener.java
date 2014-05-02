@@ -4,7 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 
 import com.github.aiderpmsi.pimsdriver.dao.NavigationDTO;
-import com.github.aiderpmsi.pimsdriver.dao.UploadedElementsDTO;
+import com.github.aiderpmsi.pimsdriver.dao.UploadPmsiDTOB;
 import com.github.aiderpmsi.pimsdriver.dao.model.UploadedPmsi;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.HierarchicalContainer;
@@ -107,7 +107,7 @@ public class ExpandListener implements Tree.ExpandListener {
 			Integer month = (Integer) hc.getContainerProperty(event.getItemId(), "month").getValue();
 			
 			// CREATES THE QUERY TO GET THE UPLOADED ITEMS
-			UploadedElementsDTO ued = new UploadedElementsDTO();
+			UploadPmsiDTOB ued = new UploadPmsiDTOB();
 			List<UploadedPmsi> models = 
 					ued.getUploadedElements(
 							"SELECT plud_id, plud_processed, plud_finess, plud_year, plud_month, plud_dateenvoi FROM plud_pmsiupload WHERE plud_processed = ?::plud_status AND plud_finess = ? AND plud_year = ? AND plud_month = ? ORDER BY plud_dateenvoi DESC",

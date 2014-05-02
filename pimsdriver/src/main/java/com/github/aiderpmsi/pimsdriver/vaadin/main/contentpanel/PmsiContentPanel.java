@@ -27,8 +27,8 @@ public class PmsiContentPanel extends Panel {
 		}
 		else {
 			// GETS THE DATAS TO WRITE
-			NavigationDTO.RsfSynthesis rsfs = (new NavigationDTO()).rsfSynthesis(model.getRecordid());
-			NavigationDTO.RssSynthesis rsss =  (new NavigationDTO()).rssSynthesis(model.getRecordid());
+			NavigationDTO.RsfOverview rsfs = (new NavigationDTO()).rsfSynthesis(model.getRecordid());
+			NavigationDTO.RssOverview rsss =  (new NavigationDTO()).rssSynthesis(model.getRecordid());
 			
 			// SETS THE LAYOUT
 			VerticalLayout principallayout = new VerticalLayout();
