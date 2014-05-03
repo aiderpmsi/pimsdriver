@@ -53,13 +53,13 @@ public class DBFilterMapper {
 			// OLD FILTER
 			And andFilter = (And) filter;
 			// NEW LIST OF AND FILTERS
-			List<Filter> newFilters = new ArrayList<>(andFilter.getFilters());
+			List<Filter> newFilters = new ArrayList<>(andFilter.getFilters().size());
 			// POPULATE NEW FILTERS
 			for (Filter oldFilter : andFilter.getFilters()) {
 				newFilters.add(this.map(oldFilter));
 			}
 			// NEW FILTER
-			And newFilter = new And((Filter[]) newFilters.toArray());
+			And newFilter = new And(newFilters.toArray(new Filter[0]));
 			return newFilter;
 		} else if (filter instanceof Between) {
 			// OLD FILTER
@@ -143,7 +143,7 @@ public class DBFilterMapper {
 				newFilters.add(this.map(oldFilter));
 			}
 			// NEW FILTER
-			Or newFilter = new Or((Filter[]) newFilters.toArray());
+			Or newFilter = new Or(newFilters.toArray(new Filter[0]));
 			return newFilter;
 		} else if (filter instanceof SimpleStringFilter) {
 			// OLD FILTER

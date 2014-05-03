@@ -55,7 +55,7 @@ public class UploadedPmsiDTO {
 		// PREPARE THE QUERY :
 		StringBuilder query = new StringBuilder(
 				"SELECT plud_id, plud_processed, plud_finess, plud_year, plud_month, "
-				+ "plud_dateenvoi, plud_rsf_oid, plud_rss_oid, plud_arguments "
+				+ "plud_dateenvoi, plud_rsf_oid, plud_rss_oid, hstore_to_array(plud_arguments) "
 				+ "FROM plud_pmsiupload ");
 		
 		// PREPARES THE LIST OF ARGUMENTS FOR THIS QUERY
@@ -67,7 +67,7 @@ public class UploadedPmsiDTO {
 		if (first != null)
 			query.append(" OFFSET ").append(first.toString()).append(" ");
 		if (rows != null && rows != 0)
-			query.append(" LIMIT ").append(first.toString()).append(" ");
+			query.append(" LIMIT ").append(rows.toString()).append(" ");
 		
 		// CREATE THE DB STATEMENT	
 		PreparedStatement ps = con.prepareStatement(query.toString());
@@ -100,7 +100,7 @@ public class UploadedPmsiDTO {
 				if (rs.wasNull()) element.setRssoid(null);
 				Object[] array = (Object[]) rs.getArray(9).getArray();
 				element.setAttributes(new HashMap<String, String>());
-				for (int i = 0 ; i < array.length ; i = i + 1) {
+				for (int i = 0 ; i < array.length ; i = i + 2) {
 					element.getAttributes().put((String) array[i], (String) array[i + 1]);
 				}
 				

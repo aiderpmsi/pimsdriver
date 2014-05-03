@@ -14,6 +14,7 @@ import com.github.aiderpmsi.pimsdriver.vaadin.utils.UploadPmsiMapping;
 import com.vaadin.data.Container.Filter;
 import com.vaadin.data.Item;
 import com.vaadin.data.util.BeanItem;
+import com.vaadin.data.util.filter.Compare;
 import com.vaadin.data.util.sqlcontainer.query.OrderBy;
 import com.vaadin.ui.Notification;
 
@@ -30,6 +31,7 @@ public class PmsiProcessQuery implements Query{
 		DBFilterMapper fm = new DBFilterMapper(UploadPmsiMapping.sqlMapping);
 		
 		// MAPS THE FILTERS
+		qd.getFilters().add(new Compare.Equal("processed", UploadedPmsi.Status.pending));
 		sqlFilters = fm.mapFilters(qd.getFilters());
 		
 		// CREATES THE ORDERS

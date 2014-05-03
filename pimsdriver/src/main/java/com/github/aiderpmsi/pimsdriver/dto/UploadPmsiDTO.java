@@ -43,9 +43,9 @@ public class UploadPmsiDTO {
 		ps.setInt(3, model.getYear());
 		ps.setInt(4, model.getMonth());
 		if (rsfoid != null)
-			ps.setLong(6, rsfoid);
+			ps.setLong(5, rsfoid);
 		else
-			ps.setNull(6, Types.BIGINT);
+			ps.setNull(5, Types.BIGINT);
 		if (rssoid != null)
 				ps.setLong(6, rssoid);
 			else

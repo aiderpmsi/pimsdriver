@@ -10,7 +10,7 @@ public class UploadPmsiMapping {
 		sqlMapping.put("finess", "plud_finess");
 		sqlMapping.put("year", "plud_year");
 		sqlMapping.put("month", "plud_month");
-		sqlMapping.put("datenvoi", "plud_dateenvoi");
+		sqlMapping.put("dateenvoi", "plud_dateenvoi");
 		sqlMapping.put("processed", "plud_processed");
 	}
 

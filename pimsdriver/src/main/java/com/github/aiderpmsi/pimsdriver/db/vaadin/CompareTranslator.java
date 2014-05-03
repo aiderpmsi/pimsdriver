@@ -30,7 +30,7 @@ public class CompareTranslator implements DBTranslator {
         	arguments.add(status.toString());
         } else {
         	postfix = "";
-        	arguments.add(compareValue.toString());
+        	arguments.add(compareValue);
         }
         
         prefix = (String) compare.getPropertyId();
