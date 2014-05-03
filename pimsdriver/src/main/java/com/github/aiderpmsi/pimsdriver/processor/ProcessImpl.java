@@ -15,10 +15,13 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import com.github.aiderpmsi.pims.utils.Parser;
+import com.github.aiderpmsi.pims.grouper.model.RssContent;
+import com.github.aiderpmsi.pims.grouper.utils.Grouper;
+import com.github.aiderpmsi.pims.parser.utils.Parser;
 import com.github.aiderpmsi.pimsdriver.db.DataSourceSingleton;
 import com.github.aiderpmsi.pimsdriver.db.RsfContentHandler;
 import com.github.aiderpmsi.pimsdriver.db.RssContentHandler;
+import com.github.aiderpmsi.pimsdriver.dto.NavigationDTO;
 import com.github.aiderpmsi.pimsdriver.dto.model.UploadedPmsi;
 import com.github.aiderpmsi.pimsdriver.pmsi.RecorderErrorHandler;
 
@@ -107,12 +110,39 @@ public class ProcessImpl implements Callable<Boolean> {
 				if (!realrssfinessrs.next() || realrssfinessrs.getString(1) == null)
 					throw new SAXException("RSS : impossible de trouver le finess dans l'entête");
 				rssFiness = realrssfinessrs.getString(1);
+				
+				// VERIFY THAT RSF AND RSS FINESS MATCH
+				if (!rsfFiness.equals(rssFiness))
+					throw new IOException("Finess dans RSF et RSS ne correspondent pas");
+
+				// LISTS EACH PMEL_ID
+				String rssMainListQuery = 
+						"SELECT pmel_id \n"
+						+ "  FROM pmel_temp WHERE pmel_type = 'rssmain'";
+				PreparedStatement rssMainListPs = con.prepareStatement(rssMainListQuery);
+				ResultSet rssMainListResult = rssMainListPs.executeQuery();
+				NavigationDTO nd = new NavigationDTO();
+
+				// GROUPER
+				Grouper gp = new Grouper();
+
+				// GROUP EACH MAIN ID
+				while (rssMainListResult.next()) {
+					// GET THE RSS CONTENT
+					// GROUP IT
+					RssContent content = nd.readRssContent(con, element, rssMainListResult.getLong(1));
+					String result = gp.group(content);
+					// UPDATE GROUP IN DB RECORD
+					String updateRecordQuery = 
+							"UPDATE pmel_temp SET pmel_attributes = pmel_attributes || ('GroupedGHS' => ?) WHERE pmel_id = ?";
+					PreparedStatement updateRecordPS = con.prepareStatement(updateRecordQuery);
+					updateRecordPS.setString(1, result);
+					updateRecordPS.setLong(2, rssMainListResult.getLong(1));
+					updateRecordPS.execute();
+				}
+				
 			}
 
-			// VERIFY THAT RSF AND RSS FINESS MATCH
-			if (rsfFiness != null && rssFiness != null && !rsfFiness.equals(rssFiness))
-				throw new IOException("Finess dans RSF et RSS ne correspondent pas");
-						
 			// CREATE THE PARTITION TO INSERT THE DATAS
 			String createPartitionQuery = 
 					"CREATE TABLE pmel.pmel_" + element.getRecordid() + " () INHERITS (public.pmel_pmsielement)";

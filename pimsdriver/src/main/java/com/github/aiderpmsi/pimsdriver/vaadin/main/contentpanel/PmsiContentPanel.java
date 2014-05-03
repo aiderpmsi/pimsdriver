@@ -21,8 +21,14 @@ public class PmsiContentPanel extends Panel {
 	}
 	
 	public void setUpload(UploadedPmsi model, UploadedPmsi.Status status) {
+		// IF MODEL AND STATUS ARE NULL, REMOVE EVERYTHING IN PANEL
+		if (model == null)  {
+			this.removeAllActionHandlers();
+			this.setContent(new VerticalLayout());
+			setVisible(false);
+		}
 		// IF STATUS IS FAILED, WE HAVE TO REMOVE EVERYTHIN OF THIS PANEL
-		if (status == UploadedPmsi.Status.failed) {
+		else if (status == UploadedPmsi.Status.failed) {
 			this.removeAllActionHandlers();
 			this.setContent(new VerticalLayout());
 			setVisible(false);

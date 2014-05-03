@@ -40,6 +40,10 @@ public class ItemClickListener implements ItemClickEvent.ItemClickListener {
 					(UploadedPmsi) hc.getContainerProperty(event.getItemId(), "model").getValue(),
 					eventStatus);
 		}
+		// SOMETHING ELSE HAS BEEN SELECTED, PREVENT THE MAIN WINDOW
+		else {
+			rootElement.fireFinessSelected(null, null);
+		}
 	}
 
 }

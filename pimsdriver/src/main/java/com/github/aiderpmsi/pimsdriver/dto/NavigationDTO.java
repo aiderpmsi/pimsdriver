@@ -9,9 +9,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import com.github.aiderpmsi.pims.grouper.model.RssContent;
 import com.github.aiderpmsi.pimsdriver.dto.model.UploadedPmsi;
 import com.github.aiderpmsi.pimsdriver.dto.model.navigation.RsfOverview;
-import com.github.aiderpmsi.pimsdriver.dto.model.navigation.RssContent;
 import com.github.aiderpmsi.pimsdriver.dto.model.navigation.RssOverview;
 import com.github.aiderpmsi.pimsdriver.dto.model.navigation.YM;
 
@@ -21,11 +21,11 @@ public class NavigationDTO {
 		// CREATES THE QUERY
 		String query = 
 				"WITH RECURSIVE rss AS ( \n"
-						+ "SELECT pmel_id, pmel_root, pmel_parent, pmel_type, pmel_attributes \n"
+					+ "SELECT pmel_id, pmel_root, pmel_parent, pmel_type, pmel_attributes \n"
 					+ "  FROM pmel.pmel_" + model.getRecordid() + " WHERE pmel_id = ? \n"
 					+ "UNION \n"
 					+ "SELECT pmel.pmel_id, pmel.pmel_root, pmel.pmel_parent, pmel.pmel_type, pmel.pmel_attributes \n"
-					+ "FROM pmel." + model.getRecordid() + " pmel \n"
+					+ "FROM pmel.pmel_" + model.getRecordid() + " pmel \n"
 					+ "JOIN rss rss ON (rss.pmel_id = pmel.pmel_parent) \n"
 					+ ") \n"
 					+ "SELECT pmel_id, pmel_root, pmel_parent, pmel_type, hstore_to_array(pmel_attributes) FROM rss \n";
