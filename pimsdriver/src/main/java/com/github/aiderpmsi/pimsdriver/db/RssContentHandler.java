@@ -6,10 +6,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
 import org.xml.sax.Attributes;
@@ -31,7 +29,8 @@ public class RssContentHandler extends ContentHandlerHelper {
 	private String currentProperty;
 
 	/** Defines properties for the current element. */
-	private HashMap<String, String> properties;
+	private List<String> propertieskeys;
+	private List<String> propertiesvalues;
 	
 	/** Upload PKID in Database */
 	private Long uploadPKId;
@@ -44,10 +43,14 @@ public class RssContentHandler extends ContentHandlerHelper {
 	
 	/** Database link */
 	private Connection con;
+	
+	/** Query to insert datas in rss table */
+	private PreparedStatement ps;
 
-	public RssContentHandler(Connection con, Long uploadPKId) {
+	public RssContentHandler(Connection con, Long uploadPKId) throws SQLException {
 		this.con = con;
 		this.uploadPKId = uploadPKId;
+		ps = con.prepareStatement(query);
 	}
 
 	//======== METHODS FOR CONTENTHANDLER =======
@@ -85,7 +88,8 @@ public class RssContentHandler extends ContentHandlerHelper {
 		
 		// FINDS IF THIS ELEMENT IS A NEW ELEMENT AND MUST REINIT THE PROPERTIES AND MAINID
 		if (getContentPath().size() == 2 && inElement.matcher(getPath()).matches()) {
-			properties = new HashMap<String, String>();
+			propertieskeys = new LinkedList<>();
+			propertiesvalues = new LinkedList<>();
 			// WE ENTER IN A NEW RSSMAIN, WE HAVE TO SET THE MAIN ID TO NULL
 			if (getContentPath().getLast().equals("rssmain"))
 				mainPKId = null;
@@ -102,27 +106,16 @@ public class RssContentHandler extends ContentHandlerHelper {
 			throws SAXException {
 		// IF WE ARE LEAVING AN PROPERTY
 		if (getContentPath().size() == 3 && inProperty.matcher(getPath()).matches()) {
-			properties.put(currentProperty, currentPropertyContent.toString());
+			propertieskeys.add(currentProperty);
+			propertiesvalues.add(currentPropertyContent.toString());
 		}
 		// IF WE ARE LEAVING AN ELEMENT, STORE IT IN DB
 		else if (getContentPath().size() == 2 && inElement.matcher(getPath()).matches()) {
 			// GENERATES THE QUERY
-			String query = "INSERT INTO pmel_temp (pmel_root, pmel_parent, pmel_type, pmel_attributes) "
-					+ "VALUES(?, ?, ?, hstore(?::text[], ?::text[])) RETURNING pmel_id";
 
 			try {
-				PreparedStatement ps = con.prepareStatement(query);
-
-				// CREATES THE ARRAY OF ARGUMENTS (KEYS AND VALUES) FOUND IN RSF
-				List<String> argskeys = new ArrayList<>(properties.size());
-				List<String> argsvalues = new ArrayList<>(properties.size());
-				for (Entry<String, String> property : properties.entrySet()) {
-					argskeys.add(property.getKey());
-					argsvalues.add(property.getValue());
-				}
-
-				Array argskeysarray = con.createArrayOf("text", argskeys.toArray(new String[properties.size()]));
-				Array argsvaluesarray = con.createArrayOf("text", argsvalues.toArray(new String[properties.size()]));
+				Array argskeysarray = con.createArrayOf("text", propertieskeys.toArray());
+				Array argsvaluesarray = con.createArrayOf("text", propertiesvalues.toArray());
 			
 				// SETS THE VALUES OF QUERY ARGS
 				ps.setLong(1, uploadPKId);
@@ -181,4 +174,8 @@ public class RssContentHandler extends ContentHandlerHelper {
 	public void skippedEntity(String name) throws SAXException {
 		// Do nothing
 	}
+
+	private static final String query = "INSERT INTO pmel_temp (pmel_root, pmel_parent, pmel_type, pmel_attributes) "
+			+ "VALUES(?, ?, ?, hstore(?::text[], ?::text[])) RETURNING pmel_id";
+
 }
