@@ -62,7 +62,13 @@ public class ProcessImpl implements Callable<Boolean> {
 			
 			// PROCESS RSF
 			InputStream rsfis = lom.open(element.getRsfoid()).getInputStream();
-			rsfFiness = processPmsi(new RsfContentHandler(con, element.getRecordid()), "headerrsf", new BufferedInputStream(rsfis), "rsfheader", con);
+			RsfContentHandler fch = null;
+			try {
+				fch = new RsfContentHandler(con, element.getRecordid());
+				rsfFiness = processPmsi(fch, "headerrsf", new BufferedInputStream(rsfis), "rsfheader", con);
+			} finally {
+				fch.close();
+			}
 
 			// IF RSS IS DEFINED, GET ITS CONTENT AND PROCESS IT
 			if (element.getRssoid() != null) {

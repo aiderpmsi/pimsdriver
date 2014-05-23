@@ -8,6 +8,12 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 import org.xml.sax.Attributes;
@@ -17,10 +23,10 @@ import org.xml.sax.SAXException;
 public class RsfContentHandler extends ContentHandlerHelper {
 
 	/** Regexp to know if we are in an element */
-	private Pattern inElement = Pattern.compile("/root/(?:rsfheader|rsfa|rsfb|rsfc|rsfh|rsfi|rsfl|rsfm)");
+	private static Pattern inElement = Pattern.compile("/root/(?:rsfheader|rsfa|rsfb|rsfc|rsfh|rsfi|rsfl|rsfm)");
 	
 	/** Regexp to know if we are in a property */
-	private Pattern inProperty = Pattern.compile("/root/(?:rsfheader|rsfa|rsfb|rsfc|rsfh|rsfi|rsfl|rsfm)/.+");
+	private static Pattern inProperty = Pattern.compile("/root/(?:rsfheader|rsfa|rsfb|rsfc|rsfh|rsfi|rsfl|rsfm)/.+");
 	
 	/** Colligates the elements of charachter */
 	private StringBuilder currentPropertyContent;
@@ -35,20 +41,18 @@ public class RsfContentHandler extends ContentHandlerHelper {
 	/** Upload PK in DB (plud_id) */
 	private Long uploadPKId;
 	
-	/** Header PK in DB */
-	private Long headerPKId = null;
+	/** Process that makes the link with the db */
+	private DbLink dblink;
 	
-	/** Database link */
-	private Connection con;
-
-	/** Prepared statement form connection in constructor */
-	private PreparedStatement ps;
-
+	/** Queue between main process and child process */
+	private LinkedBlockingQueue<RsfChEntry> queue = new LinkedBlockingQueue<>(1000);
+	
+	/** future of dblink */
+	private Future<Boolean> future = null;
+	
 	public RsfContentHandler(Connection con, Long uploadPKId) throws SQLException {
 		this.uploadPKId = uploadPKId;
-		this.con = con;
-		// CREATES QUERY
-		ps = con.prepareStatement(query);
+		this.dblink = new DbLink(con, queue);
 	}
 
 	//======== METHODS FOR CONTENTHANDLER =======
@@ -59,12 +63,25 @@ public class RsfContentHandler extends ContentHandlerHelper {
 
 	@Override
 	public void startDocument() throws SAXException {
-		// WE DO NOT HAVE TO DO ANYTHING WHEN WE ENTER A DOCUMENT
+		// WHEN WE ENTER IN THIS DOCUMENT, START THE DB LINK
+		future = Executors.newSingleThreadExecutor().submit(dblink);
 	}
 
 	@Override
 	public void endDocument() throws SAXException {
-		// WE DO NOT HAVE TO DO ANYTHING WHEN WE LEAVE A DOCUMENT
+		// WE HAVE TO WAIT THE DB LINK TO END
+		try {
+			RsfChEntry entry = new RsfChEntry();
+			entry.finished = false;
+			queue.add(entry);
+			future.get();
+		} catch (InterruptedException e) {
+			// DO NOTHING, WE HAVE TO END
+		} catch (ExecutionException e) {
+			throw new SAXException(e);
+		} finally {
+			future = null;
+		}
 	}
 
 	@Override
@@ -104,33 +121,14 @@ public class RsfContentHandler extends ContentHandlerHelper {
 			propertieskeys.add(currentProperty);
 			propertiesvalues.add(currentPropertyContent.toString());
 		}
-		// IF WE ARE LEAVING AN ELEMENT, STORE IT IN DB
+		// IF WE ARE LEAVING AN ELEMENT, SEND IT TO THE PROCESS STORING IN DB
 		else if (getContentPath().size() == 2 && inElement.matcher(getPath()).matches()) {
-			try {
-				// CREATES THE ARRAY OF ARGUMENTS (KEYS AND VALUES) FOUND IN RSF
-				Array argskeysarray = con.createArrayOf("text", propertieskeys.toArray());
-				Array argsvaluesarray = con.createArrayOf("text", propertiesvalues.toArray());
-				
-				// SETS THE VALUES OF QUERY ARGS
-				ps.setLong(1, uploadPKId);
-				if (headerPKId == null)
-					ps.setNull(2, Types.BIGINT);
-				else
-					ps.setLong(2, headerPKId);
-				ps.setString(3, getContentPath().getLast());
-				ps.setArray(4, argskeysarray);
-				ps.setArray(5, argsvaluesarray);
-				
-				ResultSet rs = ps.executeQuery();
-				
-				// IF THIS ELEMENT IS THE HEADER, USE THIS ELEMENT ID AS PARENT ID (HEADER ID)
-				if (getContentPath().getLast().equals("rsfheader")) {
-					rs.next();
-					headerPKId = rs.getLong(1);
-				}
-			} catch (SQLException e) {
-				throw new SAXException(e);
-			}
+			RsfChEntry entry = new RsfChEntry();
+			entry.pmel_root = uploadPKId;
+			entry.pmel_type = getContentPath().getLast();
+			entry.attributeskeys = propertieskeys;
+			entry.attributesvalues = propertiesvalues;
+			queue.add(entry);
 		}
 		
 		// BE SURE TO DECREMENT DEPTH
@@ -162,7 +160,85 @@ public class RsfContentHandler extends ContentHandlerHelper {
 	public void skippedEntity(String name) throws SAXException {
 		// Do nothing
 	}
+	
+	public void close() {
+		try {
+			future.cancel(true);
+			future.get();
+		} catch (InterruptedException | ExecutionException e) {
+			// DO NOTHING, WE HAVE TO END
+		} finally {
+			future = null;
+		}
+	}
 
+	public class RsfChEntry {
+		public boolean finished = false;
+		public Long pmel_root;
+		public String pmel_type;
+		public List<String> attributeskeys;
+		public List<String> attributesvalues;
+	}
+	
+	public class DbLink implements Callable<Boolean> {
+
+		/** Header PK in DB */
+		private Long headerPKId = null;
+
+		/** Database link */
+		private Connection con;
+
+		/** Prepared statement form connection in constructor */
+		private PreparedStatement ps;
+
+		/** Queue serving as an ipc */
+		private LinkedBlockingQueue<RsfChEntry> queue = new LinkedBlockingQueue<>(1000);
+
+		public DbLink(Connection con, LinkedBlockingQueue<RsfChEntry> queue) throws SQLException {
+			this.con = con;
+			this.queue = queue;
+			// CREATES QUERY
+			ps = con.prepareStatement(query);
+		}
+		
+		@Override
+		public Boolean call() throws InterruptedException, SQLException {
+			while (true) {
+				RsfChEntry entry = queue.poll(1, TimeUnit.SECONDS);
+
+				if (entry == null) {
+					continue;
+				} else if (entry.finished) {
+					break;
+				} else {
+					// CREATES THE ARRAY OF ARGUMENTS (KEYS AND VALUES) FOUND IN RSF
+					Array argskeysarray = con.createArrayOf("text", entry.attributeskeys.toArray());
+					Array argsvaluesarray = con.createArrayOf("text", entry.attributesvalues.toArray());
+					
+					// SETS THE VALUES OF QUERY ARGS
+					ps.setLong(1, entry.pmel_root);
+					if (headerPKId == null)
+						ps.setNull(2, Types.BIGINT);
+					else
+						ps.setLong(2, headerPKId);
+					ps.setString(3, entry.pmel_type);
+					ps.setArray(4, argskeysarray);
+					ps.setArray(5, argsvaluesarray);
+					
+					ResultSet rs = ps.executeQuery();
+					
+					// IF THIS ELEMENT IS THE HEADER, USE THIS ELEMENT ID AS PARENT ID (HEADER ID)
+					if (getContentPath().getLast().equals("rsfheader")) {
+						rs.next();
+						headerPKId = rs.getLong(1);
+					}
+				}
+			}
+			return null;
+		}
+		
+	}
+	
 	private static final String query = "INSERT INTO pmel_temp (pmel_root, pmel_parent, pmel_type, pmel_attributes) "
 			+ "VALUES(?, ?, ?, hstore(?::text[], ?::text[])) RETURNING pmel_id";
 
