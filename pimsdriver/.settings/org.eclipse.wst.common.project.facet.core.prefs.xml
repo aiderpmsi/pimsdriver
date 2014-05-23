@@ -12,4 +12,9 @@
       <attribute name="platform-id" value="generic_2_2"/>
     </node>
   </facet>
+  <facet id="jst.jsf">
+    <node name="libprov">
+      <attribute name="provider-id" value="jsf-no-op-library-provider"/>
+    </node>
+  </facet>
 </root>

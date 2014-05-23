@@ -46,6 +46,7 @@ public class RsfContentHandler extends ContentHandlerHelper {
 
 	public RsfContentHandler(Connection con, Long uploadPKId) throws SQLException {
 		this.uploadPKId = uploadPKId;
+		this.con = con;
 		// CREATES QUERY
 		ps = con.prepareStatement(query);
 	}
