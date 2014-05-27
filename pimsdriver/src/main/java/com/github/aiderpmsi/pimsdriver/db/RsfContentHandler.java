@@ -72,7 +72,7 @@ public class RsfContentHandler extends ContentHandlerHelper {
 		// WE HAVE TO WAIT THE DB LINK TO END
 		try {
 			RsfChEntry entry = new RsfChEntry();
-			entry.finished = false;
+			entry.finished = true;
 			queue.add(entry);
 			future.get();
 		} catch (InterruptedException e) {
@@ -163,8 +163,10 @@ public class RsfContentHandler extends ContentHandlerHelper {
 	
 	public void close() {
 		try {
-			future.cancel(true);
-			future.get();
+			if (future != null) {
+				future.cancel(true);
+				future.get();
+			}
 		} catch (InterruptedException | ExecutionException e) {
 			// DO NOTHING, WE HAVE TO END
 		} finally {

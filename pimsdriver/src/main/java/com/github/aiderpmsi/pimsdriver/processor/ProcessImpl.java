@@ -24,6 +24,7 @@ import com.github.aiderpmsi.pims.grouper.model.RssContent;
 import com.github.aiderpmsi.pims.grouper.tags.Group;
 import com.github.aiderpmsi.pims.grouper.utils.Grouper;
 import com.github.aiderpmsi.pims.parser.utils.Parser;
+import com.github.aiderpmsi.pims.treebrowser.TreeBrowserException;
 import com.github.aiderpmsi.pimsdriver.db.DataSourceSingleton;
 import com.github.aiderpmsi.pimsdriver.db.RsfContentHandler;
 import com.github.aiderpmsi.pimsdriver.db.RssContentHandler;
@@ -65,15 +66,21 @@ public class ProcessImpl implements Callable<Boolean> {
 			RsfContentHandler fch = null;
 			try {
 				fch = new RsfContentHandler(con, element.getRecordid());
-				rsfFiness = processPmsi(fch, "headerrsf", new BufferedInputStream(rsfis), "rsfheader", con);
+				rsfFiness = processPmsi(fch, "rsfheader", new BufferedInputStream(rsfis), "rsfheader", con);
 			} finally {
-				fch.close();
+				if (fch != null) fch.close();
 			}
 
 			// IF RSS IS DEFINED, GET ITS CONTENT AND PROCESS IT
 			if (element.getRssoid() != null) {
 				InputStream rssis = lom.open(element.getRssoid(), LargeObjectManager.READ).getInputStream();
-				rssFiness = processPmsi(new RssContentHandler(con, element.getRecordid()), "headerrss", new BufferedInputStream(rssis), "rssheader", con);
+				RssContentHandler rch = null;
+				try {
+					rch = new RssContentHandler(con, element.getRecordid());
+					rssFiness = processPmsi(rch, "rssheader", new BufferedInputStream(rssis), "rssheader", con);
+				} finally {
+					if (rch != null) rch.close();
+				}
 				
 				// VERIFY THAT RSF AND RSS FINESS MATCH
 				if (!rsfFiness.equals(rssFiness))
@@ -185,10 +192,10 @@ public class ProcessImpl implements Callable<Boolean> {
 		return true;
 	}
 
-	private String processPmsi(ContentHandler ch, String pmsitype, InputStream is, String pmsiheader, Connection con) throws SQLException, SAXException, IOException {
+	private String processPmsi(ContentHandler ch, String pmsitype, InputStream is, String pmsiheader, Connection con) throws SQLException, SAXException, IOException, TreeBrowserException {
 		RecorderErrorHandler eh = new RecorderErrorHandler();
 		Parser parser = new Parser();
-		parser.setStartState(pmsitype);
+		parser.setType(pmsitype);
 		parser.setContentHandler(ch);
 		parser.setErrorHandler(eh);
 		parser.parse(new InputSource(new InputStreamReader(is, "ISO-8859-1")));
