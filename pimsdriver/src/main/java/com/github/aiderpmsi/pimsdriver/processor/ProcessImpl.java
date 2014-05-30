@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -149,7 +150,7 @@ public class ProcessImpl implements Callable<Boolean> {
 			dbFile = lom.open(id).getInputStream();
 			try {
 				tmpPath = Files.createTempFile("", "");
-				Files.copy(dbFile, tmpPath);
+				Files.copy(dbFile, tmpPath, StandardCopyOption.REPLACE_EXISTING);
 				try {
 					tmpFile = Files.newInputStream(tmpPath);
 

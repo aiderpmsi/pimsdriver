@@ -113,8 +113,11 @@ public abstract class DbLink extends Reader implements Callable<Boolean> {
 				
 				escape(entry.pmel_content, content);
 				
+				content.append("\r\n");
+				
 				// STORE ROW AND GETS LINE NUMBER
-				remaining = content.toString();
+				remaining = content;
+				
 				last_line = Long.parseLong(entry.pmel_line);
 			}
 		}
