@@ -88,8 +88,7 @@ public abstract class PmsiContentHandlerHelper extends ContentHandlerHelper {
 				isElement(getNumLinePath()) ? LINE_NUMBER :
 				(isElement(getElementPath()) ? ELEMENT :
 				(isElement(getHeaderPath()) ? HEADER :
-				(isElement(getPropertyPath()) ?
-				(position == ELEMENT ? PROPERTY : PROPERTY_HEADER) : ELSE)));
+				(isElement(getPropertyPath()) ?	(position == ELEMENT ? PROPERTY : PROPERTY_HEADER) : ELSE)));
 		
 		if (position == LINE_NUMBER || position == ELEMENT || position == HEADER) {
 			// REINIT THE CONTENT OF THIS LINE
