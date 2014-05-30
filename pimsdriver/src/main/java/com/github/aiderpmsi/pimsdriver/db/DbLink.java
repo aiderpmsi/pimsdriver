@@ -97,6 +97,9 @@ public abstract class DbLink extends Reader implements Callable<Boolean> {
 				StringBuilder content = new StringBuilder();
 				content.append(Long.toString(pmel_root));
 				content.append('|');
+
+				escape(getRootType(), content);
+				content.append('|');				
 				
 				Long pmel_parent;
 				if ((pmel_parent = getParent()) == null)
@@ -104,7 +107,7 @@ public abstract class DbLink extends Reader implements Callable<Boolean> {
 				else
 					content.append(Long.toString(pmel_parent));
 				content.append('|');
-
+				
 				escape(entry.pmel_type, content);
 				content.append('|');
 
@@ -149,8 +152,10 @@ public abstract class DbLink extends Reader implements Callable<Boolean> {
 	protected abstract Long getParent();
 
 	protected abstract void calculateParent(Entry entry);
+	
+	protected abstract CharSequence getRootType();
 
-	private static final String query = "COPY pmel_temp (pmel_root, pmel_parent, pmel_type, pmel_line, pmel_content) "
+	private static final String query = "COPY pmel_temp (pmel_root, pmel_root_type, pmel_parent, pmel_type, pmel_line, pmel_content) "
 			+ "FROM STDIN WITH DELIMITER '|'";
 
 	private static final char[] escapeEscape = {'\\', '\\'};

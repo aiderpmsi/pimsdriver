@@ -48,4 +48,11 @@ public class RssDbLink extends DbLink {
 
 	}
 
+	@Override
+	protected CharSequence getRootType() {
+		return rootType;
+	}
+
+	private static final String rootType = "rss";
+
 }

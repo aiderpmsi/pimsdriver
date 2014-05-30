@@ -18,6 +18,7 @@ CREATE TABLE public.plud_pmsiupload (
 CREATE TABLE public.pmel_pmsielement (
   pmel_id bigserial NOT NULL,
   pmel_root bigint NOT NULL,
+  pmel_root_type character varying NOT NULL,
   pmel_parent bigint,
   pmel_type character varying NOT NULL,
   pmel_line bigint NOT NULL,

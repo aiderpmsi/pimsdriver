@@ -84,8 +84,8 @@ public class ProcessImpl implements Callable<Boolean> {
 
 			// COPY TEMP TABLE INTO PMEL TABLE
 			String copyQuery = 
-					"INSERT INTO pmel.pmel_" + element.getRecordid() + " (pmel_id, pmel_root, pmel_parent, pmel_type, pmel_line, pmel_content, pmel_arguments) \n"
-					+ "SELECT pmel_id, pmel_root, pmel_parent, pmel_type, pmel_line, pmel_content, pmel_arguments FROM pmel_temp";
+					"INSERT INTO pmel.pmel_" + element.getRecordid() + " (pmel_id, pmel_root, pmel_root_type, pmel_parent, pmel_type, pmel_line, pmel_content, pmel_arguments) \n"
+					+ "SELECT pmel_id, pmel_root, pmel_root_type, pmel_parent, pmel_type, pmel_line, pmel_content, pmel_arguments FROM pmel_temp";
 			PreparedStatement copyPs = con.prepareStatement(copyQuery);
 			copyPs.execute();
 			
@@ -96,22 +96,8 @@ public class ProcessImpl implements Callable<Boolean> {
 			updateps.setLong(2, element.getRecordid());
 			updateps.execute();
 
-			// CREATE CONSTRAINTS ON PMEL TABLE
-			String createPartitionConstraints = 
-					"ALTER TABLE pmel.pmel_" + element.getRecordid() + " \n"
-					+ "ADD CONSTRAINT pmel_inherited_" + element.getRecordid() + "_pkey PRIMARY KEY (pmel_id); \n"
-					+ "ALTER TABLE pmel.pmel_" + element.getRecordid() + " \n"
-					+ "ADD CONSTRAINT pmel_inherited_" + element.getRecordid() + "_pmel_parent_fkey FOREIGN KEY (pmel_parent) \n"
-					+ "  REFERENCES pmel.pmel_" + element.getRecordid() + " (pmel_line) MATCH SIMPLE \n"
-					+ "  ON UPDATE NO ACTION ON DELETE NO ACTION DEFERRABLE INITIALLY DEFERRED; \n"
-					+ "ALTER TABLE pmel.pmel_" + element.getRecordid() + " \n"
-					+ "ADD CONSTRAINT pmel_inherited_" + element.getRecordid() + "_pmel_root_fkey FOREIGN KEY (pmel_root) \n"
-					+ "  REFERENCES public.plud_pmsiupload (plud_id) MATCH SIMPLE \n"
-					+ "  ON UPDATE NO ACTION ON DELETE NO ACTION DEFERRABLE INITIALLY DEFERRED; \n"
-					+ "CREATE INDEX pmel_inherited_" + element.getRecordid() + "pmel_line_idx ON pmel.pmel_" + element.getRecordid() + " USING btree (pmel_line);\n"
-					+ "ALTER TABLE pmel.pmel_" + element.getRecordid() + " ADD CHECK (pmel_root = " + element.getRecordid() + ") NO INHERIT;";
-			PreparedStatement createPartitionConstraintsPs = con.prepareStatement(createPartitionConstraints);
-			createPartitionConstraintsPs.execute();
+			// CREATE CONSTRAINTS ON PMEL RSF TABLE
+			createConstraints(element.getRecordid(), "", con);
 			
 			// EVERYTHING WENT FINE, COMMIT
 			con.commit();
@@ -143,6 +129,28 @@ public class ProcessImpl implements Callable<Boolean> {
 		return true;
 	}
 
+	private void createConstraints(long id, CharSequence suffix, Connection con) throws SQLException {
+		CharSequence idRepresentation = Long.toString(id);
+		CharSequence fullSuffix = new StringBuilder(idRepresentation).append(suffix);
+		StringBuilder query = new StringBuilder();
+		query.append("ALTER TABLE pmel.pmel_").append(fullSuffix).append('\n').
+			append("ADD CONSTRAINT pmel_inherited_").append(fullSuffix).append("_pkey PRIMARY KEY (pmel_id);\n");
+		query.append("ALTER TABLE pmel.pmel_").append(fullSuffix).append('\n').
+			append("ADD CONSTRAINT pmel_inherited_").append(fullSuffix).append("_line_unique UNIQUE (pmel_line);\n");
+		query.append("ALTER TABLE pmel.pmel_").append(fullSuffix).append('\n').
+			append("ADD CONSTRAINT pmel_inherited_").append(fullSuffix).append("_pmel_parent_fkey FOREIGN KEY (pmel_root_type, pmel_parent)\n").
+			append("REFERENCES pmel.pmel_").append(fullSuffix).append(" (pmel_root_type, pmel_line) MATCH SIMPLE\n").
+			append("ON UPDATE NO ACTION ON DELETE NO ACTION DEFERRABLE INITIALLY DEFERRED;\n");
+		query.append("ALTER TABLE pmel.pmel_").append(fullSuffix).append('\n').
+			append("ADD CONSTRAINT pmel_inherited_").append(fullSuffix).append("_pmel_root_fkey FOREIGN KEY (pmel_root)\n").
+			append("REFERENCES public.plud_pmsiupload (plud_id) MATCH SIMPLE\n").
+			append("ON UPDATE NO ACTION ON DELETE NO ACTION DEFERRABLE INITIALLY DEFERRED;\n");
+		query.append("CREATE INDEX pmel_inherited_").append(fullSuffix).append("_pmel_line_idx ON pmel.pmel_").append(" USING btree (pmel_line);\n");
+		query.append("ALTER TABLE pmel.pmel_").append(fullSuffix).append('\n').
+			append("ADD CONSTRAINT pmel_inherited_").append(fullSuffix).append("_root_check CHECK (pmel_root = ").append(idRepresentation).append(") NO INHERIT;");
+		con.prepareCall(query.toString()).execute();
+	}
+	
 	private void processPmsi(PmsiContentHandlerHelper ch, String pmsitype, Long id, LargeObjectManager lom) throws SQLException, SAXException, IOException, TreeBrowserException {
 		InputStream dbFile = null, tmpFile = null;
 		Path tmpPath = null;

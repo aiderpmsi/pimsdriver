@@ -31,5 +31,11 @@ public class RsfDbLink extends DbLink {
 		}
 
 	}
+	
+	@Override
+	protected CharSequence getRootType() {
+		return rootType;
+	}
 
+	private static final String rootType = "rsf";
 }
