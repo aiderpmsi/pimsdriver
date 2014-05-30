@@ -26,8 +26,8 @@ import com.github.aiderpmsi.pims.grouper.utils.Grouper;
 import com.github.aiderpmsi.pims.parser.utils.Parser;
 import com.github.aiderpmsi.pims.treebrowser.TreeBrowserException;
 import com.github.aiderpmsi.pimsdriver.db.DataSourceSingleton;
-import com.github.aiderpmsi.pimsdriver.db.RsfContentHandler;
-import com.github.aiderpmsi.pimsdriver.db.RssContentHandler;
+import com.github.aiderpmsi.pimsdriver.db.PmsiContentHandlerHelper;
+import com.github.aiderpmsi.pimsdriver.db.RssContentHandlerb;
 import com.github.aiderpmsi.pimsdriver.dto.model.UploadedPmsi;
 import com.github.aiderpmsi.pimsdriver.pmsi.RecorderErrorHandler;
 
@@ -63,9 +63,9 @@ public class ProcessImpl implements Callable<Boolean> {
 			
 			// PROCESS RSF
 			InputStream rsfis = lom.open(element.getRsfoid()).getInputStream();
-			RsfContentHandler fch = null;
+			PmsiContentHandlerHelper fch = null;
 			try {
-				fch = new RsfContentHandler(con, element.getRecordid());
+				fch = new PmsiContentHandlerHelper(con, element.getRecordid());
 				rsfFiness = processPmsi(fch, "rsfheader", new BufferedInputStream(rsfis), "rsfheader", con);
 			} finally {
 				if (fch != null) fch.close();
@@ -74,9 +74,9 @@ public class ProcessImpl implements Callable<Boolean> {
 			// IF RSS IS DEFINED, GET ITS CONTENT AND PROCESS IT
 			if (element.getRssoid() != null) {
 				InputStream rssis = lom.open(element.getRssoid(), LargeObjectManager.READ).getInputStream();
-				RssContentHandler rch = null;
+				RssContentHandlerb rch = null;
 				try {
-					rch = new RssContentHandler(con, element.getRecordid());
+					rch = new RssContentHandlerb(con, element.getRecordid());
 					rssFiness = processPmsi(rch, "rssheader", new BufferedInputStream(rssis), "rssheader", con);
 				} finally {
 					if (rch != null) rch.close();
