@@ -1,9 +1,10 @@
 package com.github.aiderpmsi.pimsdriver.processor;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -51,26 +52,24 @@ public class ProcessImpl implements Callable<Boolean> {
 			createTempTablePs.execute();
 			
 			// PROCESS RSF
-			InputStream rsfis = lom.open(element.getRsfoid()).getInputStream();
 			PmsiContentHandlerHelper fch = null;
 			try {
 				fch = new RsfContentHandler(con, element.getRecordid());
-				processPmsi(fch, "rsfheader", new BufferedInputStream(rsfis), "rsfheader", con);
+				processPmsi(fch, "rsfheader", element.getRsfoid(), lom);
 			} finally {
 				if (fch != null) fch.close();
 			}
 
 			// IF RSS IS DEFINED, GET ITS CONTENT AND PROCESS IT
 			if (element.getRssoid() != null) {
-				InputStream rssis = lom.open(element.getRssoid(), LargeObjectManager.READ).getInputStream();
-				RssContentHandler rch = null;
+				PmsiContentHandlerHelper rch = null;
 				try {
 					rch = new RssContentHandler(con, element.getRecordid());
-					processPmsi(rch, "rssheader", new BufferedInputStream(rssis), "rssheader", con);
+					processPmsi(rch, "rssheader", element.getRssoid(), lom);
 				} finally {
 					if (rch != null) rch.close();
 				}
-				
+
 				// VERIFY THAT RSF AND RSS FINESS MATCH
 				if (!fch.getFiness().equals(rch.getFiness()))
 					throw new IOException("Finess dans RSF et RSS ne correspondent pas");
@@ -143,17 +142,37 @@ public class ProcessImpl implements Callable<Boolean> {
 		return true;
 	}
 
-	private void processPmsi(PmsiContentHandlerHelper ch, String pmsitype, InputStream is, String pmsiheader, Connection con) throws SQLException, SAXException, IOException, TreeBrowserException {
-		RecorderErrorHandler eh = new RecorderErrorHandler();
-		Parser parser = new Parser();
-		parser.setType(pmsitype);
-		parser.setContentHandler(ch);
-		parser.setErrorHandler(eh);
-		parser.parse(new InputSource(new InputStreamReader(is, "ISO-8859-1")));
+	private void processPmsi(PmsiContentHandlerHelper ch, String pmsitype, Long id, LargeObjectManager lom) throws SQLException, SAXException, IOException, TreeBrowserException {
+		InputStream dbFile = null, tmpFile = null;
+		Path tmpPath = null;
+		try {
+			dbFile = lom.open(id).getInputStream();
+			try {
+				tmpPath = Files.createTempFile("", "");
+				Files.copy(dbFile, tmpPath);
+				try {
+					tmpFile = Files.newInputStream(tmpPath);
 
-		// CHECK IF THERE WERE ANY ERRORS IN PMSI
-		if (eh.getErrors().size() != 0)
-			throw new SAXException("Processing " + pmsitype + " : error " + eh.getErrors().get(0).getMessage());
+					RecorderErrorHandler eh = new RecorderErrorHandler();
+					Parser parser = new Parser();
+					parser.setType(pmsitype);
+					parser.setContentHandler(ch);
+					parser.setErrorHandler(eh);
+					parser.parse(new InputSource(new InputStreamReader(tmpFile, "ISO-8859-1")));
+
+					// CHECK IF THERE WERE ANY ERRORS IN PMSI
+					if (eh.getErrors().size() != 0)
+						throw new SAXException("Processing " + pmsitype + " : error " + eh.getErrors().get(0).getMessage());
+					
+				} finally {
+					if (tmpFile != null) tmpFile.close();
+				}
+			} finally {
+				if (tmpPath != null) Files.delete(tmpPath);
+			}
+		} finally {
+			if (dbFile != null) dbFile.close();
+		}
 
 	}
 	

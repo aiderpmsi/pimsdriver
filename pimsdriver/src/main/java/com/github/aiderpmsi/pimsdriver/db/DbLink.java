@@ -148,7 +148,7 @@ public abstract class DbLink extends Reader implements Callable<Boolean> {
 	protected abstract void calculateParent(Entry entry);
 
 	private static final String query = "COPY pmel_temp (pmel_root, pmel_parent, pmel_type, pmel_line, pmel_content) "
-			+ "FROM STDIN WITH FORMAT text DELIMITER '|'";
+			+ "FROM STDIN WITH DELIMITER '|'";
 
 	private static final char[] escapeEscape = {'\\', '\\'};
 
