@@ -102,14 +102,14 @@ public class ProcessImpl implements Callable<Boolean> {
 					+ "ADD CONSTRAINT pmel_inherited_" + element.getRecordid() + "_pkey PRIMARY KEY (pmel_id); \n"
 					+ "ALTER TABLE pmel.pmel_" + element.getRecordid() + " \n"
 					+ "ADD CONSTRAINT pmel_inherited_" + element.getRecordid() + "_pmel_parent_fkey FOREIGN KEY (pmel_parent) \n"
-					+ "  REFERENCES pmel.pmel_" + element.getRecordid() + " (pmel_id) MATCH SIMPLE \n"
+					+ "  REFERENCES pmel.pmel_" + element.getRecordid() + " (pmel_line) MATCH SIMPLE \n"
 					+ "  ON UPDATE NO ACTION ON DELETE NO ACTION DEFERRABLE INITIALLY DEFERRED; \n"
 					+ "ALTER TABLE pmel.pmel_" + element.getRecordid() + " \n"
 					+ "ADD CONSTRAINT pmel_inherited_" + element.getRecordid() + "_pmel_root_fkey FOREIGN KEY (pmel_root) \n"
 					+ "  REFERENCES public.plud_pmsiupload (plud_id) MATCH SIMPLE \n"
 					+ "  ON UPDATE NO ACTION ON DELETE NO ACTION DEFERRABLE INITIALLY DEFERRED; \n"
-					+ "CREATE INDEX pmel_inherited_" + element.getRecordid() + "pmel_root_idx ON pmel.pmel_" + element.getRecordid() + " USING btree (pmel_root);\n"
-					+ "ALTER TABLE pmel.pmel" + element.getRecordid() + " ADD CHECK (pmel_root = " + element.getRecordid() + ") NO INHERIT;";
+					+ "CREATE INDEX pmel_inherited_" + element.getRecordid() + "pmel_line_idx ON pmel.pmel_" + element.getRecordid() + " USING btree (pmel_line);\n"
+					+ "ALTER TABLE pmel.pmel_" + element.getRecordid() + " ADD CHECK (pmel_root = " + element.getRecordid() + ") NO INHERIT;";
 			PreparedStatement createPartitionConstraintsPs = con.prepareStatement(createPartitionConstraints);
 			createPartitionConstraintsPs.execute();
 			
@@ -165,7 +165,7 @@ public class ProcessImpl implements Callable<Boolean> {
 			+ " pmel_type character varying NOT NULL, \n"
 			+ " pmel_line bigint NOT NULL, \n"
 			+ " pmel_content character varying NOT NULL, \n"
-			+ " pmel_attributes hstore NOT NULL DEFAULT hstore('')\n"
+			+ " pmel_arguments hstore NOT NULL DEFAULT hstore('')\n"
 			+ ") ON COMMIT DROP;";
 
 }

@@ -21,7 +21,7 @@ public class RsfDbLink extends DbLink {
 	protected void calculateParent(Entry entry) {
 		// IF LAST ELEMENT WAS RSFHEADER, USE ITS ID AS THE PARENT ID FOR EVERY ELEMENT
 		if (wasHeader)
-			currentParent = last_id;
+			currentParent = last_line;
 		
 		// CHECKS IF THIS ELEMENT IS HEADER FOR NEXT ITERATION THROUGH CALCULATEPARENT
 		if (entry.pmel_type.equals("rsfheader")) {

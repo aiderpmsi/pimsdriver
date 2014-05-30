@@ -27,9 +27,9 @@ public class RssDbLink extends DbLink {
 	protected void calculateParent(Entry entry) {
 		// IF LAST ELEMENT WAS RSSHEADER, STORE IT
 		if (wasHeader)
-			rssHeader = last_id;
+			rssHeader = last_line;
 		else if (wasMain)
-			rssMain = last_id;
+			rssMain = last_line;
 		
 		// CHECKS IF THIS ELEMENT IS HEADER OR MAIN FOR NEXT ITERATION THROUGH CALCULATEPARENT
 		if (entry.pmel_type.equals("rssheader")) {
