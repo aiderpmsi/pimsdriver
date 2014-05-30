@@ -55,7 +55,8 @@ public abstract class DbLink implements Callable<Boolean> {
 				else
 					ps.setLong(2, pmel_parent);
 				ps.setString(3, entry.pmel_type);
-				ps.setString(4, entry.pmel_content);
+				ps.setString(4, entry.pmel_line);
+				ps.setString(5, entry.pmel_content);
 				
 				// STORE ROW AND GETS INSERTION ID
 				ResultSet rs = null;
@@ -84,6 +85,6 @@ public abstract class DbLink implements Callable<Boolean> {
 	protected abstract void calculateParent(Entry entry);
 
 	private static final String query = "INSERT INTO pmel_temp (pmel_root, pmel_parent, pmel_type, pmel_line, pmel_content) "
-			+ "VALUES(?, ?, ?, ?, ?) RETURNING pmel_id";
+			+ "VALUES(?, ?, ?, ?::BIGINT, ?) RETURNING pmel_id";
 
 }

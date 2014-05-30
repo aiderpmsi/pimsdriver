@@ -81,11 +81,11 @@ public class ProcessImpl implements Callable<Boolean> {
 					"CREATE TABLE pmel.pmel_" + element.getRecordid() + " () INHERITS (public.pmel_pmsielement)";
 			PreparedStatement createPartitionPs = con.prepareStatement(createPartitionQuery);
 			createPartitionPs.execute();
-			
+
 			// COPY TEMP TABLE INTO PMEL TABLE
 			String copyQuery = 
-					"INSERT INTO pmel.pmel_" + element.getRecordid() + " (pmel_root, pmel_parent, pmel_type, pmel_line, pmel_content) \n"
-					+ "SELECT pmel_id, pmel_root, pmel_parent, pmel_type, pmel_attributes FROM pmel_temp";
+					"INSERT INTO pmel.pmel_" + element.getRecordid() + " (pmel_id, pmel_root, pmel_parent, pmel_type, pmel_line, pmel_content, pmel_arguments) \n"
+					+ "SELECT pmel_id, pmel_root, pmel_parent, pmel_type, pmel_line, pmel_content, pmel_arguments FROM pmel_temp";
 			PreparedStatement copyPs = con.prepareStatement(copyQuery);
 			copyPs.execute();
 			
@@ -163,6 +163,7 @@ public class ProcessImpl implements Callable<Boolean> {
 			+ " pmel_root bigint NOT NULL, \n"
 			+ " pmel_parent bigint, \n"
 			+ " pmel_type character varying NOT NULL, \n"
+			+ " pmel_line bigint NOT NULL, \n"
 			+ " pmel_content character varying NOT NULL, \n"
 			+ " pmel_attributes hstore NOT NULL DEFAULT hstore('')\n"
 			+ ") ON COMMIT DROP;";

@@ -167,14 +167,14 @@ public abstract class PmsiContentHandlerHelper extends ContentHandlerHelper {
 		return finess.toString();
 	}
 	
-	public void close() {
+	public void close() throws SAXException {
 		try {
 			if (future != null) {
 				future.cancel(true);
 				future.get();
 			}
 		} catch (InterruptedException | ExecutionException e) {
-			// DO NOTHING, WE HAVE TO END
+			throw new SAXException(e);
 		} finally {
 			future = null;
 		}

@@ -38,7 +38,7 @@ public abstract class ContentHandlerHelper implements ContentHandler {
 			String element = it.next();
 			
 			for (int j = 0 ; j < eltDef[i].length ; j++) {
-				if (eltDef[i].equals("*") || element.equals(eltDef[i][j])) {
+				if (eltDef[i][j].equals("*") || element.equals(eltDef[i][j])) {
 					found = true;
 					break;
 				}
