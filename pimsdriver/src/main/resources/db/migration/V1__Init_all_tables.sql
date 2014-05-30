@@ -11,7 +11,7 @@ CREATE TABLE public.plud_pmsiupload (
   plud_dateenvoi timestamp with time zone NOT NULL,
   plud_rsf_oid oid,
   plud_rss_oid oid,
-  plud_arguments hstore,
+  plud_arguments hstore NOT NULL DEFAULT hstore(''),
   CONSTRAINT plud_pmsiupload_pkey PRIMARY KEY (plud_id)
 );
 
@@ -20,7 +20,9 @@ CREATE TABLE public.pmel_pmsielement (
   pmel_root bigint NOT NULL,
   pmel_parent bigint,
   pmel_type character varying NOT NULL,
-  pmel_attributes hstore NOT NULL
+  pmel_line bigint NOT NULL,
+  pmel_content character varying NOT NULL,
+  pmel_arguments hstore NOT NULL DEFAULT hstore('')
 );
 
 CREATE TABLE pmel.pmel_cleanup (

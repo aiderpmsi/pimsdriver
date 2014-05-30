@@ -24,10 +24,18 @@ public class RsfContentHandler extends PmsiContentHandlerHelper {
 		return propertyPath;
 	}
 
+	@Override
+	public String[][] getHeaderPath() {
+		return headerPath;
+	}
+
 	private static final String[][] numLinePath = {{"root"}, {"numline"}};
 
-	private static final String[][] elementPath = {{"root"}, {"rsfheader", "rsfa", "rsfb", "rsfc", "rsfh", "rsfi", "rsfl", "rsfm"}};
+	private static final String[][] headerPath = {{"root"}, {"rsfheader"}};
+
+	private static final String[][] elementPath = {{"root"}, {"rsfa", "rsfb", "rsfc", "rsfh", "rsfi", "rsfl", "rsfm"}};
 
 	private static final String[][] propertyPath = {{"root"}, {"rsfheader", "rsfa", "rsfb", "rsfc", "rsfh", "rsfi", "rsfl", "rsfm"}, {"*"}};
+
 
 }

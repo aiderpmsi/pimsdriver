@@ -10,9 +10,11 @@ import org.xml.sax.SAXException;
 public abstract class PmsiContentHandlerHelper extends ContentHandlerHelper {
 
 	private static final int LINE_NUMBER = 0;
-	private static final int ELEMENT = 1;
-	private static final int PROPERTY = 2;
-	private static final int ELSE = 3;
+	private static final int HEADER = 1;
+	private static final int ELEMENT = 2;
+	private static final int PROPERTY = 3;
+	private static final int PROPERTY_HEADER = 4;
+	private static final int ELSE = 5;
 
 	/** Stores if we are in a line number, element, property on somewhere else */
 	private int position = ELSE;
@@ -22,6 +24,9 @@ public abstract class PmsiContentHandlerHelper extends ContentHandlerHelper {
 	
 	/** NumLine */
 	private String lineNumber = "0";
+	
+	/** Finess */
+	private StringBuilder finess = new StringBuilder();
 	
 	/** Version of the rsf */
 	private String version;
@@ -77,46 +82,50 @@ public abstract class PmsiContentHandlerHelper extends ContentHandlerHelper {
 			Attributes atts) throws SAXException {
 		// COUNT THE ARRIVAL IN THIS NEW ELEMENT
 		super.startElement(uri, localName, qName, atts);
+
+		// UPDATES POSITION
+		position =
+				isElement(getNumLinePath()) ? LINE_NUMBER :
+				(isElement(getElementPath()) ? ELEMENT :
+				(isElement(getHeaderPath()) ? HEADER :
+				(isElement(getPropertyPath()) ?
+				(position == ELEMENT ? PROPERTY : PROPERTY_HEADER) : ELSE)));
 		
-		if (isElement(getNumLinePath())) {
-			// IF THIS ELEMENT IS A NEW LINE, REINIT THE CONTENT
+		if (position == LINE_NUMBER || position == ELEMENT || position == HEADER) {
+			// REINIT THE CONTENT OF THIS LINE
 			content = new StringBuilder();
-			position = LINE_NUMBER;
-		} else if (isElement(getElementPath())) {
-			// IF THIS ELEMENT IS A NEW ELEMENT, REINIT THE PROPERTIES AND ADDS LINE NUMBER PROPERTY
-			content = new StringBuilder();
-			// IF THIS ELEMENT IS RSFHEADER, GETS THE VERSION FROM ATTRIBUTES
-			if (contentPath.getLast().equals("rsfheader"))
-				version = atts.getValue("version");
-			position = ELEMENT;
-		} else if (isElement(getPropertyPath())) {
-			// IF WE ARE IN A PROPERTY ELEMENT, DO NOTHING
-			position = PROPERTY;
 		}
+		
+		if (position == HEADER) {
+			version = atts.getValue("version");
+		}
+
 	}
 
 	@Override
 	public void endElement(String uri, String localName, String qName)
 			throws SAXException {
-		// IF WE ARE LEAVING AN PROPERTY
-		if (position == PROPERTY) {
-			position = ELEMENT;
-		}
-		// IF WE ARE LEAVING AN ELEMENT, SEND IT TO THE PROCESS STORING IN DB
-		else if (position == ELEMENT) {
+		// IF WE ARE LEAVING AN ELEMENT OR THE HEADER, SEND IT TO THE PROCESSING
+		if (position == ELEMENT || position == HEADER) {
 			Entry entry = new Entry();
 			entry.pmel_type = contentPath.getLast();
 			entry.pmel_content = content.toString();
 			entry.pmel_line = lineNumber;
 			dblink.store(entry);
-			position = ELSE;
-		}
-		// IF WE ARE LEAVING A NUMLINE, SAVE IT AND GO BACK
-		else if (position == LINE_NUMBER) {
-			lineNumber = content.toString();
-			position = ELSE;
 		}
 		
+		if (position == PROPERTY) {
+			// IF WE ARE LEAVING A PROPERTY
+			position = ELEMENT;
+		} else if (position == PROPERTY_HEADER) {
+			position = HEADER;
+		} else if (position == LINE_NUMBER) {
+			lineNumber = content.toString();
+			position = ELSE;
+		} else if (position == ELEMENT || position == HEADER) {
+			position = ELSE;
+		}
+
 		// BE SURE TO DECREMENT DEPTH
 		super.endElement(uri, localName, qName);
 	}
@@ -125,8 +134,12 @@ public abstract class PmsiContentHandlerHelper extends ContentHandlerHelper {
 	public void characters(char[] ch, int start, int length)
 			throws SAXException {
 		// IF WE ARE IN PROPERTY OR NUMLINE
-		if (position == PROPERTY || position == LINE_NUMBER) {
+		if (position == PROPERTY || position == PROPERTY_HEADER || position == LINE_NUMBER) {
 			content.append(ch, start, length);
+		}
+		
+		if (position == PROPERTY_HEADER && contentPath.getLast().equals("Finess")) {
+			finess.append(ch, start, length);
 		}
 	}
 
@@ -147,6 +160,14 @@ public abstract class PmsiContentHandlerHelper extends ContentHandlerHelper {
 		// Do nothing
 	}
 	
+	public String getVersion() {
+		return version;
+	}
+
+	public String getFiness() {
+		return finess.toString();
+	}
+	
 	public void close() {
 		try {
 			if (future != null) {
@@ -160,13 +181,11 @@ public abstract class PmsiContentHandlerHelper extends ContentHandlerHelper {
 		}
 	}
 
-	public String getVersion() {
-		return version;
-	}
-
 	public abstract String[][] getNumLinePath();
 	
 	public abstract String[][] getElementPath();
+
+	public abstract String[][] getHeaderPath();
 
 	public abstract String[][] getPropertyPath();
 	

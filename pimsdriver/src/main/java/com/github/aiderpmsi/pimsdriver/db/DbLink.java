@@ -58,10 +58,14 @@ public abstract class DbLink implements Callable<Boolean> {
 				ps.setString(4, entry.pmel_content);
 				
 				// STORE ROW AND GETS INSERTION ID
-				ResultSet rs = ps.executeQuery();
-				rs.next();
-				last_id = rs.getLong(1);
-
+				ResultSet rs = null;
+				try {
+					rs = ps.executeQuery();
+					rs.next();
+					last_id = rs.getLong(1);
+				} finally {
+					if (rs != null) rs.close();
+				}
 			}
 		}
 		return null;

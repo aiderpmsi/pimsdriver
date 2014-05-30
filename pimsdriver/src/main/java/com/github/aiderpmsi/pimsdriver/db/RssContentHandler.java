@@ -24,9 +24,16 @@ public class RssContentHandler extends PmsiContentHandlerHelper {
 		return propertyPath;
 	}
 
+	@Override
+	public String[][] getHeaderPath() {
+		return headerPath;
+	}
+
 	private static final String[][] numLinePath = {{"root"}, {"numline"}};
 
-	private static final String[][] elementPath = {{"root"}, {"rssheader", "rssmain", "rssacte", "rssda", "rssdad"}};
+	private static final String[][] headerPath = {{"root"}, {"rssheader"}};
+
+	private static final String[][] elementPath = {{"root"}, {"rssmain", "rssacte", "rssda", "rssdad"}};
 
 	private static final String[][] propertyPath = {{"root"}, {"rssheader", "rssmain", "rssacte", "rssda", "rssdad"}, {"*"}};
 
