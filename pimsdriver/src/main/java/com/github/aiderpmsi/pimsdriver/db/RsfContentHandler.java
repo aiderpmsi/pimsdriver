@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -14,25 +15,28 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Pattern;
-
 import org.xml.sax.Attributes;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 
 public class RsfContentHandler extends ContentHandlerHelper {
 
-	/** Regexp to know if we are in an element */
-	private static Pattern inElement = Pattern.compile("/root/(?:rsfheader|rsfa|rsfb|rsfc|rsfh|rsfi|rsfl|rsfm)");
+	private static final int LINE_NUMBER = 0;
+	private static final int ELEMENT = 1;
+	private static final int PROPERTY = 2;
+	private static final int ELSE = 3;
+
+	/** Stores if we are in a line number, element, property on somewhere else */
+	private int position = ELSE;
 	
-	/** Regexp to know if we are in a property */
-	private static Pattern inProperty = Pattern.compile("/root/(?:rsfheader|rsfa|rsfb|rsfc|rsfh|rsfi|rsfl|rsfm)/.+");
-	
-	/** Colligates the elements of charachter */
-	private StringBuilder currentPropertyContent;
+	/** Colligates the elements of charachter for each element */
+	private StringBuilder[] currentPropertyContent = new StringBuilder[4];
 	
 	/** Name of the property */
 	private String currentProperty;
+	
+	/** NumLine */
+	private String lineNumber = "0";
 
 	/** Defines properties for the current element. */
 	private List<String> propertieskeys;
@@ -101,15 +105,22 @@ public class RsfContentHandler extends ContentHandlerHelper {
 		// COUNT THE ARRIVAL IN THIS NEW ELEMENT
 		super.startElement(uri, localName, qName, atts);
 		
-		// FINDS IF THIS ELEMENT IS A NEW ELEMENT AND MUST REINIT THE PROPERTIES
-		if (getContentPath().size() == 2 && inElement.matcher(getPath()).matches()) {
+		if (isElement(numLinePath)) {
+			// IF THIS ELEMENT IS A NEW LINE, REINIT THE CORRESPONDING CURRENTPROPERTYCONTENT
+			currentPropertyContent[LINE_NUMBER] = new StringBuilder();
+			position = LINE_NUMBER;
+		} else if (isElement(elementPath)) {
+			// IF THIS ELEMENT IS A NEW ELEMENT, REINIT THE PROPERTIES
 			propertieskeys = new LinkedList<>();
 			propertiesvalues = new LinkedList<>();
-		}
-		// IF WE ARE AT DEPTH 2 AND IN AN ELEMENT, GET THE PROPERTY NAME
-		else if (getContentPath().size() == 3 && inProperty.matcher(getPath()).matches()) {
+			propertieskeys.add("linenumber");
+			propertiesvalues.add(lineNumber);
+			position = ELEMENT;
+		} else if (isElement(propertyPath)) {
+			// IF WE ARE IN A PROPERTY ELEMENT, GET THE NAME OF THIS ELEMENT AND REINIT THE CONTENT
 			currentProperty = localName;
-			currentPropertyContent = new StringBuilder();
+			currentPropertyContent[PROPERTY] = new StringBuilder();
+			position = PROPERTY;
 		}
 	}
 
@@ -117,18 +128,25 @@ public class RsfContentHandler extends ContentHandlerHelper {
 	public void endElement(String uri, String localName, String qName)
 			throws SAXException {
 		// IF WE ARE LEAVING AN PROPERTY
-		if (getContentPath().size() == 3 && inProperty.matcher(getPath()).matches()) {
+		if (position == PROPERTY) {
 			propertieskeys.add(currentProperty);
-			propertiesvalues.add(currentPropertyContent.toString());
+			propertiesvalues.add(currentPropertyContent[PROPERTY].toString());
+			position = ELEMENT;
 		}
 		// IF WE ARE LEAVING AN ELEMENT, SEND IT TO THE PROCESS STORING IN DB
-		else if (getContentPath().size() == 2 && inElement.matcher(getPath()).matches()) {
+		else if (position == ELEMENT) {
 			RsfChEntry entry = new RsfChEntry();
 			entry.pmel_root = uploadPKId;
 			entry.pmel_type = getContentPath().getLast();
 			entry.attributeskeys = propertieskeys;
 			entry.attributesvalues = propertiesvalues;
 			queue.add(entry);
+			position = ELSE;
+		}
+		// IF WE ARE LEAVING A NUMLINE, SAVE IT AND GO BACK
+		else if (position == LINE_NUMBER) {
+			lineNumber = currentPropertyContent[LINE_NUMBER].toString();
+			position = ELSE;
 		}
 		
 		// BE SURE TO DECREMENT DEPTH
@@ -138,9 +156,9 @@ public class RsfContentHandler extends ContentHandlerHelper {
 	@Override
 	public void characters(char[] ch, int start, int length)
 			throws SAXException {
-		// IF WE ARE NOT OUT AND AT DEPTH 3, APPEND THOSE CHARACTERS TO THE CONTENT OF CURRENT PROPERTY
-		if (getContentPath().size() == 3 && inProperty.matcher(getPath()).matches()) {
-			currentPropertyContent.append(ch, start, length);
+		// IF WE ARE IN PROPERTY OR NUMLINE
+		if (position == PROPERTY || position == LINE_NUMBER) {
+			currentPropertyContent[position].append(ch, start, length);
 		}
 	}
 
@@ -241,7 +259,45 @@ public class RsfContentHandler extends ContentHandlerHelper {
 		
 	}
 	
+	private boolean isElement(String[][] eltDef) {
+		List<String> contentPath = getContentPath();
+		
+		// IF WE HAVE NOT THE CORRECT NUMBER OF ARGUMENTS, GO AWAY
+		if (contentPath.size() != eltDef.length)
+			return false;
+		
+		// CHECK THE ELEMENTS ARE ACCEPTED
+		
+		Iterator<String> it = contentPath.iterator();
+		int i = 0;
+		while (it.hasNext()) {
+			boolean found = false;
+			String element = it.next();
+			
+			for (int j = 0 ; j < eltDef[i].length ; j++) {
+				if (eltDef[i].equals("*") || element.equals(eltDef[i][j])) {
+					found = true;
+					break;
+				}
+			}
+			
+			if (found == false)
+				return false;
+			
+			i++;
+		}
+		
+		// ALL ELEMENTS ARE GOOD
+		return true;
+	}
+	
 	private static final String query = "INSERT INTO pmel_temp (pmel_root, pmel_parent, pmel_type, pmel_attributes) "
 			+ "VALUES(?, ?, ?, hstore(?::text[], ?::text[])) RETURNING pmel_id";
 
+	private static final String[][] numLinePath = {{"root"}, {"numline"}};
+
+	private static final String[][] elementPath = {{"root"}, {"rsfheader", "rsfa", "rsfb", "rsfc", "rsfh", "rsfi", "rsfl", "rsfm"}};
+
+	private static final String[][] propertyPath = {{"root"}, {"rsfheader", "rsfa", "rsfb", "rsfc", "rsfh", "rsfi", "rsfl", "rsfm"}, {"*"}};
+	
 }

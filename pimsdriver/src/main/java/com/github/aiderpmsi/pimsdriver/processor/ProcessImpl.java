@@ -158,7 +158,8 @@ public class ProcessImpl implements Callable<Boolean> {
 					+ "ADD CONSTRAINT pmel_inherited_" + element.getRecordid() + "_pmel_root_fkey FOREIGN KEY (pmel_root) \n"
 					+ "  REFERENCES public.plud_pmsiupload (plud_id) MATCH SIMPLE \n"
 					+ "  ON UPDATE NO ACTION ON DELETE NO ACTION DEFERRABLE INITIALLY DEFERRED; \n"
-					+ "CREATE INDEX pmel_inherited_" + element.getRecordid() + "pmel_root_idx ON pmel.pmel_" + element.getRecordid() + " USING btree (pmel_root);";
+					+ "CREATE INDEX pmel_inherited_" + element.getRecordid() + "pmel_root_idx ON pmel.pmel_" + element.getRecordid() + " USING btree (pmel_root);\n"
+					+ "ALTER TABLE pmel.pmel" + element.getRecordid() + " ADD CHECK (pmel_root = " + element.getRecordid() + ") NO INHERIT;";
 			PreparedStatement createPartitionConstraintsPs = con.prepareStatement(createPartitionConstraints);
 			createPartitionConstraintsPs.execute();
 			
