@@ -136,7 +136,7 @@ public class ProcessImpl implements Callable<Boolean> {
 		query.append("ALTER TABLE pmel.pmel_").append(fullSuffix).append('\n').
 			append("ADD CONSTRAINT pmel_inherited_").append(fullSuffix).append("_pkey PRIMARY KEY (pmel_id);\n");
 		query.append("ALTER TABLE pmel.pmel_").append(fullSuffix).append('\n').
-			append("ADD CONSTRAINT pmel_inherited_").append(fullSuffix).append("_line_unique UNIQUE (pmel_line);\n");
+			append("ADD CONSTRAINT pmel_inherited_").append(fullSuffix).append("_line_unique UNIQUE (pmel_root_type, pmel_line);\n");
 		query.append("ALTER TABLE pmel.pmel_").append(fullSuffix).append('\n').
 			append("ADD CONSTRAINT pmel_inherited_").append(fullSuffix).append("_pmel_parent_fkey FOREIGN KEY (pmel_root_type, pmel_parent)\n").
 			append("REFERENCES pmel.pmel_").append(fullSuffix).append(" (pmel_root_type, pmel_line) MATCH SIMPLE\n").
@@ -145,7 +145,7 @@ public class ProcessImpl implements Callable<Boolean> {
 			append("ADD CONSTRAINT pmel_inherited_").append(fullSuffix).append("_pmel_root_fkey FOREIGN KEY (pmel_root)\n").
 			append("REFERENCES public.plud_pmsiupload (plud_id) MATCH SIMPLE\n").
 			append("ON UPDATE NO ACTION ON DELETE NO ACTION DEFERRABLE INITIALLY DEFERRED;\n");
-		query.append("CREATE INDEX pmel_inherited_").append(fullSuffix).append("_pmel_line_idx ON pmel.pmel_").append(" USING btree (pmel_line);\n");
+		query.append("CREATE INDEX pmel_inherited_").append(fullSuffix).append("_pmel_line_idx ON pmel.pmel_").append(fullSuffix).append(" USING btree (pmel_root_type, pmel_line);\n");
 		query.append("ALTER TABLE pmel.pmel_").append(fullSuffix).append('\n').
 			append("ADD CONSTRAINT pmel_inherited_").append(fullSuffix).append("_root_check CHECK (pmel_root = ").append(idRepresentation).append(") NO INHERIT;");
 		con.prepareCall(query.toString()).execute();
@@ -189,6 +189,7 @@ public class ProcessImpl implements Callable<Boolean> {
 			"CREATE TEMPORARY TABLE pmel_temp ( \n"
 			+ " pmel_id bigint NOT NULL DEFAULT nextval('plud_pmsiupload_plud_id_seq'::regclass), \n"
 			+ " pmel_root bigint NOT NULL, \n"
+			+ " pmel_root_type character varying NOT NULL, \n"
 			+ " pmel_parent bigint, \n"
 			+ " pmel_type character varying NOT NULL, \n"
 			+ " pmel_line bigint NOT NULL, \n"
