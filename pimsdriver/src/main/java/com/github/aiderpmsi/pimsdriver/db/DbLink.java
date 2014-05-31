@@ -36,13 +36,17 @@ public abstract class DbLink extends Reader implements Callable<Boolean> {
 	private CharSequence remaining = new Segment(); 
 
 	/** Indicates if the end element has been reached */
-	boolean end = false;
+	protected boolean end = false;
 	
-	public DbLink(Connection con, long pmel_root) throws SQLException {
+	/** Position in the pmsi */
+	public long pmsiPosition;
+	
+	public DbLink(Connection con, long pmel_root, long pmsiPosition) throws SQLException {
 		@SuppressWarnings("unchecked")
 		Connection conn = ((DelegatingConnection<Connection>) con).getInnermostDelegateInternal();
 		cm = new CopyManager((org.postgresql.core.BaseConnection)conn);
 		this.pmel_root = pmel_root;
+		this.pmsiPosition = pmsiPosition;
 	}
 
 	@Override
@@ -98,8 +102,8 @@ public abstract class DbLink extends Reader implements Callable<Boolean> {
 				content.append(Long.toString(pmel_root));
 				content.append('|');
 
-				escape(getRootType(), content);
-				content.append('|');				
+				content.append(Long.toString(pmsiPosition));
+				content.append('|');
 				
 				Long pmel_parent;
 				if ((pmel_parent = getParent()) == null)
@@ -122,13 +126,18 @@ public abstract class DbLink extends Reader implements Callable<Boolean> {
 				remaining = content;
 				
 				last_line = Long.parseLong(entry.pmel_line);
+				
+				pmsiPosition++;
 			}
 		}
 		return position - off;
 	}
 
-	public void store(Entry entry) {
-		queue.offer(entry);
+	public void store(Entry entry) throws InterruptedException {
+		while (!queue.offer(entry, 1, TimeUnit.SECONDS)) {
+			if (Thread.interrupted())
+				throw new InterruptedException();
+		}
 	}
 
 	@Override
@@ -155,7 +164,7 @@ public abstract class DbLink extends Reader implements Callable<Boolean> {
 	
 	protected abstract CharSequence getRootType();
 
-	private static final String query = "COPY pmel_temp (pmel_root, pmel_root_type, pmel_parent, pmel_type, pmel_line, pmel_content) "
+	private static final String query = "COPY pmel_temp (pmel_root, pmel_position, pmel_parent, pmel_type, pmel_line, pmel_content) "
 			+ "FROM STDIN WITH DELIMITER '|'";
 
 	private static final char[] escapeEscape = {'\\', '\\'};

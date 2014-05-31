@@ -5,8 +5,8 @@ import java.sql.SQLException;
 
 public class RsfContentHandler extends PmsiContentHandlerHelper {
 
-	public RsfContentHandler(Connection con, Long uploadPKId) throws SQLException {
-		dblink = new RsfDbLink(con, uploadPKId);
+	public RsfContentHandler(Connection con, Long uploadPKId, Long pmsiPosition) throws SQLException {
+		dblink = new RsfDbLink(con, uploadPKId, pmsiPosition);
 	}
 	
 	@Override

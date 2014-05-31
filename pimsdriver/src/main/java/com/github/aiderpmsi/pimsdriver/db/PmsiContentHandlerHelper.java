@@ -110,7 +110,11 @@ public abstract class PmsiContentHandlerHelper extends ContentHandlerHelper {
 			entry.pmel_type = contentPath.getLast();
 			entry.pmel_content = content.toString();
 			entry.pmel_line = lineNumber;
-			dblink.store(entry);
+			try {
+				dblink.store(entry);
+			} catch (InterruptedException e) {
+				throw new SAXException(e);
+			}
 		}
 		
 		if (position == PROPERTY) {
@@ -165,6 +169,10 @@ public abstract class PmsiContentHandlerHelper extends ContentHandlerHelper {
 
 	public String getFiness() {
 		return finess.toString();
+	}
+	
+	public long getPmsiPosition() {
+		return dblink.pmsiPosition;
 	}
 	
 	public void close() throws SAXException {

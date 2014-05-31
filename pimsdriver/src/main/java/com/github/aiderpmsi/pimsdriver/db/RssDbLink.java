@@ -15,8 +15,8 @@ public class RssDbLink extends DbLink {
 	
 	private Long currentParent = null;
 	
-	public RssDbLink(Connection con, long pmel_root) throws SQLException {
-		super(con, pmel_root);
+	public RssDbLink(Connection con, long pmel_root, long pmsiPosition) throws SQLException {
+		super(con, pmel_root, pmsiPosition);
 	}
 	@Override
 	protected Long getParent() {
@@ -27,9 +27,9 @@ public class RssDbLink extends DbLink {
 	protected void calculateParent(Entry entry) {
 		// IF LAST ELEMENT WAS RSSHEADER, STORE IT
 		if (wasHeader)
-			rssHeader = last_line;
+			rssHeader = pmsiPosition - 1;
 		else if (wasMain)
-			rssMain = last_line;
+			rssMain = pmsiPosition - 1;
 		
 		// CHECKS IF THIS ELEMENT IS HEADER OR MAIN FOR NEXT ITERATION THROUGH CALCULATEPARENT
 		if (entry.pmel_type.equals("rssheader")) {

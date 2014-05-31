@@ -5,8 +5,8 @@ import java.sql.SQLException;
 
 public class RssContentHandler extends PmsiContentHandlerHelper {
 
-	public RssContentHandler(Connection con, Long uploadPKId) throws SQLException {
-		dblink = new RssDbLink(con, uploadPKId);
+	public RssContentHandler(Connection con, Long uploadPKId, long pmsiPosition) throws SQLException {
+		dblink = new RssDbLink(con, uploadPKId, pmsiPosition);
 	}
 	
 	@Override

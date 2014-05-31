@@ -9,8 +9,8 @@ public class RsfDbLink extends DbLink {
 	
 	private Long currentParent = null;
 	
-	public RsfDbLink(Connection con, long pmel_root) throws SQLException {
-		super(con, pmel_root);
+	public RsfDbLink(Connection con, long pmel_root, long pmsiPosition) throws SQLException {
+		super(con, pmel_root, pmsiPosition);
 	}
 	@Override
 	protected Long getParent() {
@@ -21,7 +21,7 @@ public class RsfDbLink extends DbLink {
 	protected void calculateParent(Entry entry) {
 		// IF LAST ELEMENT WAS RSFHEADER, USE ITS ID AS THE PARENT ID FOR EVERY ELEMENT
 		if (wasHeader)
-			currentParent = last_line;
+			currentParent = pmsiPosition - 1;
 		
 		// CHECKS IF THIS ELEMENT IS HEADER FOR NEXT ITERATION THROUGH CALCULATEPARENT
 		if (entry.pmel_type.equals("rsfheader")) {
