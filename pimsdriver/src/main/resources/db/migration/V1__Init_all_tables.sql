@@ -159,3 +159,28 @@ SELECT pmel_id,
        pmel_arguments
   FROM public.pmel_pmsielement
   WHERE pmel_type = 'rsfc';
+
+CREATE VIEW public.favh_rsfh_2012_view AS
+SELECT pmel_id,
+       pmel_root,
+       pmel_parent,
+       pmel_type,
+       pmel_line,
+       'H'::character varying TypeEnregistrement,
+       substring(pmel_content from 2 for 9) Finess,
+       substring(pmel_content from 11 for 20) NumRSS,
+       substring(pmel_content from 31 for 13) CodeSS,
+       substring(pmel_content from 44 for 2) CleCodeSS,
+       substring(pmel_content from 46 for 3) RangBeneficiaire,
+       substring(pmel_content from 49 for 9) NumFacture,
+       substring(pmel_content from 58 for 8) DateDebutSejour,
+       substring(pmel_content from 66 for 7) CodeUCD,
+       substring(pmel_content from 73 for 5) CoefficientFractionnement,
+       substring(pmel_content from 78 for 7) PrixAchatUnitaire,
+       substring(pmel_content from 85 for 7) MontantUnitaireEcartIndemnisable,
+       substring(pmel_content from 92 for 7) MontantTotalEcartIndemnisable,
+       substring(pmel_content from 99 for 3) Quantite,
+       substring(pmel_content from 102 for 7) MontantTotalFactureTTC,
+       pmel_arguments
+  FROM public.pmel_pmsielement
+  WHERE pmel_type = 'rsfh';
