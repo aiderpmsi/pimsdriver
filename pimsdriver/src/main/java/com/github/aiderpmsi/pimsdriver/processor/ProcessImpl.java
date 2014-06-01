@@ -48,8 +48,8 @@ public class ProcessImpl implements Callable<Boolean> {
 			
 			// GETS THE LARGE OBJECT INTERFACE FOR FILES
 			@SuppressWarnings("unchecked")
-			Connection conn = ((DelegatingConnection<Connection>) con).getInnermostDelegateInternal();
-			LargeObjectManager lom = ((org.postgresql.PGConnection)conn).getLargeObjectAPI();
+			Connection innerConn = ((DelegatingConnection<Connection>) con).getInnermostDelegateInternal();
+			LargeObjectManager lom = ((org.postgresql.PGConnection)innerConn).getLargeObjectAPI();
 			
 			// CREATE THE TEMP TABLE TO INSERT THE DATAS
 			createTempTablePs.execute();
@@ -67,9 +67,9 @@ public class ProcessImpl implements Callable<Boolean> {
 				}
 			}
 
+			PmsiContentHandlerHelper rch = null;
 			// IF RSS IS DEFINED, GET ITS CONTENT AND PROCESS IT
 			if (element.getRssoid() != null) {
-				PmsiContentHandlerHelper rch = null;
 				try {
 					rch = new RssContentHandler(con, element.getRecordid(), pmsiPosition);
 					processPmsi(rch, "rssheader", element.getRssoid(), lom);
@@ -93,16 +93,27 @@ public class ProcessImpl implements Callable<Boolean> {
 
 			// COPY TEMP TABLE INTO PMEL TABLE
 			String copyQuery = 
-					"INSERT INTO pmel.pmel_" + element.getRecordid() + " (pmel_id, pmel_root, pmel_position, pmel_parent, pmel_type, pmel_line, pmel_content, pmel_arguments) \n"
-					+ "SELECT pmel_id, pmel_root, pmel_position, pmel_parent, pmel_type, pmel_line, pmel_content, pmel_arguments FROM pmel_temp";
+					"INSERT INTO pmel.pmel_" + element.getRecordid() + " (pmel_root, pmel_position, pmel_parent, pmel_type, pmel_line, pmel_content, pmel_arguments) \n"
+					+ "SELECT pmel_root, pmel_position, pmel_parent, pmel_type, pmel_line, pmel_content, pmel_arguments FROM pmel_temp";
 			PreparedStatement copyPs = con.prepareStatement(copyQuery);
 			copyPs.execute();
 			
 			// UPDATE STATUS AND REAL FINESS
-			String updatequery = "UPDATE plud_pmsiupload SET plud_processed = 'successed'::plud_status, plud_finess = ? WHERE plud_id = ?";
-			PreparedStatement updateps = con.prepareStatement(updatequery);
-			updateps.setString(1, fch.getFiness());
-			updateps.setLong(2, element.getRecordid());
+			StringBuilder updatequery = new StringBuilder("UPDATE plud_pmsiupload SET plud_processed = 'successed'::plud_status, plud_finess = ?, ");
+			updatequery.append("plud_arguments = plud_arguments || hstore(?, ?)");
+			if (rch != null)
+				updatequery.append(" || hstore(?, ?)");
+			updatequery.append(" WHERE plud_id = ?");
+			PreparedStatement updateps = con.prepareStatement(updatequery.toString());
+			int updateindex = 1;
+			updateps.setString(updateindex++, fch.getFiness());
+			updateps.setString(updateindex++, "rsfversion");
+			updateps.setString(updateindex++, fch.getVersion());
+			if (rch != null) {
+				updateps.setString(updateindex++, "rssversion");
+				updateps.setString(updateindex++, rch.getVersion());
+			}
+			updateps.setLong(updateindex++, element.getRecordid());
 			updateps.execute();
 
 			// CREATE CONSTRAINTS ON PMEL RSF TABLE
@@ -196,7 +207,6 @@ public class ProcessImpl implements Callable<Boolean> {
 	
 	private static final String createTempTableQuery =
 			"CREATE TEMPORARY TABLE pmel_temp ( \n"
-			+ " pmel_id bigint NOT NULL DEFAULT nextval('plud_pmsiupload_plud_id_seq'::regclass), \n"
 			+ " pmel_root bigint NOT NULL, \n"
 			+ " pmel_position bigint NOT NULL, \n"
 			+ " pmel_parent bigint, \n"

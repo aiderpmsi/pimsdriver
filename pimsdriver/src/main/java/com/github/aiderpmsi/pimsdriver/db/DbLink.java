@@ -30,7 +30,7 @@ public abstract class DbLink extends Reader implements Callable<Boolean> {
 	private CopyManager cm;
 
 	/** Queue serving as an ipc */
-	public LinkedBlockingQueue<Entry> queue = new LinkedBlockingQueue<>(1000);
+	public LinkedBlockingQueue<Entry> queue = new LinkedBlockingQueue<>(2048);
 
 	/** Buffer for readed elements remaining */
 	private CharSequence remaining = new Segment(); 
