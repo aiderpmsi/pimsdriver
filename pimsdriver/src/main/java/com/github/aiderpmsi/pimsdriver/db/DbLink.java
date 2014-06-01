@@ -128,8 +128,10 @@ public abstract class DbLink extends Reader implements Callable<Boolean> {
 				last_line = Long.parseLong(entry.pmel_line);
 				
 				pmsiPosition++;
+				
 			}
 		}
+		System.out.println(queue.size());
 		return position - off;
 	}
 

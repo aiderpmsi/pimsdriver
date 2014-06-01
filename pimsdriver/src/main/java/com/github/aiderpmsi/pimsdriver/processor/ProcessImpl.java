@@ -1,8 +1,10 @@
 package com.github.aiderpmsi.pimsdriver.processor;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.Reader;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -16,7 +18,7 @@ import org.postgresql.largeobject.LargeObjectManager;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import com.github.aiderpmsi.pims.parser.utils.Parser;
+import com.github.aiderpmsi.pims.parser.utils.Parser2;
 import com.github.aiderpmsi.pims.treebrowser.TreeBrowserException;
 import com.github.aiderpmsi.pimsdriver.db.DataSourceSingleton;
 import com.github.aiderpmsi.pimsdriver.db.PmsiContentHandlerHelper;
@@ -159,22 +161,22 @@ public class ProcessImpl implements Callable<Boolean> {
 	}
 	
 	private void processPmsi(PmsiContentHandlerHelper ch, String pmsitype, Long id, LargeObjectManager lom) throws SQLException, SAXException, IOException, TreeBrowserException {
-		InputStream dbFile = null, tmpFile = null;
+		InputStream dbFile = null;
+		Reader tmpFile = null;
 		Path tmpPath = null;
 		try {
-			dbFile = lom.open(id).getInputStream();
+			dbFile = new BufferedInputStream(lom.open(id).getInputStream());
 			try {
 				tmpPath = Files.createTempFile("", "");
 				Files.copy(dbFile, tmpPath, StandardCopyOption.REPLACE_EXISTING);
 				try {
-					tmpFile = Files.newInputStream(tmpPath);
+					tmpFile = Files.newBufferedReader(tmpPath, Charset.forName("ISO-8859-1"));
 
 					RecorderErrorHandler eh = new RecorderErrorHandler();
-					Parser parser = new Parser();
-					parser.setType(pmsitype);
+					Parser2 parser = new Parser2(pmsitype);
 					parser.setContentHandler(ch);
 					parser.setErrorHandler(eh);
-					parser.parse(new InputSource(new InputStreamReader(tmpFile, "ISO-8859-1")));
+					parser.parse(new InputSource(tmpFile));
 
 					// CHECK IF THERE WERE ANY ERRORS IN PMSI
 					if (eh.getErrors().size() != 0)
