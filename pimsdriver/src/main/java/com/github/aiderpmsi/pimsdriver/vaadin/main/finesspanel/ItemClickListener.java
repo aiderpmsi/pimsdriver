@@ -44,6 +44,7 @@ public class ItemClickListener implements ItemClickEvent.ItemClickListener {
 		else {
 			rootElement.fireFinessSelected(null, null);
 		}
+		
 	}
 
 }

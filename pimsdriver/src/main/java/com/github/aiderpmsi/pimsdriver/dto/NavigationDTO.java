@@ -11,8 +11,7 @@ import java.util.List;
 
 import com.github.aiderpmsi.pims.grouper.model.RssContent;
 import com.github.aiderpmsi.pimsdriver.dto.model.UploadedPmsi;
-import com.github.aiderpmsi.pimsdriver.dto.model.navigation.RsfOverview;
-import com.github.aiderpmsi.pimsdriver.dto.model.navigation.RssOverview;
+import com.github.aiderpmsi.pimsdriver.dto.model.navigation.PmsiOverviewEntry;
 import com.github.aiderpmsi.pimsdriver.dto.model.navigation.YM;
 
 public class NavigationDTO {
@@ -87,155 +86,92 @@ public class NavigationDTO {
 	}
 
 	public List<YM> readYMList(Connection con, UploadedPmsi.Status status, String finess) throws SQLException {
+
 		// CREATES THE QUERY
-		String query = 
-				"SELECT DISTINCT ON (plud_year, plud_month) plud_year, plud_month FROM plud_pmsiupload "
-						+ "WHERE plud_processed = ?::public.plud_status AND plud_finess = ? ORDER BY plud_year DESC, plud_month DESC";
-		PreparedStatement ps = con.prepareStatement(query);
-		ps.setString(1, status.toString());
-		ps.setString(2, finess);
-			
-		// EXECUTE QUERY
-		ResultSet rs = null;
-		// LIST OF ELEMENTS
-		List<YM> yms = new ArrayList<>();
+		PreparedStatement ps = null;
+		
 		try {
-			rs = ps.executeQuery();
+			ps = con.prepareStatement(ymQuery);
+			ps.setString(1, status.toString());
+			ps.setString(2, finess);
 			
-			while (rs.next()) {
-				YM ym = new YM();
-				ym.setYear(rs.getInt(1));
-				ym.setMonth(rs.getInt(2));
-				yms.add(ym);
+			// EXECUTE QUERY
+			ResultSet rs = null;
+			// LIST OF ELEMENTS
+			List<YM> yms = new ArrayList<>();
+			try {
+				rs = ps.executeQuery();
+			
+				while (rs.next()) {
+					YM ym = new YM();
+					ym.setYear(rs.getInt(1));
+					ym.setMonth(rs.getInt(2));
+					yms.add(ym);
+				}
+
+				return yms;
+			} finally {
+				if (rs != null) rs.close();
 			}
 		} finally {
-			if (rs != null) rs.close();
+			if (ps != null) ps.close();
 		}
-		
-		return yms;
 	}
 	
-	public RsfOverview readRsfOverview(Connection con, UploadedPmsi model) throws SQLException {
+	public List<PmsiOverviewEntry> readPmsiOverview(Connection con, UploadedPmsi model, String headerName) throws SQLException {
 
 		// CREATES THE QUERY
-		String query = 
-				"WITH RECURSIVE all_lines AS ( \n"
-						+ "SELECT pmel_id, pmel_parent, pmel_type, pmel_attributes \n"
-						+ "FROM pmel.pmel_" + model.getRecordid() + " WHERE pmel_type = 'rsfheader' \n"
-						+ "UNION \n"
-						+ "SELECT pmel.pmel_id, pmel.pmel_parent, pmel.pmel_type, pmel.pmel_attributes \n"
-						+ "FROM pmel.pmel_" + model.getRecordid() + " pmel \n"
-						+ "JOIN all_lines al \n"
-						+ "ON (al.pmel_id = pmel.pmel_parent) \n"
-						+ "), \n"
-						+ "rsfa AS ( \n"
-						+ "SELECT COUNT(*) AS nbrows FROM all_lines WHERE pmel_type = 'rsfa' \n"
-						+ "), \n"
-						+ "rsfb AS ( \n"
-						+ "SELECT COUNT(*) AS nbrows FROM all_lines WHERE pmel_type = 'rsfb' \n"
-						+ "), \n"
-						+ "rsfc AS ( \n"
-						+ "SELECT COUNT(*) AS nbrows FROM all_lines WHERE pmel_type = 'rsfc' \n"
-						+ "), \n"
-						+ "rsfh AS ( \n"
-						+ "SELECT COUNT(*) AS nbrows FROM all_lines WHERE pmel_type = 'rsfh' \n"
-						+ "), \n"
-						+ "rsfi AS ( \n"
-						+ "SELECT COUNT(*) AS nbrows FROM all_lines WHERE pmel_type = 'rsfi' \n"
-						+ "), \n"
-						+ "rsfl AS ( \n"
-						+ "SELECT COUNT(*) AS nbrows FROM all_lines WHERE pmel_type = 'rsfl' \n"
-						+ "), \n"
-						+ "rsfm AS ( \n"
-						+ "SELECT COUNT(*) AS nbrows FROM all_lines WHERE pmel_type = 'rsfm' \n"
-						+ ") \n"
-						+ "SELECT rsfa.nbrows rsfa , rsfb.nbrows rsfb, rsfc.nbrows rsfc, rsfh.nbrows rsfh, rsfi.nbrows rsfi, rsfl.nbrows rsfl, rsfm.nbrows rsfm \n"
-						+ "FROM rsfa rsfa \n"
-						+ "CROSS JOIN rsfb rsfb \n"
-						+ "CROSS JOIN rsfc rsfc \n"
-						+ "CROSS JOIN rsfh rsfh \n"
-						+ "CROSS JOIN rsfi rsfi \n"
-						+ "CROSS JOIN rsfl rsfl \n"
-						+ "CROSS JOIN rsfm rsfm";
-		PreparedStatement ps = con.prepareStatement(query);
-		
-		// EXECUTE QUERY
-		ResultSet rs = null;
-		// OVERVIEW THE ITEMS
-		RsfOverview rsfs = new RsfOverview();
+		PreparedStatement ps = null;
 		
 		try {
-			rs = ps.executeQuery();
-			
-			rs.next();
-			rsfs.setRsfa(rs.getLong(1));
-			rsfs.setRsfb(rs.getLong(2));
-			rsfs.setRsfc(rs.getLong(3));
-			rsfs.setRsfh(rs.getLong(4));
-			rsfs.setRsfi(rs.getLong(5));
-			rsfs.setRsfl(rs.getLong(6));
-			rsfs.setRsfm(rs.getLong(7));
+			ps = con.prepareStatement(nbPmsiLinesQuery);
+			ps.setString(1, headerName);
+			ps.setLong(2, model.getRecordid());
+			ps.setLong(3, model.getRecordid());
+			ps.setString(4, headerName);
 		
+			// EXECUTE QUERY
+			ResultSet rs = null;
+			// NUMBER OF LINES FOR EACH LINE TYPE
+			List<PmsiOverviewEntry> lines = new ArrayList<>();
+			try {
+				rs = ps.executeQuery();
+		
+				while (rs.next()) {
+					PmsiOverviewEntry entry = new PmsiOverviewEntry();
+					entry.lineName = rs.getString(1);
+					entry.number = rs.getLong(2);
+					lines.add(entry);
+				}
+
+				return lines;
+
+			} finally {
+				if (rs != null) rs.close();
+			}
 		} finally {
-			if (rs != null) rs.close();
+			if (ps != null)
+				ps.close();
 		}
-			
-		return rsfs;
 	}
 
-	public RssOverview readRssOverview(Connection con, UploadedPmsi model) throws SQLException {
-		// CREATES THE QUERY
-		String query = 
-				"WITH RECURSIVE all_lines AS ( \n"
-						+ "SELECT pmel_id, pmel_parent, pmel_type, pmel_attributes \n"
-						+ "FROM pmel.pmel_" + model.getRecordid() + " WHERE pmel_type = 'rssheader' \n"
-						+ "UNION \n"
-						+ "SELECT pmel.pmel_id, pmel.pmel_parent, pmel.pmel_type, pmel.pmel_attributes \n"
-						+ "FROM pmel.pmel_" + model.getRecordid() + " pmel \n"
-						+ "JOIN all_lines al \n"
-						+ "ON (al.pmel_id = pmel.pmel_parent) \n"
-						+ "), \n"
-						+ "rssmain AS ( \n"
-						+ "SELECT COUNT(*) AS nbrows FROM all_lines WHERE pmel_type = 'rssmain' \n"
-						+ "), \n"
-						+ "rssacte AS ( \n"
-						+ "SELECT COUNT(*) AS nbrows FROM all_lines WHERE pmel_type = 'rssacte' \n"
-						+ "), \n"
-						+ "rssda AS ( \n"
-						+ "SELECT COUNT(*) AS nbrows FROM all_lines WHERE pmel_type = 'rssda' \n"
-						+ "), \n"
-						+ "rssdad AS ( \n"
-						+ "SELECT COUNT(*) AS nbrows FROM all_lines WHERE pmel_type = 'rssdad' \n"
-						+ "), \n"
-						+ "rssseances AS ( \n"
-						+ "SELECT SUM((pmel_attributes -> 'NbSeances')::int) AS nbseances FROM all_lines \n"
-						+ ") \n"
-						+ "SELECT rssmain.nbrows rssmain , rssacte.nbrows rssacte, rssda.nbrows rssda, rssdad.nbrows rssdad, rssseances.nbseances nbseances \n"
-						+ "FROM rssmain rssmain \n"
-						+ "CROSS JOIN rssacte rssacte \n"
-						+ "CROSS JOIN rssda rssda \n"
-						+ "CROSS JOIN rssdad rssdad \n"
-						+ "CROSS JOIN rssseances rssseances";
-		PreparedStatement ps = con.prepareStatement(query);
-			
-		// EXECUTE QUERY
-		ResultSet rs = null;
-		// RSF OVERVIEW MODEL
-		RssOverview rsss = new RssOverview();
-		try {
-			rs = ps.executeQuery();
+	private static final String nbPmsiLinesQuery = 
+			"WITH RECURSIVE all_lines AS ( \n"
+			+ "SELECT pmel_position, pmel_parent, pmel_type \n"
+			+ "FROM public.pmel_pmsielement \n"
+			+ "WHERE pmel_type = ? AND pmel_root = ? \n"
+			+ "UNION \n"
+			+ "SELECT pmel.pmel_position, pmel.pmel_parent, pmel.pmel_type \n"
+			+ "FROM public.pmel_pmsielement pmel \n"
+			+ "JOIN all_lines al \n"
+			+ "ON al.pmel_position = pmel.pmel_parent \n"
+			+ "WHERE pmel.pmel_root = ? \n"
+			+ ") SELECT pmel_type, COUNT(pmel_type) nb  FROM all_lines \n"
+			+ "WHERE pmel_type != ? \n"
+			+ "GROUP BY pmel_type \n"
+			+ "ORDER BY pmel_type;";
 
-			rs.next();
-			rsss.setMain(rs.getLong(1));
-			rsss.setActe(rs.getLong(2));
-			rsss.setDa(rs.getLong(3));
-			rsss.setDad(rs.getLong(4));
-			rsss.setSeances(rs.getLong(5));
-		} finally {
-			if (rs != null) rs.close();
-		}
-		
-		return rsss;
-	}
-	
+	private static final String ymQuery = 
+			"SELECT DISTINCT ON (plud_year, plud_month) plud_year, plud_month FROM plud_pmsiupload "
+			+ "WHERE plud_processed = ?::public.plud_status AND plud_finess = ? ORDER BY plud_year DESC, plud_month DESC";
 }

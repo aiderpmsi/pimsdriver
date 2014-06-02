@@ -8,8 +8,7 @@ import com.github.aiderpmsi.pimsdriver.db.DataSourceSingleton;
 import com.github.aiderpmsi.pimsdriver.dto.NavigationDTO;
 import com.github.aiderpmsi.pimsdriver.dto.UploadedPmsiDTO;
 import com.github.aiderpmsi.pimsdriver.dto.model.UploadedPmsi;
-import com.github.aiderpmsi.pimsdriver.dto.model.navigation.RsfOverview;
-import com.github.aiderpmsi.pimsdriver.dto.model.navigation.RssOverview;
+import com.github.aiderpmsi.pimsdriver.dto.model.navigation.PmsiOverviewEntry;
 import com.github.aiderpmsi.pimsdriver.dto.model.navigation.YM;
 import com.vaadin.data.Container.Filter;
 import com.vaadin.data.util.sqlcontainer.query.OrderBy;
@@ -174,8 +173,8 @@ public class NavigationActions {
 	}
 
 	public class Overview {
-		public RsfOverview rsf;
-		public RssOverview rss;
+		public List<PmsiOverviewEntry> rsf;
+		public List<PmsiOverviewEntry> rss;
 	}
 	
 	public Overview getOverview(UploadedPmsi model) throws ActionException {
@@ -192,9 +191,13 @@ public class NavigationActions {
 				try {
 					overview = new Overview();
 					if (model.getRsfoid() != null)
-						overview.rsf = upd.readRsfOverview(con, model);
+						overview.rsf = upd.readPmsiOverview(con, model, "rsfheader");
+					else
+						overview.rsf = null;
 					if (model.getRssoid() != null)
-						overview.rss = upd.readRssOverview(con, model);
+						overview.rss = upd.readPmsiOverview(con, model, "rssheader");
+					else
+						overview.rss = null;
 					// SELECTION HAS SUCCEDDED
 					con.commit();
 				} catch (SQLException e) {

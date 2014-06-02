@@ -1,10 +1,16 @@
 package com.github.aiderpmsi.pimsdriver.vaadin.main.contentpanel;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.github.aiderpmsi.pimsdriver.db.actions.ActionException;
 import com.github.aiderpmsi.pimsdriver.db.actions.NavigationActions;
 import com.github.aiderpmsi.pimsdriver.dto.model.UploadedPmsi;
+import com.github.aiderpmsi.pimsdriver.dto.model.navigation.PmsiOverviewEntry;
+import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Layout;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
@@ -18,6 +24,7 @@ public class PmsiContentPanel extends Panel {
 		super();
 		setCaption(null);
 		setVisible(false);
+		addStyleName("pims-contentpanel");
 	}
 	
 	public void setUpload(UploadedPmsi model, UploadedPmsi.Status status) {
@@ -27,7 +34,7 @@ public class PmsiContentPanel extends Panel {
 			this.setContent(new VerticalLayout());
 			setVisible(false);
 		}
-		// IF STATUS IS FAILED, WE HAVE TO REMOVE EVERYTHIN OF THIS PANEL
+		// IF STATUS IS FAILED, WE HAVE TO REMOVE EVERYTHING OF THIS PANEL
 		else if (status == UploadedPmsi.Status.failed) {
 			this.removeAllActionHandlers();
 			this.setContent(new VerticalLayout());
@@ -43,36 +50,22 @@ public class PmsiContentPanel extends Panel {
 				VerticalLayout principallayout = new VerticalLayout();
 				setContent(principallayout);
 				
-				HorizontalLayout headerlayout = new HorizontalLayout();
+				VerticalLayout headerlayout = new VerticalLayout();
 				principallayout.addStyleName("pims-contentpanel-headerlayout");
 				principallayout.addComponent(headerlayout);
 				
 				// RSF PANEL
-				Panel rsfPanel = createPanel("RSF", new String[][] {
-						new String[] {"Nb lignes A", overview.rsf.getRsfa().toString()},
-						new String[] {"Nb lignes B", overview.rsf.getRsfb().toString()},
-						new String[] {"Nb lignes C", overview.rsf.getRsfc().toString()},
-						new String[] {"Nb lignes H", overview.rsf.getRsfh().toString()},
-						new String[] {"Nb lignes I", overview.rsf.getRsfi().toString()},
-						new String[] {"Nb lignes L", overview.rsf.getRsfl().toString()},
-						new String[] {"Nb lignes M", overview.rsf.getRsfm().toString()},
-				});
+				Layout rsfPanel = createContentHeader("RSF", overview.rsf);
 				headerlayout.addComponent(rsfPanel);
 				
 				// RSS PANEL
-				Panel rssPanel;
-				if (model.getRssoid() == null) {
+				Layout rssPanel;
+				if (overview.rss == null) {
 					// THERE IS NO RSS FILE
-					rssPanel = createPanel("Absence de RSS", new String[][] {});
+					rssPanel = createContentHeader("Absence de RSS", new ArrayList<PmsiOverviewEntry>());
 				} else {
 					// FILLS THE RSS CONTENT
-					rssPanel = createPanel("RSS", new String[][]{
-							new String[] {"Nb lignes", overview.rss.getMain().toString()},
-							new String[] {"Nb actes", overview.rss.getActe().toString()},
-							new String[] {"Nb diagnostics associés", overview.rss.getDa().toString()},
-							new String[] {"Nb diagnostics documentaires", overview.rss.getDad().toString()},
-							new String[] {"Nb séances", overview.rss.getSeances().toString()}
-					});
+					rssPanel = createContentHeader("RSS", overview.rss);
 				}
 				headerlayout.addComponent(rssPanel);
 				
@@ -83,24 +76,26 @@ public class PmsiContentPanel extends Panel {
 		}
 	}
 	
-	private Panel createPanel(String header, String[][] elements) {
-		Panel panel = new Panel();
-		panel.addStyleName("pims-contentpanel-headerpanel");
-		VerticalLayout layout = new VerticalLayout();
-		layout.addStyleName("pims-contentpanel-headerpanel-layout");
-		panel.setContent(layout);
+	private Layout createContentHeader(String header, List<PmsiOverviewEntry> entries) {
+		HorizontalLayout layout = new HorizontalLayout();
+		layout.addStyleName("pims-contentpanel-header-layout");
 
 		// TITLE
 		Label title = new Label(header);
-		title.addStyleName("pims-contentpanel-headerpanel-headerlabel");
+		title.addStyleName("pims-contentpanel-header-label");
 		layout.addComponent(title);
 		
 		// CONTENT
-		for (String[] element : elements) {
-			Label label = new Label(element[0] + " : " + element[1]);
-			layout.addComponent(label);
+		CssLayout contentLayout = new CssLayout();
+		contentLayout.addStyleName("pims-contentpanel-header-content-layout");
+		for (PmsiOverviewEntry entry : entries) {
+			Label label = new Label(entry.lineName + " : " + Long.toString(entry.number));
+			label.setSizeUndefined();
+			label.addStyleName("pims-contentpanel-header-content-label");
+			contentLayout.addComponent(label);
 		}
-		return panel;
+		layout.addComponent(contentLayout);
+		return layout;
 	}
 	
 }

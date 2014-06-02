@@ -9,6 +9,11 @@ import java.util.List;
 
 public class CleanupDTO {
 
+	public class PmsiEntry {
+		public String lineName;
+		public long number;
+	}
+	
 	public List<Long> readList(Connection con) throws SQLException {
 		// GETS THE UPLOAD ID DELETED
 		String checkQuery = 

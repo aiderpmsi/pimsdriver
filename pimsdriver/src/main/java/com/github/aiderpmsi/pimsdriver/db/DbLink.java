@@ -131,7 +131,6 @@ public abstract class DbLink extends Reader implements Callable<Boolean> {
 				
 			}
 		}
-		System.out.println(queue.size());
 		return position - off;
 	}
 

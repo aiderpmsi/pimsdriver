@@ -26,8 +26,10 @@ public class RootWindow extends UI {
 		setContent(layout);
 		
 		// ADDS EACH WIDGET INSIDE LAYOUT
-		layout.addComponent(new Header());
-		layout.addComponent(new MenuBar());
+		Header header = new Header();
+		layout.addComponent(header);
+		MenuBar menuBar = new MenuBar();
+		layout.addComponent(menuBar);
 		splitPanel = new SplitPanel(this);
 		layout.addComponent(splitPanel);
 		// SPLIT PANEL EXPANDS MAX If LAYOUT IS VERTICAL LAYOUT
@@ -35,7 +37,7 @@ public class RootWindow extends UI {
 			((VerticalLayout) layout).setExpandRatio(splitPanel, 1f);
 
 		// REGISTER A FINESS SELECTED LISTENER WHEN A FINESS CHANGES
-		addListener(new FinessSelectedListener(splitPanel.getContentPanel()));
+		addListener(new FinessSelectedListener(splitPanel.getContentPanel(), menuBar));
 	}
 	
 	private Layout createLayout() {

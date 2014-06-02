@@ -10,8 +10,11 @@ public class FinessSelectedListener implements Listener {
 
 	private PmsiContentPanel pcp;
 	
-	public FinessSelectedListener(PmsiContentPanel pcp) {
+	private MenuBar menuBar;
+	
+	public FinessSelectedListener(PmsiContentPanel pcp, MenuBar menuBar) {
 		this.pcp = pcp;
+		this.menuBar = menuBar;
 	}
 
 	@Override
@@ -20,6 +23,7 @@ public class FinessSelectedListener implements Listener {
 		if (event.getClass() == FinessSelectedEvent.class) {
 			FinessSelectedEvent fse = (FinessSelectedEvent) event;
 			pcp.setUpload(fse.getModel(), fse.getStatus());
+			menuBar.setUpload(fse.getModel(), fse.getStatus());
 		}
 		// IF ITS NOT, DO NOTHING
 	}

@@ -62,7 +62,8 @@ public class FinessPanel extends Panel {
 		finessTree = new Tree();
 		finessTree.setContainerDataSource(hc);
 		finessTree.setItemCaptionPropertyId("caption");
-
+		finessTree.setImmediate(true);
+		
 		// ADDS THE LISTENERS
 		ExpandListener el = new ExpandListener(hc, this);
 		CollapseListener cl = new CollapseListener(hc);
