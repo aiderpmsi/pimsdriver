@@ -168,6 +168,10 @@ public class ProcessImpl implements Callable<Boolean> {
 		query.append("CREATE INDEX pmel_inherited_").append(fullSuffix).append("_pmel_position_idx ON pmel.pmel_").append(fullSuffix).append(" USING btree (pmel_position);\n");
 		query.append("ALTER TABLE pmel.pmel_").append(fullSuffix).append('\n').
 			append("ADD CONSTRAINT pmel_inherited_").append(fullSuffix).append("_root_check CHECK (pmel_root = ").append(idRepresentation).append(") NO INHERIT;");
+		query.append("CREATE INDEX pmel_inherited_").append(fullSuffix).append("_pmel_rsfb_numrss_idx ON pmel.pmel_").append(fullSuffix).
+			append(" (substring(pmel_content from 11 for 20)) WHERE pmel_type = 'rsfb';");
+		query.append("CREATE INDEX pmel_inherited_").append(fullSuffix).append("_pmel_rssmain_numrss_idx ON pmel.pmel_").append(fullSuffix).
+			append(" (substring(pmel_content from 28 for 20)) WHERE pmel_type = 'rssmain';");
 		con.prepareCall(query.toString()).execute();
 	}
 	

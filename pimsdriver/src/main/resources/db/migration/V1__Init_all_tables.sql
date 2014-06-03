@@ -320,7 +320,6 @@ CREATE VIEW public.shva_rssheaders_116_view AS
 SELECT pmel.pmel_id,
        pmel.pmel_root,
        pmel.pmel_position,
-       pmel.pmel_position,
        pmel.pmel_parent,
        pmel.pmel_type,
        pmel.pmel_line,
