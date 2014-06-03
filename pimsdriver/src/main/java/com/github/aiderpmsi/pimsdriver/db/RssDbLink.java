@@ -9,9 +9,9 @@ public class RssDbLink extends DbLink {
 	
 	private boolean wasMain = false;
 
-	long rssHeader;
+	private long rssHeader;
 	
-	long rssMain;
+	private long rssMain;
 	
 	private Long currentParent = null;
 	

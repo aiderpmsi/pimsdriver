@@ -7,6 +7,12 @@ public class RsfDbLink extends DbLink {
 
 	private boolean wasHeader = false;
 	
+	private boolean wasRsfA = false;
+
+	private long rsfHeader;
+	
+	private long rsfA;
+	
 	private Long currentParent = null;
 	
 	public RsfDbLink(Connection con, long pmel_root, long pmsiPosition) throws SQLException {
@@ -21,13 +27,23 @@ public class RsfDbLink extends DbLink {
 	protected void calculateParent(Entry entry) {
 		// IF LAST ELEMENT WAS RSFHEADER, USE ITS ID AS THE PARENT ID FOR EVERY ELEMENT
 		if (wasHeader)
-			currentParent = pmsiPosition - 1;
-		
-		// CHECKS IF THIS ELEMENT IS HEADER FOR NEXT ITERATION THROUGH CALCULATEPARENT
+			rsfHeader = pmsiPosition - 1;
+		else if (wasRsfA)
+			rsfA = pmsiPosition - 1;
+			
+		// CHECKS IF THIS ELEMENT IS HEADER OR RSFA FOR NEXT ITERATION THROUGH CALCULATEPARENT
 		if (entry.pmel_type.equals("rsfheader")) {
 			wasHeader = true;
+			wasRsfA = false;
+			currentParent = null;
+		} else if (entry.pmel_type.equals("rsfa")) {
+			wasHeader = false;
+			wasRsfA = true;
+			currentParent = rsfHeader;
 		} else {
 			wasHeader = false;
+			wasRsfA = false;
+			currentParent = rsfA;
 		}
 
 	}
