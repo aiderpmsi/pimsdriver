@@ -13,6 +13,7 @@ import java.util.Map;
 import javax.annotation.security.PermitAll;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
@@ -40,8 +41,8 @@ public class Report {
     @Path("/report/{id}/factures{finess}.pdf")
     @Produces({"application/pdf"})
 	public Response getPendingUploadedElements(
-			@QueryParam("id") final Long id,
-			@QueryParam("finess") String finess) {
+			@PathParam("id") final Long id,
+			@PathParam("finess") String finess) {
 		
 		StreamingOutput stream = new StreamingOutput() {
 	
@@ -54,7 +55,7 @@ public class Report {
 
 					Map<String, Object> parametres = new HashMap<>();
 
-					parametres.put("pmel_root", (Object) id);
+					parametres.put("plud_id", id);
 					
 					Connection con = null;
 					try {

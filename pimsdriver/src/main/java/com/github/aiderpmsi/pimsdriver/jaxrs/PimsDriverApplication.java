@@ -20,6 +20,7 @@ public class PimsDriverApplication extends Application {
         // register jax-rs resources
         classes.add(ImportPmsi.class);
         classes.add(UploadedPmsi.class);
+        classes.add(Report.class);
         // register filters
         classes.add(RolesAllowedDynamicFeature.class);
         classes.add(SecurityFilter.class);

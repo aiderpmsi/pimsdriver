@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<fontFamilies>
+
+	<fontFamily name="Pictonic" visible="false">
+		<normal>
+			<ttf>net/sf/jasperreports/fonts/pictonic/pictonic.ttf</ttf>
+			<svg>net/sf/jasperreports/fonts/pictonic/pictonic.svg</svg>
+			<eot>net/sf/jasperreports/fonts/pictonic/pictonic.eot</eot>
+			<woff>net/sf/jasperreports/fonts/pictonic/pictonic.woff</woff>
+		</normal>
+		<pdfEncoding>Identity-H</pdfEncoding>
+		<pdfEmbedded>true</pdfEmbedded>
+	</fontFamily>
+
+	<fontFamily name="DejaVu Sans">
+		<normal>com/github/aiderpmsi/pimsdriver/fonts/dejavu/DejaVuSans.ttf
+		</normal>
+		<bold>com/github/aiderpmsi/pimsdriver/fonts/dejavu/DejaVuSans-Bold.ttf
+		</bold>
+		<italic>com/github/aiderpmsi/pimsdriver/fonts/dejavu/DejaVuSans-Oblique.ttf
+		</italic>
+		<boldItalic>com/github/aiderpmsi/pimsdriver/fonts/dejavu/DejaVuSans-BoldOblique.ttf
+		</boldItalic>
+		<pdfEncoding>Identity-H</pdfEncoding>
+		<pdfEmbedded>true</pdfEmbedded>
+		<exportFonts>
+			<export key="net.sf.jasperreports.html">'DejaVu Sans', Arial, Helvetica, sans-serif
+			</export>
+			<export key="net.sf.jasperreports.xhtml">'DejaVu Sans', Arial, Helvetica, sans-serif
+			</export>
+		</exportFonts>
+	</fontFamily>
+
+	<fontFamily name="DejaVu Serif">
+		<normal>com/github/aiderpmsi/pimsdriver/fonts/dejavu/DejaVuSerif.ttf
+		</normal>
+		<bold>com/github/aiderpmsi/pimsdriver/fonts/dejavu/DejaVuSerif-Bold.ttf
+		</bold>
+		<italic>com/github/aiderpmsi/pimsdriver/fonts/dejavu/DejaVuSerif-Italic.ttf
+		</italic>
+		<boldItalic>com/github/aiderpmsi/pimsdriver/fonts/dejavu/DejaVuSerif-BoldItalic.ttf
+		</boldItalic>
+		<pdfEncoding>Identity-H</pdfEncoding>
+		<pdfEmbedded>true</pdfEmbedded>
+		<exportFonts>
+			<export key="net.sf.jasperreports.html">'DejaVu Serif', 'Times New Roman', Times, serif
+			</export>
+			<export key="net.sf.jasperreports.xhtml">'DejaVu Serif', 'Times New Roman', Times, serif
+			</export>
+		</exportFonts>
+	</fontFamily>
+
+	<fontFamily name="DejaVu Sans Mono">
+		<normal>com/github/aiderpmsi/pimsdriver/fonts/dejavu/DejaVuSansMono.ttf
+		</normal>
+		<bold>com/github/aiderpmsi/pimsdriver/fonts/dejavu/DejaVuSansMono-Bold.ttf
+		</bold>
+		<italic>com/github/aiderpmsi/pimsdriver/fonts/dejavu/DejaVuSansMono-Oblique.ttf
+		</italic>
+		<boldItalic>com/github/aiderpmsi/pimsdriver/fonts/dejavu/DejaVuSansMono-BoldItalic.ttf
+		</boldItalic>
+		<pdfEncoding>Identity-H</pdfEncoding>
+		<pdfEmbedded>true</pdfEmbedded>
+		<exportFonts>
+      <export key="net.sf.jasperreports.html">'DejaVu Sans Mono', 'Courier New', Courier, monospace</export>
+      <export key="net.sf.jasperreports.xhtml">'DejaVu Sans Mono', 'Courier New', Courier, monospace</export>
+     		</exportFonts>
+	</fontFamily>
+
+</fontFamilies>
+
+  

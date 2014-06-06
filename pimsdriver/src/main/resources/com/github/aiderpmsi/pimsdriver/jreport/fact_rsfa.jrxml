@@ -225,7 +225,7 @@ WHERE a.pmel_root = $P{pmel_root}::bigint]]>
 				</subreportParameter>
 				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
 				<subreportExpression class="net.sf.jasperreports.engine.JasperReport">
-					<![CDATA[com.github.aiderpmsi.pimsdriver.jaxrs.Report.reportFromResourceName("fact_rsfb.jrxml"))]]>
+					<![CDATA[com.github.aiderpmsi.pimsdriver.jaxrs.Report.reportFromResourceName("fact_rsfb.jrxml")]]>
 				</subreportExpression>
 			</subreport>
 			<subreport>
@@ -245,7 +245,7 @@ WHERE a.pmel_root = $P{pmel_root}::bigint]]>
 				</subreportParameter>
 				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
 				<subreportExpression class="net.sf.jasperreports.engine.JasperReport">
-					<![CDATA[com.github.aiderpmsi.pimsdriver.jaxrs.Report.reportFromResourceName("fact_rsfc.jrxml"))]]>
+					<![CDATA[com.github.aiderpmsi.pimsdriver.jaxrs.Report.reportFromResourceName("fact_rsfc.jrxml")]]>
 				</subreportExpression>
 			</subreport>
 		</band>

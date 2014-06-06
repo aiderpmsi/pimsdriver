@@ -13,6 +13,7 @@
 
 	<parameter name="now" class="java.util.Date" isForPrompting="false">
 		<parameterDescription><![CDATA[Date de génération rapport]]></parameterDescription>
+		<defaultValueExpression><![CDATA[new Date()]]></defaultValueExpression>
 	</parameter>
 
 	<queryString language="SQL">
@@ -125,7 +126,7 @@
 				</subreportParameter>
 				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
 				<subreportExpression class="net.sf.jasperreports.engine.JasperReport">
-					<![CDATA[com.github.aiderpmsi.pimsdriver.jaxrs.Report.reportFromResourceName("fact_rsfa.jrxml"))]]>
+					<![CDATA[com.github.aiderpmsi.pimsdriver.jaxrs.Report.reportFromResourceName("fact_rsfa.jrxml")]]>
 				</subreportExpression>
 			</subreport>
 
@@ -141,7 +142,7 @@
 				</subreportParameter>
 				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
 				<subreportExpression class="net.sf.jasperreports.engine.JasperReport">
-					<![CDATA[com.github.aiderpmsi.pimsdriver.jaxrs.Report.reportFromResourceName("fact_resume.jrxml"))]]>
+					<![CDATA[com.github.aiderpmsi.pimsdriver.jaxrs.Report.reportFromResourceName("fact_resume.jrxml")]]>
 				</subreportExpression>
 			</subreport>
 		</band>
