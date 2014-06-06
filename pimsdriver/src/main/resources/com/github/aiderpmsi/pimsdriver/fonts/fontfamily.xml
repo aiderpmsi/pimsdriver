@@ -63,9 +63,11 @@
 		<pdfEncoding>Identity-H</pdfEncoding>
 		<pdfEmbedded>true</pdfEmbedded>
 		<exportFonts>
-      <export key="net.sf.jasperreports.html">'DejaVu Sans Mono', 'Courier New', Courier, monospace</export>
-      <export key="net.sf.jasperreports.xhtml">'DejaVu Sans Mono', 'Courier New', Courier, monospace</export>
-     		</exportFonts>
+			<export key="net.sf.jasperreports.html">'DejaVu Sans Mono', 'Courier New', Courier,
+				monospace</export>
+			<export key="net.sf.jasperreports.xhtml">'DejaVu Sans Mono', 'Courier New', Courier,
+				monospace</export>
+		</exportFonts>
 	</fontFamily>
 
 </fontFamilies>
