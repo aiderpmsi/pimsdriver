@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version last-->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="fact_rsfc" pageWidth="555" pageHeight="802" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="2e7371c3-02e8-4761-96e0-730894c6ef5c">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="pimsdriver"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value="ZmF2Y19yc2ZjXzIwMTJfdmlldyBBUyAsNiwwOw=="/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<style name="zebra">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{REPORT_COUNT}%2 == 1]]></conditionExpression>
+			<style mode="Opaque" backcolor="#D4D4D4"/>
+		</conditionalStyle>
+	</style>
+	<style name="invert-zebra">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{REPORT_COUNT}%2 != 1]]></conditionExpression>
+			<style mode="Opaque" backcolor="#D4D4D4"/>
+		</conditionalStyle>
+	</style>
+	<parameter name="pmel_parent" class="java.lang.Long">
+		<parameterDescription><![CDATA[pmel position of parent]]></parameterDescription>
+		<defaultValueExpression><![CDATA[0]]></defaultValueExpression>
+	</parameter>
+	<parameter name="pmel_root" class="java.lang.Long">
+		<parameterDescription><![CDATA[id d'insertion]]></parameterDescription>
+		<defaultValueExpression><![CDATA[0]]></defaultValueExpression>
+	</parameter>
+	<queryString language="SQL">
+		<![CDATA[SELECT MIN(to_date(favc_rsfc_2012_view.dateacte, 'DDMMYYYY')) datepremieracte,
+	MAX(to_date(favc_rsfc_2012_view.dateacte, 'DDMMYYYY')) datedernieracte,
+	favc_rsfc_2012_view.codeacte,
+	SUM(favc_rsfc_2012_view.quantite::integer) quantite,
+	SUM(favc_rsfc_2012_view.montanttotalhonoraire::integer) montanttotalhonoraire
+FROM favc_rsfc_2012_view
+WHERE favc_rsfc_2012_view.pmel_parent = $P{pmel_parent}::bigint
+  AND favc_rsfc_2012_view.pmel_root = $P{pmel_root}::bigint
+GROUP BY favc_rsfc_2012_view.codeacte
+ORDER BY codeacte]]>
+	</queryString>
+	<field name="codeacte" class="java.lang.String"/>
+	<field name="quantite" class="java.lang.Long"/>
+	<field name="datepremieracte" class="java.sql.Date"/>
+	<field name="datedernieracte" class="java.sql.Date"/>
+	<field name="montanttotalhonoraire" class="java.lang.Long"/>
+	<variable name="sumMontant" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[$F{montanttotalhonoraire}]]></variableExpression>
+	</variable>
+	<columnHeader>
+		<band height="15" splitType="Prevent">
+			<property name="local_mesure_unitheight" value="pixel"/>
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<staticText>
+				<reportElement x="0" y="0" width="110" height="14" uuid="6dc57879-f738-4de1-b43d-19a14243db3b">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<paragraph leftIndent="2" rightIndent="2" spacingBefore="1" spacingAfter="1"/>
+				</textElement>
+				<text><![CDATA[Acte]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="110" y="0" width="120" height="14" uuid="a5774d6c-dc28-4409-89b5-439a53b686f0">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<paragraph leftIndent="2" rightIndent="2" spacingBefore="1" spacingAfter="1"/>
+				</textElement>
+				<text><![CDATA[Quantité]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="230" y="0" width="150" height="14" uuid="7ec9e724-caff-4a55-8876-557b83b18fa3">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<paragraph leftIndent="2" rightIndent="2" spacingBefore="1" spacingAfter="1"/>
+				</textElement>
+				<text><![CDATA[Montant]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="380" y="0" width="174" height="14" uuid="5ad58aee-fbf8-4668-b214-dea1ed56d3e7">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<paragraph leftIndent="2" rightIndent="2" spacingBefore="1" spacingAfter="1" tabStopWidth="40"/>
+				</textElement>
+				<text><![CDATA[Dates]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="14" width="554" height="1" uuid="302d14ce-7cb4-45a0-a8bc-8cd4858fae26">
+					<property name="local_mesure_unity" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+			</line>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="16" splitType="Prevent">
+			<property name="local_mesure_unitheight" value="pixel"/>
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<textField>
+				<reportElement style="zebra" x="110" y="0" width="120" height="16" uuid="7a075d55-e67f-4ed7-ad48-4f092463e2bc">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="DejaVu Sans Mono"/>
+					<paragraph leftIndent="2" rightIndent="2" spacingBefore="0" spacingAfter="0"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{quantite}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="zebra" x="230" y="0" width="150" height="16" uuid="f3395f31-8751-4be5-b4f4-ba83f53abaf4">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="DejaVu Sans Mono"/>
+					<paragraph leftIndent="2" rightIndent="2" spacingBefore="0" spacingAfter="0"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new DecimalFormat("+#,##0.00;-#,##0.00", new DecimalFormatSymbols(Locale.FRANCE)).format(new BigDecimal($F{montanttotalhonoraire}).divide(new BigDecimal(100)))]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="zebra" x="380" y="0" width="174" height="16" uuid="eb45b7c3-780d-4ca8-8976-6993c03b0f3d">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="DejaVu Sans Mono"/>
+					<paragraph leftIndent="2" rightIndent="2" spacingBefore="0" spacingAfter="0"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new SimpleDateFormat("dd/MM/yyyy").format($F{datepremieracte}) + "-" +  new SimpleDateFormat("dd/MM/yyyy").format($F{datedernieracte})]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="zebra" x="0" y="0" width="110" height="16" uuid="79979066-1c6e-4730-8e3e-5a62bc344581">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="local_mesure_unity" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="DejaVu Sans Mono"/>
+					<paragraph leftIndent="2" rightIndent="2" spacingBefore="0" spacingAfter="0"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{codeacte}.trim()]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="16" splitType="Prevent">
+			<property name="local_mesure_unitheight" value="pixel"/>
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<staticText>
+				<reportElement key="" style="invert-zebra" x="110" y="0" width="120" height="16" uuid="a283f557-a5f2-4084-bd60-c2a7a13a0c4c">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<paragraph leftIndent="2" rightIndent="2" spacingBefore="0" spacingAfter="0"/>
+				</textElement>
+				<text><![CDATA[Total]]></text>
+			</staticText>
+			<textField>
+				<reportElement style="invert-zebra" x="230" y="0" width="150" height="16" uuid="c6187211-12e4-4d9c-971d-89f8ed4006fd">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="DejaVu Sans Mono"/>
+					<paragraph leftIndent="2" rightIndent="2" spacingBefore="0" spacingAfter="0"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new DecimalFormat("+#,##0.00;-#,##0.00", new DecimalFormatSymbols(Locale.FRANCE)).format(new BigDecimal($V{sumMontant}).divide(new BigDecimal(100)))]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnFooter>
+</jasperReport>

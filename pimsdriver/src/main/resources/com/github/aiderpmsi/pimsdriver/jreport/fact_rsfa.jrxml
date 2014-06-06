@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version last-->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="fact_rsfa" pageWidth="555" pageHeight="802" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="749c7e1f-54e3-4986-bc9e-33d369438a7f">
+	<property name="com.jaspersoft.studio.data.sql.tables" value="ZmF2YV9yc2ZhXzIwMTJfdmlldyBBUyAsMTUsMDs="/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="pimsdriver"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<parameter name="pmel_root" class="java.lang.Long">
+		<parameterDescription><![CDATA[]]></parameterDescription>
+		<defaultValueExpression><![CDATA[0]]></defaultValueExpression>
+	</parameter>
+	<queryString language="SQL">
+		<![CDATA[WITH distinctrss AS (
+  SELECT DISTINCT numrss
+    FROM smva_rssmain_116_view
+    WHERE pmel_root = $P{pmel_root}::bigint
+)
+ SELECT a.pmel_id,
+	a.pmel_position,
+	a.numrss,
+	a.sexe,
+	a.codess,
+	a.clecodess,
+	a.rangbeneficiaire,
+	a.numfacture,
+	to_date(a.datenaissance, 'DDMMYYYY') datenaissance,
+	to_date(a.dateentree, 'DDMMYYYY') dateentree,
+	to_date(a.datesortie, 'DDMMYYYY') datesortie,
+	a.etatliquidation,
+	a.totalfactureph::integer,
+	a.totalfacturehonoraire::integer,
+	dr.numrss IS NOT NULL hospit,
+	dr.numrss rssnumrss
+FROM fava_rsfa_2012_view a
+LEFT JOIN distinctrss dr ON
+       a.numrss = dr.numrss
+WHERE a.pmel_root = $P{pmel_root}::bigint]]>
+	</queryString>
+	<field name="pmel_id" class="java.lang.Long"/>
+	<field name="numrss" class="java.lang.String"/>
+	<field name="sexe" class="java.lang.String"/>
+	<field name="codess" class="java.lang.String"/>
+	<field name="clecodess" class="java.lang.String"/>
+	<field name="rangbeneficiaire" class="java.lang.String"/>
+	<field name="numfacture" class="java.lang.String"/>
+	<field name="datenaissance" class="java.sql.Date"/>
+	<field name="dateentree" class="java.sql.Date"/>
+	<field name="datesortie" class="java.sql.Date"/>
+	<field name="etatliquidation" class="java.lang.String"/>
+	<field name="totalfactureph" class="java.lang.Integer"/>
+	<field name="totalfacturehonoraire" class="java.lang.Integer"/>
+	<field name="pmel_position" class="java.lang.Long"/>
+	<field name="hospit" class="java.lang.Boolean"/>
+	<field name="rssnumrss" class="java.lang.String"/>
+	<detail>
+		<band height="95" splitType="Stretch">
+			<property name="local_mesure_unitheight" value="pixel"/>
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<rectangle>
+				<reportElement x="0" y="2" width="369" height="21" forecolor="#000000" backcolor="#000000" uuid="d24bcbab-c400-4e20-8e83-2518393efb11">
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+			</rectangle>
+			<textField>
+				<reportElement mode="Transparent" x="0" y="2" width="210" height="20" forecolor="#FFFFFF" backcolor="#000000" uuid="5279eb1d-bf6e-4676-871d-0e557e086cc7"/>
+				<textElement>
+					<font size="16"/>
+					<paragraph leftIndent="2" rightIndent="2" spacingBefore="1" spacingAfter="1"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Facture n° " + $F{numfacture}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="370" y="2" width="184" height="14" uuid="e52d1b38-7bc1-469a-b6c4-fc18e70984f7">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<paragraph leftIndent="2" rightIndent="2" spacingBefore="1" spacingAfter="1"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Date de naissance : " + new SimpleDateFormat("dd/MM/yyyy").format($F{datenaissance})]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="370" y="16" width="184" height="14" uuid="7ecf1b0d-ac54-4001-b5e9-8c93d72501a4">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<paragraph firstLineIndent="0" leftIndent="2" rightIndent="2" spacingBefore="1" spacingAfter="1"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Sexe : " + ($F{sexe}.equals("1") ? "M" : "") + ($F{sexe}.equals("2") ? "F" : "")]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="0" y="0" width="554" height="1" uuid="82b6a037-b2c0-48cd-a842-e602ba10b5f3"/>
+			</line>
+			<rectangle>
+				<reportElement mode="Transparent" x="371" y="2" width="184" height="70" uuid="8f7d4558-af07-454e-8f0e-d7d0f6f61503">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<graphicElement>
+					<pen lineStyle="Solid"/>
+				</graphicElement>
+			</rectangle>
+			<textField>
+				<reportElement x="371" y="30" width="184" height="14" uuid="cccd9a7f-9d3c-4563-9fd4-d97e7712635a">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<paragraph leftIndent="2" rightIndent="2" spacingBefore="1" spacingAfter="1"/>
+				</textElement>
+				<textFieldExpression><![CDATA["NSS : " + $F{codess}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="370" y="44" width="184" height="14" uuid="941e14b3-2fff-4b1a-a7e5-818d726ec151">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<paragraph leftIndent="2" rightIndent="2" spacingBefore="1" spacingAfter="1"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Clef SS : " + $F{clecodess}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement mode="Transparent" x="370" y="58" width="184" height="14" forecolor="#000000" backcolor="#FFFFFF" uuid="567f0b7a-7d33-467e-a9fc-cb68318d8d48"/>
+				<box padding="0" topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="0"/>
+				<textElement textAlignment="Left" verticalAlignment="Top" rotation="None" markup="none">
+					<font fontName="SansSerif" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single" lineSpacingSize="1.0" firstLineIndent="0" leftIndent="2" rightIndent="2" spacingBefore="1" spacingAfter="1" tabStopWidth="40"/>
+				</textElement>
+				<textFieldExpression><![CDATA["RSS : " + ($F{hospit} ? $F{rssnumrss}.trim() : "aucun")]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="90" y="25" width="180" height="14" uuid="7a5cc8d1-faea-4f28-b405-4ea241fada78">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Courier 10 Pitch"/>
+					<paragraph leftIndent="2" rightIndent="2" spacingBefore="1" spacingAfter="1" tabStopWidth="40"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new DecimalFormat("+#,##0.00;-#,##0.00", new DecimalFormatSymbols(Locale.FRANCE)).format(new BigDecimal($F{totalfactureph}).divide(new BigDecimal(100)))]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="25" width="90" height="14" uuid="b936b992-4f13-4564-892e-fc2f0ff19111">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<paragraph firstLineIndent="0" leftIndent="2" rightIndent="2" spacingBefore="1" spacingAfter="1"/>
+				</textElement>
+				<text><![CDATA[Prestations Hosp]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="90" y="40" width="180" height="14" uuid="3684bb3a-ff95-4723-9b20-0b1b1cca12a5">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Courier 10 Pitch"/>
+					<paragraph leftIndent="2" rightIndent="2" spacingBefore="1" spacingAfter="1"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new DecimalFormat("+#,##0.00;-#,##0.00", new DecimalFormatSymbols(Locale.FRANCE)).format(new BigDecimal($F{totalfacturehonoraire}).divide(new BigDecimal(100)))]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="40" width="90" height="14" uuid="ae36bac7-7e0f-41e6-8f84-be989fad9813">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<paragraph leftIndent="2" rightIndent="2" spacingBefore="1" spacingAfter="1" tabStopWidth="40"/>
+				</textElement>
+				<text><![CDATA[Honoraires]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="54" width="270" height="1" uuid="fe6cf304-029f-415f-8fd9-ab18f5b93410"/>
+			</line>
+			<textField>
+				<reportElement x="90" y="55" width="180" height="14" uuid="d2c5d129-b4a4-4848-9905-08b338721190">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Courier 10 Pitch"/>
+					<paragraph leftIndent="2" rightIndent="2" spacingBefore="1" spacingAfter="1"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new DecimalFormat("+#,##0.00;-#,##0.00", new DecimalFormatSymbols(Locale.FRANCE)).format(new BigDecimal($F{totalfacturehonoraire} + $F{totalfactureph}).divide(new BigDecimal(100)))]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="55" width="90" height="14" uuid="544f0936-a6de-4250-9503-55249c573b68">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<paragraph leftIndent="2" rightIndent="2" spacingBefore="1" spacingAfter="1"/>
+				</textElement>
+				<text><![CDATA[Total]]></text>
+			</staticText>
+			<textField>
+				<reportElement mode="Transparent" x="210" y="2" width="160" height="20" forecolor="#FFFFFF" backcolor="#000000" uuid="0eefd624-c3f4-4fc2-b7e4-33dbf98cf19e"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10"/>
+					<paragraph leftIndent="2" rightIndent="2" spacingBefore="1" spacingAfter="1"/>
+				</textElement>
+				<textFieldExpression><![CDATA["(" + new SimpleDateFormat("dd/MM/yyyy").format($F{dateentree}) + "-" + new SimpleDateFormat("dd/MM/yyyy").format($F{datesortie}) + ")"]]></textFieldExpression>
+			</textField>
+			<subreport>
+				<reportElement x="0" y="80" width="554" height="1" uuid="20a09d71-1849-4b59-b63d-a435f0457543">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<subreportParameter name="pmel_parent">
+					<subreportParameterExpression><![CDATA[$F{pmel_position}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="pmel_root">
+					<subreportParameterExpression><![CDATA[$P{pmel_root}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression class="net.sf.jasperreports.engine.JasperReport">
+					<![CDATA[com.github.aiderpmsi.pimsdriver.jaxrs.Report.reportFromResourceName("fact_rsfb.jrxml"))]]>
+				</subreportExpression>
+			</subreport>
+			<subreport>
+				<reportElement positionType="Float" x="0" y="85" width="554" height="1" uuid="7a4695e5-74b1-40b3-9407-13484698b516">
+					<property name="local_mesure_unity" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="local_mesure_unitx" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<subreportParameter name="pmel_root">
+					<subreportParameterExpression><![CDATA[$P{pmel_root}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="pmel_parent">
+					<subreportParameterExpression><![CDATA[$F{pmel_position}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression class="net.sf.jasperreports.engine.JasperReport">
+					<![CDATA[com.github.aiderpmsi.pimsdriver.jaxrs.Report.reportFromResourceName("fact_rsfc.jrxml"))]]>
+				</subreportExpression>
+			</subreport>
+		</band>
+	</detail>
+</jasperReport>
