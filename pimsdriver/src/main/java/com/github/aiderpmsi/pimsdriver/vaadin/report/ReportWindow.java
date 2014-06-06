@@ -33,7 +33,8 @@ public class ReportWindow extends Window {
         setContent(hl);
 
 		// CREATE LINK TO JAX-RS TO EXPORT ELEMENT
-		Link report = new Link("Rapport", new ExternalResource("rest/report/report/" + pmsi.getRecordid() + "/factures" + pmsi.getFiness() + ".pdf"));
+		Link report = new Link("Rapport", new ExternalResource("rest/report/report/" + pmsi.getRecordid() + "/factures.pdf"));
+		report.setTargetName("facture" + pmsi.getFiness() + ".pdf");
 		hl.addComponent(report);
 	}
 
