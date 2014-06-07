@@ -388,3 +388,53 @@ SELECT pmel.pmel_id,
     pmel.pmel_root = plud.plud_id
   WHERE pmel.pmel_type = 'rssmain'
     AND plud.plud_arguments -> 'rssversion' = 'rss116header';
+
+CREATE VIEW public.sava_rssacte_116_view AS
+SELECT pmel.pmel_id,
+       pmel.pmel_root,
+       pmel.pmel_position,
+       pmel.pmel_parent,
+       pmel.pmel_type,
+       pmel.pmel_line,
+       substring(pmel.pmel_content from 1 for 8) DateRealisation,
+       substring(pmel.pmel_content from 9 for 7) CodeCCAM,
+       substring(pmel.pmel_content from 16 for 1) Phase,
+       substring(pmel.pmel_content from 17 for 1) Activite,
+       substring(pmel.pmel_content from 18 for 1) Ext,
+       substring(pmel.pmel_content from 19 for 4) Modificateurs,
+       substring(pmel.pmel_content from 23 for 1) RbtExceptionnel,
+       substring(pmel.pmel_content from 24 for 1) AssocNonPrevue,
+       substring(pmel.pmel_content from 25 for 2) NbActe
+  FROM public.pmel_pmsielement pmel
+  JOIN public.plud_pmsiupload plud ON
+    pmel.pmel_root = plud.plud_id
+  WHERE pmel.pmel_type = 'rssacte'
+    AND plud.plud_arguments -> 'rssversion' = 'rss116header';
+
+CREATE VIEW public.sdva_rssda_116_view AS
+SELECT pmel.pmel_id,
+       pmel.pmel_root,
+       pmel.pmel_position,
+       pmel.pmel_parent,
+       pmel.pmel_type,
+       pmel.pmel_line,
+       substring(pmel.pmel_content from 1 for 8) DA
+  FROM public.pmel_pmsielement pmel
+  JOIN public.plud_pmsiupload plud ON
+    pmel.pmel_root = plud.plud_id
+  WHERE pmel.pmel_type = 'rssda'
+    AND plud.plud_arguments -> 'rssversion' = 'rss116header';
+    
+CREATE VIEW public.sdda_rssdad_116_view AS
+SELECT pmel.pmel_id,
+       pmel.pmel_root,
+       pmel.pmel_position,
+       pmel.pmel_parent,
+       pmel.pmel_type,
+       pmel.pmel_line,
+       substring(pmel.pmel_content from 1 for 8) DAD
+  FROM public.pmel_pmsielement pmel
+  JOIN public.plud_pmsiupload plud ON
+    pmel.pmel_root = plud.plud_id
+  WHERE pmel.pmel_type = 'rssdad'
+    AND plud.plud_arguments -> 'rssversion' = 'rss116header';
