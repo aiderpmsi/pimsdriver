@@ -9,27 +9,24 @@ import org.xml.sax.SAXException;
 
 public abstract class PmsiContentHandlerHelper extends ContentHandlerHelper {
 
-	private static final int LINE_NUMBER = 0;
-	private static final int HEADER = 1;
-	private static final int ELEMENT = 2;
-	private static final int PROPERTY = 3;
-	private static final int PROPERTY_HEADER = 4;
-	private static final int ELSE = 5;
+	protected enum State {
+		LINE_NUMBER, HEADER, ELEMENT, PROPERTY, PROPERTY_HEADER, ELSE;
+	}
 
 	/** Stores if we are in a line number, element, property on somewhere else */
-	private int position = ELSE;
+	protected State position = State.ELSE;
 	
 	/** Stores the elements of charachter for each element */
-	private StringBuilder content;
+	protected StringBuilder content;
 	
 	/** NumLine */
-	private String lineNumber = "0";
+	protected String lineNumber = "0";
 	
 	/** Finess */
-	private StringBuilder finess = new StringBuilder();
+	protected StringBuilder finess = new StringBuilder();
 	
 	/** Version of the rsf */
-	private String version;
+	protected String version;
 
 	/** Process that makes the link with the db */
 	protected DbLink dblink;
@@ -69,7 +66,7 @@ public abstract class PmsiContentHandlerHelper extends ContentHandlerHelper {
 	@Override
 	public void startPrefixMapping(String prefix, String uri)
 			throws SAXException {
-		// DO NOTHIN
+		// DO NOTHING
 	}
 
 	@Override
@@ -85,17 +82,17 @@ public abstract class PmsiContentHandlerHelper extends ContentHandlerHelper {
 
 		// UPDATES POSITION
 		position =
-				isElement(getNumLinePath()) ? LINE_NUMBER :
-				(isElement(getElementPath()) ? ELEMENT :
-				(isElement(getHeaderPath()) ? HEADER :
-				(isElement(getPropertyPath()) ?	(position == ELEMENT ? PROPERTY : PROPERTY_HEADER) : ELSE)));
+				isElement(getNumLinePath()) ? State.LINE_NUMBER :
+				(isElement(getElementPath()) ? State.ELEMENT :
+				(isElement(getHeaderPath()) ? State.HEADER :
+				(isElement(getPropertyPath()) ?	(position == State.ELEMENT ? State.PROPERTY : State.PROPERTY_HEADER) : State.ELSE)));
 		
-		if (position == LINE_NUMBER || position == ELEMENT || position == HEADER) {
+		if (position == State.LINE_NUMBER || position == State.ELEMENT || position == State.HEADER) {
 			// REINIT THE CONTENT OF THIS LINE
 			content = new StringBuilder();
 		}
 		
-		if (position == HEADER) {
+		if (position == State.HEADER) {
 			version = atts.getValue("version");
 		}
 
@@ -105,7 +102,7 @@ public abstract class PmsiContentHandlerHelper extends ContentHandlerHelper {
 	public void endElement(String uri, String localName, String qName)
 			throws SAXException {
 		// IF WE ARE LEAVING AN ELEMENT OR THE HEADER, SEND IT TO THE PROCESSING
-		if (position == ELEMENT || position == HEADER) {
+		if (position == State.ELEMENT || position == State.HEADER) {
 			Entry entry = new Entry();
 			entry.pmel_type = contentPath.getLast();
 			entry.pmel_content = content.toString();
@@ -117,16 +114,16 @@ public abstract class PmsiContentHandlerHelper extends ContentHandlerHelper {
 			}
 		}
 		
-		if (position == PROPERTY) {
+		if (position == State.PROPERTY) {
 			// IF WE ARE LEAVING A PROPERTY
-			position = ELEMENT;
-		} else if (position == PROPERTY_HEADER) {
-			position = HEADER;
-		} else if (position == LINE_NUMBER) {
+			position = State.ELEMENT;
+		} else if (position == State.PROPERTY_HEADER) {
+			position = State.HEADER;
+		} else if (position == State.LINE_NUMBER) {
 			lineNumber = content.toString();
-			position = ELSE;
-		} else if (position == ELEMENT || position == HEADER) {
-			position = ELSE;
+			position = State.ELSE;
+		} else if (position == State.ELEMENT || position == State.HEADER) {
+			position = State.ELSE;
 		}
 
 		// BE SURE TO DECREMENT DEPTH
@@ -137,11 +134,11 @@ public abstract class PmsiContentHandlerHelper extends ContentHandlerHelper {
 	public void characters(char[] ch, int start, int length)
 			throws SAXException {
 		// IF WE ARE IN PROPERTY OR NUMLINE
-		if (position == PROPERTY || position == PROPERTY_HEADER || position == LINE_NUMBER) {
+		if (position == State.PROPERTY || position == State.PROPERTY_HEADER || position == State.LINE_NUMBER) {
 			content.append(ch, start, length);
 		}
 		
-		if (position == PROPERTY_HEADER && contentPath.getLast().equals("Finess")) {
+		if (position == State.PROPERTY_HEADER && contentPath.getLast().equals("Finess")) {
 			finess.append(ch, start, length);
 		}
 	}
