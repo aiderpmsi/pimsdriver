@@ -27,7 +27,7 @@ import com.github.aiderpmsi.pims.treebrowser.TreeBrowserException;
  * @author jpc
  *
  */
-public class GroupDbLink extends InputStream implements Callable<Boolean> {
+public class GroupDbLink extends InputStream implements Callable<Path> {
 
 	/** Queue serving as an ipc */
 	public LinkedBlockingQueue<GroupEntry> queue = new LinkedBlockingQueue<>(2048);
@@ -62,14 +62,14 @@ public class GroupDbLink extends InputStream implements Callable<Boolean> {
 	}
 
 	@Override
-	public Boolean call() throws InterruptedException, IOException {
+	public Path call() throws InterruptedException, IOException {
 		// COPY FROM THIS READER TO THE FILE
 		Files.copy(this, tmpFile, StandardCopyOption.REPLACE_EXISTING);
 		
 		if (Thread.interrupted())
 			throw new InterruptedException();
 		
-		return null;
+		return tmpFile;
 	}
 
 	@Override
@@ -208,6 +208,7 @@ public class GroupDbLink extends InputStream implements Callable<Boolean> {
 
 				newContent.setRssmain(mainContent);
 				fullRss.add(newContent);
+				lastNumRss = groupEntry.content.get("NumRSS");
 			} else if (groupEntry.line_type.equals("rssacte")) {
 				EnumMap<RssActe, String> acteRss = new EnumMap<>(RssActe.class);
 				acteRss.put(RssActe.activite, groupEntry.content.get("Activite"));

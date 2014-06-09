@@ -1,8 +1,13 @@
 package com.github.aiderpmsi.pimsdriver.db;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import org.xml.sax.SAXException;
 
@@ -14,10 +19,38 @@ public class RssContentHandler extends PmsiContentHandlerHelper {
 	
 	protected GroupDbLink groupdblink;
 	
-	public RssContentHandler(Connection con, Long uploadPKId, long pmsiPosition) throws IOException {
+	protected Future<Path> groupFuture;
+		
+	public RssContentHandler(Connection con, Long uploadPKId, long pmsiPosition) throws IOException, SQLException {
 		groupdblink = new GroupDbLink();
+		dblink = new RssDbLink(con, uploadPKId, pmsiPosition);
 	}
 	
+	@Override
+	public void startDocument() throws SAXException {
+		// WHEN WE ENTER IN THIS DOCUMENT, START THE DB LINK
+		groupFuture = Executors.newSingleThreadExecutor().submit(groupdblink);
+		super.startDocument();
+	}
+
+	@Override
+	public void endDocument() throws SAXException {
+		// WE HAVE TO WAIT THE GROUP LINK TO END
+		try {
+			GroupEntry groupEntry = new GroupEntry();
+			groupEntry.finished = true;
+			groupdblink.store(groupEntry);
+			groupFuture.get();
+		} catch (InterruptedException e) {
+			// DO NOTHING, WE HAVE TO END
+		} catch (ExecutionException e) {
+			throw new SAXException(e);
+		} finally {
+			groupFuture = null;
+			super.endDocument();
+		}
+	}
+
 	@Override
 	public void endElement(String uri, String localName, String qName)
 			throws SAXException {
