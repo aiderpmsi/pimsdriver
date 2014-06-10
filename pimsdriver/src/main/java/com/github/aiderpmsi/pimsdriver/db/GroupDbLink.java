@@ -44,13 +44,20 @@ public class GroupDbLink extends InputStream implements Callable<Path> {
 	/** Rss (list of Rums) */
 	private List<RssContent> fullRss = new ArrayList<>();
 	
+	/** List of pmsipositions of current rss */
+	private List<Long> pmsiPositions = new ArrayList<>();
+	
 	/** Last rss number */
 	private String lastNumRss = null;
 	
 	/** Used Grouper */
 	private Grouper grouper;
 		
-	public GroupDbLink() throws IOException {
+	/** Positino in pmsi */
+	protected Long pmsiPosition;
+	
+	public GroupDbLink(Long startPmsiPosition) throws IOException {
+		this.pmsiPosition = startPmsiPosition;
 		// USE A TEMP FILE TO STORE GROUPING RESULTS
 		tmpFile = Files.createTempFile("", "");
 		// GROUPER USED
@@ -148,7 +155,7 @@ public class GroupDbLink extends InputStream implements Callable<Path> {
 		// INDICATES IF SOMETHING HAS REALLY BEEN INSERTED
 		boolean inserted = false;
 		// TRY TO FILL
-		while (remaining.length == initialSize) {
+		while (remaining.length == initialSize && end == false) {
 			GroupEntry groupEntry;
 			try {
 				groupEntry = queue.poll(1, TimeUnit.SECONDS);
@@ -165,7 +172,7 @@ public class GroupDbLink extends InputStream implements Callable<Path> {
 				// WE ARE AT END OF STREAM, STORE BUFFER IF NEEDED
 				end = true;
 				if (fullRss.size() != 0)
-					store(fullRss);
+					store(fullRss, pmsiPositions);
 				inserted = true;
 				break;
 			}
@@ -180,11 +187,11 @@ public class GroupDbLink extends InputStream implements Callable<Path> {
 					&& lastNumRss != null
 					&& (newNumRss = groupEntry.content.get("NumRSS")) != null
 					&& newNumRss != lastNumRss) {
-				store(fullRss);
+				store(fullRss, pmsiPositions);
 				// REINIT FULL RSS
 				fullRss = new ArrayList<>();
+				pmsiPositions = new ArrayList<>();
 				inserted = true;
-				break;
 			}
 			
 			// DEPENDING ON THE LINE TYPE :
@@ -209,6 +216,7 @@ public class GroupDbLink extends InputStream implements Callable<Path> {
 				newContent.setRssmain(mainContent);
 				fullRss.add(newContent);
 				lastNumRss = groupEntry.content.get("NumRSS");
+				pmsiPositions.add(pmsiPosition++);
 			} else if (groupEntry.line_type.equals("rssacte")) {
 				EnumMap<RssActe, String> acteRss = new EnumMap<>(RssActe.class);
 				acteRss.put(RssActe.activite, groupEntry.content.get("Activite"));
@@ -216,21 +224,25 @@ public class GroupDbLink extends InputStream implements Callable<Path> {
 				acteRss.put(RssActe.phase, groupEntry.content.get("Phase"));
 				
 				fullRss.get(fullRss.size() - 1).getRssacte().add(acteRss);
+				pmsiPositions.add(pmsiPosition++);
 			} else if (groupEntry.line_type.equals("rssda")) {
 				EnumMap<RssDa, String> daRss = new EnumMap<>(RssDa.class);
 				daRss.put(RssDa.da, groupEntry.content.get("DA"));
 				
 				fullRss.get(fullRss.size() - 1).getRssda().add(daRss);
+				pmsiPositions.add(pmsiPosition++);
 			}
 		}
 		return inserted;
 	}
 	
-	private void store(List<RssContent> rums) throws IOException {
+	private void store(List<RssContent> rums, List<Long> pmsiPositions) throws IOException {
 		Group group;
 		try {
 			group = grouper.group(rums);
 			StringBuilder line = new StringBuilder();
+			escape(lastNumRss, line);
+			line.append('|');
 			escape(group.getRacine(), line);
 			line.append('|');
 			escape(group.getModalite(), line);
@@ -239,7 +251,10 @@ public class GroupDbLink extends InputStream implements Callable<Path> {
 			line.append('|');
 			escape(group.getErreur(), line);
 			line.append('\n');
-			remaining = ArrayUtils.addAll(remaining, line.toString().getBytes("UTF-8"));
+			String postfix = line.toString();
+			for (Long pmsiPosition : pmsiPositions) {
+				remaining = ArrayUtils.addAll(remaining, (Long.toString(pmsiPosition) + '|' + postfix).getBytes("UTF-8"));
+			}
 		} catch (Exception e) {
 			throw new IOException(e);
 		}

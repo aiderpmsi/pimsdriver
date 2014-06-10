@@ -1,6 +1,9 @@
 package com.github.aiderpmsi.pimsdriver.db;
 
 import java.io.IOException;
+import java.io.Reader;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -9,6 +12,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import org.apache.commons.dbcp2.DelegatingConnection;
+import org.postgresql.copy.CopyManager;
 import org.xml.sax.SAXException;
 
 public class RssContentHandler extends PmsiContentHandlerHelper {
@@ -20,12 +25,18 @@ public class RssContentHandler extends PmsiContentHandlerHelper {
 	protected GroupDbLink groupdblink;
 	
 	protected Future<Path> groupFuture;
+	
+	/** Copy Manager */
+	private CopyManager cm;
 		
 	public RssContentHandler(Connection con, Long uploadPKId, long pmsiPosition) throws IOException, SQLException {
-		groupdblink = new GroupDbLink();
+		@SuppressWarnings("unchecked")
+		Connection conn = ((DelegatingConnection<Connection>) con).getInnermostDelegateInternal();
+		cm = new CopyManager((org.postgresql.core.BaseConnection)conn);
+		groupdblink = new GroupDbLink(pmsiPosition);
 		dblink = new RssDbLink(con, uploadPKId, pmsiPosition);
 	}
-	
+
 	@Override
 	public void startDocument() throws SAXException {
 		// WHEN WE ENTER IN THIS DOCUMENT, START THE DB LINK
@@ -36,6 +47,7 @@ public class RssContentHandler extends PmsiContentHandlerHelper {
 	@Override
 	public void endDocument() throws SAXException {
 		// WE HAVE TO WAIT THE GROUP LINK TO END
+		Path tmpFile = null;
 		try {
 			GroupEntry groupEntry = new GroupEntry();
 			groupEntry.finished = true;
@@ -48,7 +60,19 @@ public class RssContentHandler extends PmsiContentHandlerHelper {
 		} finally {
 			groupFuture = null;
 			super.endDocument();
+			// SUBPROCESSES HAVE FINISHED, CURRENT PROCESS CAN NOW COPY THE TMP FILE WITH GROUPS IN DATABASE
+			Reader reader = null;
+			try {
+				reader = Files.newBufferedReader(tmpFile, Charset.forName("UTF-8"));
+				cm.copyIn(query, reader);
+			} catch (IOException | SQLException e) {
+				throw new SAXException(e);
+			} finally {
+				if (reader != null) try {reader.close();} catch (IOException e) {throw new SAXException(e);}
+				try {Files.deleteIfExists(tmpFile);} catch (IOException e) {throw new SAXException(e);}
+			}
 		}
+		
 	}
 
 	@Override
@@ -112,4 +136,6 @@ public class RssContentHandler extends PmsiContentHandlerHelper {
 
 	private static final String[][] propertyPath = {{"root"}, {"rssheader", "rssmain", "rssacte", "rssda", "rssdad"}, {"*"}};
 
+	private static final String query = "COPY pmgr_temp (pmel_id, pmgr_racine, pmgr_modalite, pmgr_gravite, pmgr_erreur) "
+			+ "FROM STDIN WITH DELIMITER '|'";
 }

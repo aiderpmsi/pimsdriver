@@ -1,4 +1,5 @@
 CREATE SCHEMA pmel;
+CREATE SCHEMA pmgr;
 
 CREATE TYPE public.plud_status AS ENUM ('pending', 'successed', 'failed');
 
@@ -13,6 +14,16 @@ CREATE TABLE public.plud_pmsiupload (
   plud_rss_oid oid,
   plud_arguments hstore NOT NULL DEFAULT hstore(''),
   CONSTRAINT plud_pmsiupload_pkey PRIMARY KEY (plud_id)
+);
+
+CREATE TABLE public.pmgr_pmsigroups (
+  pmgr_id bigserial NOT NULL,
+  pmel.pmel_id bigint NOT NULL,
+  pmgr.pmgr_racine character varying NOT NULL,
+  pmgr.pmgr_modalite character varying NOT NULL,
+  pmgr.pmgr_gravite character varying NOT NULL,
+  pmgr.pmgr_erreur character varying NOT NULL
+  CONSTRAINT pmgr_pmsigroup_pkey PRIMARY KEY (pmgr_id)
 );
 
 CREATE TABLE public.pmel_pmsielement (
