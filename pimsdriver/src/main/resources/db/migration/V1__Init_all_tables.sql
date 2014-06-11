@@ -18,6 +18,7 @@ CREATE TABLE public.plud_pmsiupload (
 
 CREATE TABLE public.pmgr_pmsigroups (
   pmgr_id bigserial NOT NULL,
+  pmel_root bigint NOT NULL,
   pmel_id bigint NOT NULL,
   pmgr_racine character varying NOT NULL,
   pmgr_modalite character varying NOT NULL,
@@ -34,7 +35,8 @@ CREATE TABLE public.pmel_pmsielement (
   pmel_type character varying NOT NULL,
   pmel_line bigint NOT NULL,
   pmel_content character varying NOT NULL,
-  pmel_arguments hstore NOT NULL DEFAULT hstore('')
+  pmel_arguments hstore NOT NULL DEFAULT hstore(''),
+  CONSTRAINT pmel_pmsielement_pkey PRIMARY KEY (pmel_id)
 );
 
 CREATE TABLE pmel.pmel_cleanup (

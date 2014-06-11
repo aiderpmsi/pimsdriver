@@ -224,13 +224,13 @@ public class GroupDbLink extends InputStream implements Callable<Path> {
 				acteRss.put(RssActe.phase, groupEntry.content.get("Phase"));
 				
 				fullRss.get(fullRss.size() - 1).getRssacte().add(acteRss);
-				pmsiPositions.add(pmsiPosition++);
+				pmsiPosition++;
 			} else if (groupEntry.line_type.equals("rssda")) {
 				EnumMap<RssDa, String> daRss = new EnumMap<>(RssDa.class);
 				daRss.put(RssDa.da, groupEntry.content.get("DA"));
 				
 				fullRss.get(fullRss.size() - 1).getRssda().add(daRss);
-				pmsiPositions.add(pmsiPosition++);
+				pmsiPosition++;
 			}
 		}
 		return inserted;

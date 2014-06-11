@@ -116,8 +116,8 @@ public class ProcessImpl implements Callable<Boolean> {
 				createGroupPartitionPs.execute();
 				// COPY ELEMENTS FROM PMGR TEMP TO PMGR DEFINITIVE
 				String copyGroupPartitionQuery =
-						"INSERT INTO pmgr.pmgr_" + element.getRecordid() + " (pmel_id, pmgr_racine, pmgr_modalite, pmgr_gravite, pmgr_erreur) \n"
-						+ "SELECT pmel.pmel_id, pmgr.pmgr_racine, pmgr.pmgr_modalite, pmgr.pmgr_gravite, pmgr.pmgr_erreur \n"
+						"INSERT INTO pmgr.pmgr_" + element.getRecordid() + " (pmel_id, pmel_root, pmgr_racine, pmgr_modalite, pmgr_gravite, pmgr_erreur) \n"
+						+ "SELECT pmel.pmel_id, " + element.getRecordid() + ", pmgr.pmgr_racine, pmgr.pmgr_modalite, pmgr.pmgr_gravite, pmgr.pmgr_erreur \n"
 						+ "FROM pmgr_temp pmgr \n"
 						+ "JOIN pmel.pmel_" + element.getRecordid() + " pmel ON \n"
 						+ "pmgr.pmel_position = pmel.pmel_position;";
@@ -171,6 +171,27 @@ public class ProcessImpl implements Callable<Boolean> {
 		}
 
 		return true;
+	}
+	
+	private void createGroupContraints(long id, CharSequence suffix, Connection con) throws SQLException {
+		CharSequence idRepresentation = Long.toString(id);
+		CharSequence fs = new StringBuilder(idRepresentation).append(suffix);
+		String query = 
+				  "ALTER TABLE pmgr.pmgr_" + fs + '\n'
+				+ " ADD CONSTRAINT pmgr_inherited_" + fs + "_root_check CHECK (pmel_root = " + id + ") NO INHERIT;\n"
+				+ "ALTER TABLE pmgr.pmgr_" + fs + '\n'
+				+ " ADD CONSTRAINT pmgr_inherited_" + fs + "_pkey PRIMARY KEY (pmgr_id);\n"
+				+ "ALTER TABLE pmgr.pmgr_" + fs + '\n'
+				+ " ADD CONSTRAINT pmgr_inherited_" + fs + "_pmel_id_unique UNIQUE (pmel_id);\""
+				+ "ALTER TABLE pmgr.pmgr_" + fs + '\n'
+				+ " ADD CONSTRAINT pmgr_inherited_" + fs + "_pmel_root_fkey FOREIGN KEY (pmel_root)\n"
+				+ " REFERENCES public.plud_pmsiupload (plud_id) MATCH SIMPLE\n"
+				+ " ON UPDATE NO ACTION ON DELETE NO ACTION DEFERRABLE INITIALLY DEFERRED;\n"
+				+ "ALTER TABLE pmgr.pmgr_" + fs + '\n'
+				+ " ADD CONSTRAINT pmgr_inherited_" + fs + "_pmel_id_fkey FOREIGN KEY (pmel_id)\n"
+				+ " REFERENCES pmel.pmel_" + fs + " (pmel_id) MATCH SIMPLE\n"
+				+ " ON UPDATE NO ACTION ON DELETE NO ACTION DEFERRABLE INITIALLY DEFERRED;\n";
+		con.prepareCall(query).execute();
 	}
 
 	private void createConstraints(long id, CharSequence suffix, Connection con) throws SQLException {
