@@ -8,82 +8,53 @@ import com.github.aiderpmsi.pimsdriver.db.DataSourceSingleton;
 import com.github.aiderpmsi.pimsdriver.dto.CleanupDTO;
 
 public class CleanupActions {
-
+	
 	public List<Long> getToCleanup() throws ActionException {
 
-		Connection con = null;
-		
-		try {
-			con = DataSourceSingleton.getInstance().getConnection();
-			CleanupDTO cu = new CleanupDTO();
+		try (Connection con = DataSourceSingleton.getInstance().getConnection()) {
+			CleanupDTO cu = new CleanupDTO(con);
 			
-			// STAYS NULL IF SELECTION IS NOT SUCCEDED BECAUSE OF SERIALIZATION EXCEPTIONS
-			List<Long> cleanup = null;
-			while (cleanup == null) {
+			// CONTINUE WHILE SELECTION HAS NOT SUCCEDED BECAUSE OF SERIALIZATION EXCEPTIONS
+			for (;;) {
 				try {
-					cleanup = cu.readList(con);
+					List<Long> cleanup = cu.readList();
 					// SELECTION HAS SUCCEDDED
 					con.commit();
+					return cleanup;
 				} catch (SQLException e) {
-					if (e.getSQLState().equals("40001"))
-						cleanup = null;
-					else
+					if (!e.getSQLState().equals("40001")) {
+						con.rollback();
 						throw e;
+					}
 				}
 			}
-			
-			return cleanup;
-			
 		} catch (SQLException e) {
-			// ERROR : ROLLBACK
-			try {if (con != null) con.rollback();} catch (SQLException e2) {
-				e2.addSuppressed(e);
-				throw new ActionException(e2);
-			}
 			throw new ActionException(e);
-		} finally {
-			try {if (con != null) con.close();} catch (SQLException e) {
-				throw new ActionException(e);
-			}
 		}
 	}
 
 	public void cleanup(Long cleanupId) throws ActionException {
 
-		Connection con = null;
-		
-		try {
-			con = DataSourceSingleton.getInstance().getConnection();
-			CleanupDTO cu = new CleanupDTO();
+		try (Connection con = DataSourceSingleton.getInstance().getConnection()) {
+			CleanupDTO cu = new CleanupDTO(con);
 			
-			// STAYS NULL IF SELECTION IS NOT SUCCEDED BECAUSE OF SERIALIZATION EXCEPTIONS
-			Boolean pending = true;
-			while (pending == true) {
+			// CONTINUE WHILE SELECTION HAS NOT SUCCEDED BECAUSE OF SERIALIZATION EXCEPTIONS
+			for (;;) {
 				try {
-					cu.delete(con, cleanupId);
+					cu.delete(cleanupId);
 					// SELECTION HAS SUCCEDDED
 					con.commit();
 					// GO OUT
-					pending = false;
+					return;
 				} catch (SQLException e) {
-					if (e.getSQLState().equals("40001"))
-						pending = true;
-					else
+					if (!e.getSQLState().equals("40001")) {
+						con.rollback();
 						throw e;
+					}
 				}
 			}
-			
 		} catch (SQLException e) {
-			// ERROR : ROLLBACK
-			try {if (con != null) con.rollback();} catch (SQLException e2) {
-				e2.addSuppressed(e);
-				throw new ActionException(e2);
-			}
 			throw new ActionException(e);
-		} finally {
-			try {if (con != null) con.close();} catch (SQLException e) {
-				throw new ActionException(e);
-			}
 		}
 	}
 }

@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.SQLException;
-
 import com.github.aiderpmsi.pimsdriver.db.DataSourceSingleton;
 import com.github.aiderpmsi.pimsdriver.dto.UploadPmsiDTO;
 import com.github.aiderpmsi.pimsdriver.dto.UploadedPmsiDTO;
@@ -14,76 +13,52 @@ import com.github.aiderpmsi.pimsdriver.dto.model.UploadedPmsi;
 public class IOActions {
 
 	public void uploadPmsi(UploadPmsi model, InputStream rsf, InputStream rss) throws ActionException {
-		Connection con = null;
 		
-		try {
-			con = DataSourceSingleton.getInstance().getConnection();
-			UploadPmsiDTO upd = new UploadPmsiDTO();
+		try (Connection con = DataSourceSingleton.getInstance().getConnection()) {
+			UploadPmsiDTO upd = new UploadPmsiDTO(con);
 			
-			// STAYS TRUE IF INSERTION IS NOT SUCCEDED BECAUSE OF SERIALIZATION EXCEPTIONS
-			Boolean pending = true;
-			while (pending) {
+			// CONTINUE WHILE SELECTION HAS NOT SUCCEDED BECAUSE OF SERIALIZATION EXCEPTIONS
+			for (;;) {
 				try {
-					upd.create(con, model, rsf, rss);
-					// INSERTION HAS SUCCEDDED
+					upd.create(model, rsf, rss);
+					// SELECTION HAS SUCCEDDED
 					con.commit();
-					pending = false;
-				} catch (SQLException e) {
-					if (e.getSQLState().equals("40001"))
-						pending = true;
-					else
-						throw e;
+					return;
+				} catch (SQLException | IOException e) {
+					if (e instanceof SQLException && !((SQLException)e).getSQLState().equals("40001")) {
+						con.rollback();
+						throw (SQLException) e;
+					} else {
+						throw new ActionException(e);
+					}
 				}
 			}
-			
-		} catch (SQLException | IOException e) {
-			// ERROR : ROLLBACK
-			try {if (con != null) con.rollback();} catch (SQLException e2) {
-				e2.addSuppressed(e);
-				throw new ActionException(e2);
-			}
+		} catch (SQLException e) {
 			throw new ActionException(e);
-		} finally {
-			try {if (con != null) con.close();} catch (SQLException e) {
-				throw new ActionException(e);
-			}
 		}
 	}
 
 	public void deletePmsi(UploadedPmsi model) throws ActionException {
-		Connection con = null;
-		
-		try {
-			con = DataSourceSingleton.getInstance().getConnection();
-			UploadedPmsiDTO upd = new UploadedPmsiDTO();
+
+		try (Connection con = DataSourceSingleton.getInstance().getConnection()) {
+			UploadedPmsiDTO upd = new UploadedPmsiDTO(con);
 			
-			// STAYS TRUE IF INSERTION IS NOT SUCCEDED BECAUSE OF SERIALIZATION EXCEPTIONS
-			Boolean pending = true;
-			while (pending) {
+			// CONTINUE WHILE SELECTION HAS NOT SUCCEDED BECAUSE OF SERIALIZATION EXCEPTIONS
+			for (;;) {
 				try {
-					upd.delete(con, model);
-					// INSERTION HAS SUCCEDDED
+					upd.delete(model);
+					// DELETION HAS SUCCEDDED
 					con.commit();
-					pending = false;
+					return;
 				} catch (SQLException e) {
-					if (e.getSQLState().equals("40001"))
-						pending = true;
-					else
-						throw e;
+					if (e instanceof SQLException && !((SQLException)e).getSQLState().equals("40001")) {
+						con.rollback();
+						throw (SQLException) e;
+					}
 				}
 			}
-			
 		} catch (SQLException e) {
-			// ERROR : ROLLBACK
-			try {if (con != null) con.rollback();} catch (SQLException e2) {
-				e2.addSuppressed(e);
-				throw new ActionException(e2);
-			}
 			throw new ActionException(e);
-		} finally {
-			try {if (con != null) con.close();} catch (SQLException e) {
-				throw new ActionException(e);
-			}
 		}
 	}
 

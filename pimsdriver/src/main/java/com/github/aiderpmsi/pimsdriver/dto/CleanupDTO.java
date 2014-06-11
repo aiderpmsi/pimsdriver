@@ -7,42 +7,71 @@ import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 
-public class CleanupDTO {
+import com.github.aiderpmsi.pimsdriver.dto.StatementProvider.Entry;
 
+public class CleanupDTO extends AutoCloseableDto<CleanupDTO.Cleanup>{
+
+	public enum Cleanup implements StatementProvider {
+		LIST,
+		DELETE;
+
+		@Override
+		public String getStatement(Entry<?>... entries) throws SQLException {
+			switch (this) {
+			case LIST:
+				return "SELECT plud_id FROM pmel.pmel_cleanup";
+			case DELETE:
+				if (entries.length == 1
+				&& entries[0].object != null
+				&& entries[0].object instanceof Long)
+					return
+							  "DROP TABLE pmgr.pmgr_" + entries[0].object + "; \n"
+							+ "DROP TABLE pmel.pmel_" + entries[0].object + "; \n"
+							+ "DELETE FROM pmel.pmel_cleanup WHERE plud_id = ?;";
+				else
+					throw new SQLException("getStatement for DELETE element needs not null Long entry");
+			}
+			
+			// SHOULD NEVER TOUCH THIS POINT
+			throw new RuntimeException("This code should never been reached");
+		}
+	};
+	
 	public class PmsiEntry {
 		public String lineName;
 		public long number;
 	}
 	
-	public List<Long> readList(Connection con) throws SQLException {
-		// GETS THE UPLOAD ID DELETED
-		String checkQuery = 
-				"SELECT plud_id FROM pmel.pmel_cleanup";
-		PreparedStatement checkPs = con.prepareStatement(checkQuery);
-		ResultSet checkRs = null;
+	public CleanupDTO(Connection con) {
+		super(con, CleanupDTO.Cleanup.class);
+	}
 
-		// FILLS A LINKED LIST
-		List<Long> elements = new LinkedList<>();
-		try {
-			checkRs = checkPs.executeQuery();
-			while (checkRs.next()) {
-				elements.add(checkRs.getLong(1));
+	public List<Long> readList() throws SQLException {
+		// CREATES THE PREPARED STATEMENT
+		PreparedStatement ps = getPs(Cleanup.LIST);
+
+		try (ResultSet rs = ps.executeQuery()) {
+			
+			// FILLS A LINKED LIST OF PLUD ID HAVING TO BE DELETED
+			List<Long> elements = new LinkedList<>();
+			while (rs.next()) {
+				elements.add(rs.getLong(1));
 			}
-		} finally {
-			if (checkRs != null) checkRs.close();
+			return elements;
 		}
+
+	}
+
+	public void delete(Long cleanupId) throws SQLException {
+		// CREATES THE CLEANUPID ENTRY
+		Entry<Long> cleanupEntry = new StatementProvider.Entry<>();
+		cleanupEntry.object = cleanupId;
+		cleanupEntry.clazz = Long.class;
 		
-		return elements;
-
-	}
-
-	public void delete(Connection con, Long cleanupId) throws SQLException {
-		String deleteTableQuery = "DROP TABLE pmel.pmel_" + cleanupId + "; \n"
-				+ "DELETE FROM pmel.pmel_cleanup WHERE plud_id = ?;";
-		PreparedStatement deleteTablePs = con.prepareStatement(deleteTableQuery);
-		deleteTablePs.setLong(1, cleanupId);
-				
-		deleteTablePs.execute();
-	}
-	
+		// CREATES THE PREPARED STATEMENT
+		PreparedStatement ps = getPs(Cleanup.DELETE, cleanupEntry);
+		
+		// EXECUTE IT
+		ps.execute();
+	}	
 }

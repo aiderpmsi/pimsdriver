@@ -2,7 +2,6 @@ package com.github.aiderpmsi.pimsdriver.dto;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.sql.Array;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -16,9 +15,33 @@ import org.postgresql.largeobject.LargeObjectManager;
 import com.github.aiderpmsi.pimsdriver.dto.model.UploadPmsi;
 import com.github.aiderpmsi.pimsdriver.dto.model.UploadedPmsi;
 
-public class UploadPmsiDTO {
+public class UploadPmsiDTO extends AutoCloseableDto<UploadPmsiDTO.Query> {
 
-	public Long create(Connection con, UploadPmsi model, InputStream rsf, InputStream rss) throws SQLException, IOException {
+	public enum Query implements StatementProvider {
+		INSERT_PLUD;
+
+		@Override
+		public String getStatement(Entry<?>... entries) throws SQLException {
+			switch (this) {
+			case INSERT_PLUD:
+				return "INSERT INTO plud_pmsiupload("
+				+ "plud_processed, plud_finess, plud_year, plud_month, "
+				+ "plud_dateenvoi, plud_rsf_oid, plud_rss_oid) "
+				+ "VALUES (?::public.plud_status, ?, ?, ?, "
+				+ "transaction_timestamp(), ?, ?) "
+				+ "RETURNING plud_id;";
+			default: //SHOULD NEVER REACH THIS POINT
+				throw new RuntimeException("This code should never been reached");
+			}
+		}
+	};
+	
+	public UploadPmsiDTO(Connection con) {
+		super(con, UploadPmsiDTO.Query.class);
+	}
+
+
+	public Long create(UploadPmsi model, InputStream rsf, InputStream rss) throws SQLException, IOException {
 		
 		// USE THE LARGE OBJECT INTERFACE FOR FILES
 		@SuppressWarnings("unchecked")
@@ -28,44 +51,21 @@ public class UploadPmsiDTO {
 		// CREATES AND FILLS THE RSF LARGE OBJECT (IF IT EXISTS)
 		Long rsfoid = store(lom, rsf), rssoid = store(lom, rss); 
 
-		// THEN CREATES THE SQL QUERY TO INSERT EVERYTHING IN PLUD :
-		String query = 
-				"INSERT INTO plud_pmsiupload("
-						+ "plud_processed, plud_finess, plud_year, plud_month, "
-						+ "plud_dateenvoi, plud_rsf_oid, plud_rss_oid, plud_arguments) "
-						+ "VALUES (?::public.plud_status, ?, ?, ?, "
-						+ "transaction_timestamp(), ?, ?, hstore(?::text[], ?::text[])) "
-						+ "RETURNING plud_id;";
+		// CREATES THE PREPARED STATEMENT
+		PreparedStatement ps = getPs(Query.INSERT_PLUD);
 
-		PreparedStatement ps = con.prepareStatement(query);
 		ps.setString(1, UploadedPmsi.Status.pending.toString());
-		ps.setString(2, model.getFiness());
-		ps.setInt(3, model.getYear());
-		ps.setInt(4, model.getMonth());
-		if (rsfoid != null)
-			ps.setLong(5, rsfoid);
-		else
-			ps.setNull(5, Types.BIGINT);
-		if (rssoid != null)
-				ps.setLong(6, rssoid);
-			else
-				ps.setNull(6, Types.BIGINT);
-		Array emptyarray = con.createArrayOf("text", new String[]{});
-		ps.setArray(7, emptyarray);
-		ps.setArray(8, emptyarray);
+		ps.setString(2, model.finess);
+		ps.setInt(3, model.year);
+		ps.setInt(4, model.month);
+		ps.setObject(5, rsfoid, Types.BIGINT);
+		ps.setObject(6, rssoid, Types.BIGINT);
 			
 		// EXECUTE QUERY
-		ResultSet rs = null;
-		Long pludid;
-		try {
-			rs = ps.executeQuery();
+		try (ResultSet rs = ps.executeQuery()) {
 			rs.next();
-			pludid = rs.getLong(1);
-		} finally {
-			if (rs != null) rs.close();
+			return rs.getLong(1);
 		}
-		
-		return pludid;
 	}
 
 	/**

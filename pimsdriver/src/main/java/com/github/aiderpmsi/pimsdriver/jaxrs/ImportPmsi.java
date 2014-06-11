@@ -45,9 +45,9 @@ public class ImportPmsi {
 		
 		// CREATES THE MODEL
 		UploadPmsi model = new UploadPmsi();
-		model.setMonth(month);
-		model.setYear(year);
-		model.setFiness(finess);
+		model.month = month;
+		model.year = year;
+		model.finess = finess;
 		
 		// VALIDATES THE MODEL
 		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();

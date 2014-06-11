@@ -156,7 +156,7 @@ public class ExpandListener implements Tree.ExpandListener {
 					for (UploadedPmsi model : ups) {
 						// CREATES THE NODE
 						Object id = createNode(new Object[][] {
-								new Object[] {"caption", sdf.format(model.getDateenvoi())},
+								new Object[] {"caption", sdf.format(model.dateenvoi)},
 								new Object[] {"model", model},
 								new Object[] {"year", year},
 								new Object[] {"month", month},

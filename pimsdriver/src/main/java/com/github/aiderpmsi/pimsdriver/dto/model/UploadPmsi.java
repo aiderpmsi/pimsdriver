@@ -17,40 +17,16 @@ public class UploadPmsi {
 
 	/** Pmsi Month. Must be between 1 and 12 */
 	@Min(1)	@Max(12)
-	private Integer month;
+	public Integer month;
 
 	/** Pmsi Year. Must be non null */
 	@NotNull
-	private Integer year;
+	public Integer year;
 
 	/** Finess Value. Must be non null */
 	@NotNull
 	@Size(min = 1)
-	private String finess;
-
-	public Integer getMonth() {
-		return month;
-	}
-
-	public void setMonth(Integer month) {
-		this.month = month;
-	}
-
-	public Integer getYear() {
-		return year;
-	}
-
-	public void setYear(Integer year) {
-		this.year = year;
-	}
-
-	public String getFiness() {
-		return finess;
-	}
-
-	public void setFiness(String finess) {
-		this.finess = finess;
-	}
+	public String finess;
 
 	/**
 	 * Creates the Form with default values : - month = current month - year =
@@ -61,11 +37,11 @@ public class UploadPmsi {
 		Calendar cal = GregorianCalendar.getInstance();
 		
 		// Sets the current month and current year
-		setMonth(cal.get(Calendar.MONTH) + 1);
-		setYear(cal.get(Calendar.YEAR));
+		month = cal.get(Calendar.MONTH) + 1;
+		year = cal.get(Calendar.YEAR);
 		
 		// SETS FINESS TO VOID
-		setFiness("");
+		finess = "";
 	}
 
 }

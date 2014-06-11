@@ -58,8 +58,8 @@ public class ProcessImpl implements Callable<Boolean> {
 			PmsiContentHandlerHelper fch = null;
 			long pmsiPosition = 0;
 			try {
-				fch = new RsfContentHandler(con, element.getRecordid(), pmsiPosition);
-				processPmsi(fch, "rsfheader", element.getRsfoid(), lom);
+				fch = new RsfContentHandler(con, element.recordid, pmsiPosition);
+				processPmsi(fch, "rsfheader", element.rsfoid, lom);
 			} finally {
 				if (fch != null) {
 					fch.close();
@@ -69,14 +69,14 @@ public class ProcessImpl implements Callable<Boolean> {
 
 			PmsiContentHandlerHelper rch = null;
 			// IF RSS IS DEFINED, GET ITS CONTENT AND PROCESS IT
-			if (element.getRssoid() != null) {
+			if (element.rssoid != null) {
 				PreparedStatement createTempGroupTableSt = null;
 				try {
 					createTempGroupTableSt = con.prepareStatement(createTempGroupTableQuery);
 					createTempGroupTableSt.execute();
 					try {
-						rch = new RssContentHandler(con, element.getRecordid(), pmsiPosition);
-						processPmsi(rch, "rssheader", element.getRssoid(), lom);
+						rch = new RssContentHandler(con, element.recordid, pmsiPosition);
+						processPmsi(rch, "rssheader", element.rssoid, lom);
 					} finally {
 						if (rch != null) {
 							rch.close();
@@ -94,37 +94,41 @@ public class ProcessImpl implements Callable<Boolean> {
 
 			// CREATE THE PARTITION TO INSERT THE DATAS
 			String createPartitionQuery = 
-					"CREATE TABLE pmel.pmel_" + element.getRecordid() + " () INHERITS (public.pmel_pmsielement)";
+					"CREATE TABLE pmel.pmel_" + element.recordid + " () INHERITS (public.pmel_pmsielement)";
 			PreparedStatement createPartitionPs = con.prepareStatement(createPartitionQuery);
 			createPartitionPs.execute();
 
 			// COPY TEMP TABLE INTO PMEL TABLE
 			String copyQuery = 
-					"INSERT INTO pmel.pmel_" + element.getRecordid() + " (pmel_root, pmel_position, pmel_parent, pmel_type, pmel_line, pmel_content, pmel_arguments) \n"
+					"INSERT INTO pmel.pmel_" + element.recordid + " (pmel_root, pmel_position, pmel_parent, pmel_type, pmel_line, pmel_content, pmel_arguments) \n"
 					+ "SELECT pmel_root, pmel_position, pmel_parent, pmel_type, pmel_line, pmel_content, pmel_arguments FROM pmel_temp";
 			PreparedStatement copyPs = con.prepareStatement(copyQuery);
 			copyPs.execute();
 			
 			// CREATE CONSTRAINTS ON PMEL RSF TABLE
-			createConstraints(element.getRecordid(), "", con);
+			createConstraints(element.recordid, "", con);
 
-			if (element.getRssoid() != null) {
-				// CREATE GROUP PARTITION
-				String createGroupPartitionQuery = 
-						"CREATE TABLE pmgr.pmgr_" + element.getRecordid() + " () INHERITS (public.pmgr_pmsigroups)";
-				PreparedStatement createGroupPartitionPs = con.prepareStatement(createGroupPartitionQuery);
-				createGroupPartitionPs.execute();
+			// CREATE GROUP PARTITION
+			String createGroupPartitionQuery = 
+					"CREATE TABLE pmgr.pmgr_" + element.recordid + " () INHERITS (public.pmgr_pmsigroups)";
+			PreparedStatement createGroupPartitionPs = con.prepareStatement(createGroupPartitionQuery);
+			createGroupPartitionPs.execute();
+			
+			if (element.rssoid != null) {
 				// COPY ELEMENTS FROM PMGR TEMP TO PMGR DEFINITIVE
 				String copyGroupPartitionQuery =
-						"INSERT INTO pmgr.pmgr_" + element.getRecordid() + " (pmel_id, pmel_root, pmgr_racine, pmgr_modalite, pmgr_gravite, pmgr_erreur) \n"
-						+ "SELECT pmel.pmel_id, " + element.getRecordid() + ", pmgr.pmgr_racine, pmgr.pmgr_modalite, pmgr.pmgr_gravite, pmgr.pmgr_erreur \n"
+						"INSERT INTO pmgr.pmgr_" + element.recordid + " (pmel_id, pmel_root, pmgr_racine, pmgr_modalite, pmgr_gravite, pmgr_erreur) \n"
+						+ "SELECT pmel.pmel_id, " + element.recordid + ", pmgr.pmgr_racine, pmgr.pmgr_modalite, pmgr.pmgr_gravite, pmgr.pmgr_erreur \n"
 						+ "FROM pmgr_temp pmgr \n"
-						+ "JOIN pmel.pmel_" + element.getRecordid() + " pmel ON \n"
+						+ "JOIN pmel.pmel_" + element.recordid + " pmel ON \n"
 						+ "pmgr.pmel_position = pmel.pmel_position;";
 				PreparedStatement copyGroupPartitionPs = con.prepareStatement(copyGroupPartitionQuery);
 				copyGroupPartitionPs.execute();
 			}
 
+			// CREATE CONSTRAINTS ON PMGR TABLE
+			createGroupConstraints(element.recordid, "", con);
+			
 			// UPDATE STATUS AND REAL FINESS
 			StringBuilder updatequery = new StringBuilder("UPDATE plud_pmsiupload SET plud_processed = 'successed'::plud_status, plud_finess = ?, ");
 			updatequery.append("plud_arguments = plud_arguments || hstore(?, ?)");
@@ -140,7 +144,7 @@ public class ProcessImpl implements Callable<Boolean> {
 				updateps.setString(updateindex++, "rssversion");
 				updateps.setString(updateindex++, rch.getVersion());
 			}
-			updateps.setLong(updateindex++, element.getRecordid());
+			updateps.setLong(updateindex++, element.recordid);
 			updateps.execute();
 			
 			// EVERYTHING WENT FINE, COMMIT
@@ -159,7 +163,7 @@ public class ProcessImpl implements Callable<Boolean> {
 					PreparedStatement updateps = con.prepareStatement(updatequery);
 					updateps.setString(1, "error");
 					updateps.setString(2, e.getMessage() == null ? e.getClass().toString() : e.getMessage());
-					updateps.setLong(3, element.getRecordid());
+					updateps.setLong(3, element.recordid);
 					updateps.execute();
 					con.commit();
 				} catch (SQLException e2) { e2.addSuppressed(e); throw new RuntimeException(e2); }
@@ -173,7 +177,7 @@ public class ProcessImpl implements Callable<Boolean> {
 		return true;
 	}
 	
-	private void createGroupContraints(long id, CharSequence suffix, Connection con) throws SQLException {
+	private void createGroupConstraints(long id, CharSequence suffix, Connection con) throws SQLException {
 		CharSequence idRepresentation = Long.toString(id);
 		CharSequence fs = new StringBuilder(idRepresentation).append(suffix);
 		String query = 
