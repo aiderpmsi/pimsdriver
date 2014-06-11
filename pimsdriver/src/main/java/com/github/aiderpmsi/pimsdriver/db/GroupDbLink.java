@@ -241,8 +241,6 @@ public class GroupDbLink extends InputStream implements Callable<Path> {
 		try {
 			group = grouper.group(rums);
 			StringBuilder line = new StringBuilder();
-			escape(lastNumRss, line);
-			line.append('|');
 			escape(group.getRacine(), line);
 			line.append('|');
 			escape(group.getModalite(), line);

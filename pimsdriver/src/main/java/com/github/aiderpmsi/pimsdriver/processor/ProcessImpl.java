@@ -111,7 +111,7 @@ public class ProcessImpl implements Callable<Boolean> {
 			if (element.getRssoid() != null) {
 				// CREATE GROUP PARTITION
 				String createGroupPartitionQuery = 
-						"CREATE TABLE pmgr.pmgr_" + element.getRecordid() + " () INHERITS (public.pmgr_pmsigroup)";
+						"CREATE TABLE pmgr.pmgr_" + element.getRecordid() + " () INHERITS (public.pmgr_pmsigroups)";
 				PreparedStatement createGroupPartitionPs = con.prepareStatement(createGroupPartitionQuery);
 				createGroupPartitionPs.execute();
 				// COPY ELEMENTS FROM PMGR TEMP TO PMGR DEFINITIVE
@@ -119,7 +119,7 @@ public class ProcessImpl implements Callable<Boolean> {
 						"INSERT INTO pmgr.pmgr_" + element.getRecordid() + " (pmel_id, pmgr_racine, pmgr_modalite, pmgr_gravite, pmgr_erreur) \n"
 						+ "SELECT pmel.pmel_id, pmgr.pmgr_racine, pmgr.pmgr_modalite, pmgr.pmgr_gravite, pmgr.pmgr_erreur \n"
 						+ "FROM pmgr_temp pmgr \n"
-						+ "JOIN pmel.pmel_" + element.getRecordid() + "pmel ON \n"
+						+ "JOIN pmel.pmel_" + element.getRecordid() + " pmel ON \n"
 						+ "pmgr.pmel_position = pmel.pmel_position;";
 				PreparedStatement copyGroupPartitionPs = con.prepareStatement(copyGroupPartitionQuery);
 				copyGroupPartitionPs.execute();
@@ -205,30 +205,32 @@ public class ProcessImpl implements Callable<Boolean> {
 		Path tmpPath = null;
 		try {
 			dbFile = new BufferedInputStream(lom.open(id).getInputStream());
+		
 			try {
 				tmpPath = Files.createTempFile("", "");
 				Files.copy(dbFile, tmpPath, StandardCopyOption.REPLACE_EXISTING);
-				try {
-					tmpFile = Files.newBufferedReader(tmpPath, Charset.forName("ISO-8859-1"));
-
-					RecorderErrorHandler eh = new RecorderErrorHandler();
-					Parser2 parser = new Parser2(pmsitype);
-					parser.setContentHandler(ch);
-					parser.setErrorHandler(eh);
-					parser.parse(new InputSource(tmpFile));
-
-					// CHECK IF THERE WERE ANY ERRORS IN PMSI
-					if (eh.getErrors().size() != 0)
-						throw new SAXException("Processing " + pmsitype + " : error " + eh.getErrors().get(0).getMessage());
-					
-				} finally {
-					if (tmpFile != null) tmpFile.close();
-				}
 			} finally {
-				if (tmpPath != null) Files.delete(tmpPath);
+				dbFile.close();
+			}
+			
+			try {
+				tmpFile = Files.newBufferedReader(tmpPath, Charset.forName("ISO-8859-1"));
+
+				RecorderErrorHandler eh = new RecorderErrorHandler();
+				Parser2 parser = new Parser2(pmsitype);
+				parser.setContentHandler(ch);
+				parser.setErrorHandler(eh);
+				parser.parse(new InputSource(tmpFile));
+
+				// CHECK IF THERE WERE ANY ERRORS IN PMSI
+				if (eh.getErrors().size() != 0)
+					throw new SAXException("Processing " + pmsitype + " : error " + eh.getErrors().get(0).getMessage());
+				
+			} finally {
+				if (tmpFile != null) tmpFile.close();
 			}
 		} finally {
-			if (dbFile != null) dbFile.close();
+			if (tmpPath != null) Files.delete(tmpPath);
 		}
 
 	}

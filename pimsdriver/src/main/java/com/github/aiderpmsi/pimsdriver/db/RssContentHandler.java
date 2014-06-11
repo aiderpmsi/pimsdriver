@@ -52,7 +52,7 @@ public class RssContentHandler extends PmsiContentHandlerHelper {
 			GroupEntry groupEntry = new GroupEntry();
 			groupEntry.finished = true;
 			groupdblink.store(groupEntry);
-			groupFuture.get();
+			tmpFile = groupFuture.get();
 		} catch (InterruptedException e) {
 			// DO NOTHING, WE HAVE TO END
 		} catch (ExecutionException e) {
@@ -136,6 +136,6 @@ public class RssContentHandler extends PmsiContentHandlerHelper {
 
 	private static final String[][] propertyPath = {{"root"}, {"rssheader", "rssmain", "rssacte", "rssda", "rssdad"}, {"*"}};
 
-	private static final String query = "COPY pmgr_temp (pmel_id, pmgr_racine, pmgr_modalite, pmgr_gravite, pmgr_erreur) "
+	private static final String query = "COPY pmgr_temp (pmel_position, pmgr_racine, pmgr_modalite, pmgr_gravite, pmgr_erreur) "
 			+ "FROM STDIN WITH DELIMITER '|'";
 }

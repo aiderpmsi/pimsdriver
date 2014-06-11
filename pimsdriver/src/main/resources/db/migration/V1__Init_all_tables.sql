@@ -18,11 +18,11 @@ CREATE TABLE public.plud_pmsiupload (
 
 CREATE TABLE public.pmgr_pmsigroups (
   pmgr_id bigserial NOT NULL,
-  pmel.pmel_id bigint NOT NULL,
-  pmgr.pmgr_racine character varying NOT NULL,
-  pmgr.pmgr_modalite character varying NOT NULL,
-  pmgr.pmgr_gravite character varying NOT NULL,
-  pmgr.pmgr_erreur character varying NOT NULL
+  pmel_id bigint NOT NULL,
+  pmgr_racine character varying NOT NULL,
+  pmgr_modalite character varying NOT NULL,
+  pmgr_gravite character varying NOT NULL,
+  pmgr_erreur character varying NOT NULL,
   CONSTRAINT pmgr_pmsigroup_pkey PRIMARY KEY (pmgr_id)
 );
 
