@@ -18,8 +18,8 @@ public class NavigationActions {
 	public List<UploadedPmsi> getUploadedPmsi(List<Filter> filters, List<OrderBy> orders,
 			Integer first, Integer rows) throws ActionException {
 
-		try (Connection con = DataSourceSingleton.getInstance().getConnection()) {
-			UploadedPmsiDTO upd = new UploadedPmsiDTO(con);
+		try (Connection con = DataSourceSingleton.getInstance().getConnection();
+			UploadedPmsiDTO upd = new UploadedPmsiDTO(con);) {
 			
 			// CONTINUE WHILE SELECTION HAS NOT SUCCEDED BECAUSE OF SERIALIZATION EXCEPTIONS
 			for (;;) {
@@ -42,8 +42,8 @@ public class NavigationActions {
 		
 	public Integer getUploadedPmsiSize(List<Filter> filters) throws ActionException {
 
-		try (Connection con = DataSourceSingleton.getInstance().getConnection()) {
-			UploadedPmsiDTO upd = new UploadedPmsiDTO(con);
+		try (Connection con = DataSourceSingleton.getInstance().getConnection();
+			UploadedPmsiDTO upd = new UploadedPmsiDTO(con);) {
 			
 			// CONTINUE WHILE SELECTION HAS NOT SUCCEDED BECAUSE OF SERIALIZATION EXCEPTIONS
 			for (;;) {
@@ -66,8 +66,8 @@ public class NavigationActions {
 	
 	public List<String> getDistinctFinesses(UploadedPmsi.Status status) throws ActionException {
 
-		try (Connection con = DataSourceSingleton.getInstance().getConnection()) {
-			NavigationDTO upd = new NavigationDTO(con);
+		try (Connection con = DataSourceSingleton.getInstance().getConnection();
+			NavigationDTO upd = new NavigationDTO(con);) {
 			
 			// CONTINUE WHILE SELECTION HAS NOT SUCCEDED BECAUSE OF SERIALIZATION EXCEPTIONS
 			for (;;) {
@@ -90,8 +90,8 @@ public class NavigationActions {
 
 	public List<YM> getYM(UploadedPmsi.Status status, String finess) throws ActionException {
 
-		try (Connection con = DataSourceSingleton.getInstance().getConnection()) {
-			NavigationDTO upd = new NavigationDTO(con);
+		try (Connection con = DataSourceSingleton.getInstance().getConnection();
+			NavigationDTO upd = new NavigationDTO(con);) {
 			
 			// CONTINUE WHILE SELECTION HAS NOT SUCCEDED BECAUSE OF SERIALIZATION EXCEPTIONS
 			for (;;) {
@@ -119,8 +119,8 @@ public class NavigationActions {
 	
 	public Overview getOverview(UploadedPmsi model) throws ActionException {
 
-		try (Connection con = DataSourceSingleton.getInstance().getConnection()) {
-			NavigationDTO upd = new NavigationDTO(con);
+		try (Connection con = DataSourceSingleton.getInstance().getConnection();
+			NavigationDTO upd = new NavigationDTO(con);) {
 			
 			// CONTINUE WHILE SELECTION HAS NOT SUCCEDED BECAUSE OF SERIALIZATION EXCEPTIONS
 			for (;;) {

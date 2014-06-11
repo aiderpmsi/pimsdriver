@@ -11,8 +11,8 @@ public class CleanupActions {
 	
 	public List<Long> getToCleanup() throws ActionException {
 
-		try (Connection con = DataSourceSingleton.getInstance().getConnection()) {
-			CleanupDTO cu = new CleanupDTO(con);
+		try (Connection con = DataSourceSingleton.getInstance().getConnection();
+			CleanupDTO cu = new CleanupDTO(con);) {
 			
 			// CONTINUE WHILE SELECTION HAS NOT SUCCEDED BECAUSE OF SERIALIZATION EXCEPTIONS
 			for (;;) {
@@ -35,8 +35,8 @@ public class CleanupActions {
 
 	public void cleanup(Long cleanupId) throws ActionException {
 
-		try (Connection con = DataSourceSingleton.getInstance().getConnection()) {
-			CleanupDTO cu = new CleanupDTO(con);
+		try (Connection con = DataSourceSingleton.getInstance().getConnection();
+			CleanupDTO cu = new CleanupDTO(con);) {
 			
 			// CONTINUE WHILE SELECTION HAS NOT SUCCEDED BECAUSE OF SERIALIZATION EXCEPTIONS
 			for (;;) {

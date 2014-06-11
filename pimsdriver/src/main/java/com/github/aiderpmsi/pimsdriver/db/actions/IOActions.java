@@ -14,8 +14,8 @@ public class IOActions {
 
 	public void uploadPmsi(UploadPmsi model, InputStream rsf, InputStream rss) throws ActionException {
 		
-		try (Connection con = DataSourceSingleton.getInstance().getConnection()) {
-			UploadPmsiDTO upd = new UploadPmsiDTO(con);
+		try (Connection con = DataSourceSingleton.getInstance().getConnection();
+			UploadPmsiDTO upd = new UploadPmsiDTO(con);) {
 			
 			// CONTINUE WHILE SELECTION HAS NOT SUCCEDED BECAUSE OF SERIALIZATION EXCEPTIONS
 			for (;;) {
@@ -40,8 +40,8 @@ public class IOActions {
 
 	public void deletePmsi(UploadedPmsi model) throws ActionException {
 
-		try (Connection con = DataSourceSingleton.getInstance().getConnection()) {
-			UploadedPmsiDTO upd = new UploadedPmsiDTO(con);
+		try (Connection con = DataSourceSingleton.getInstance().getConnection();
+			UploadedPmsiDTO upd = new UploadedPmsiDTO(con);) {
 			
 			// CONTINUE WHILE SELECTION HAS NOT SUCCEDED BECAUSE OF SERIALIZATION EXCEPTIONS
 			for (;;) {
