@@ -20,25 +20,17 @@ import com.vaadin.data.util.sqlcontainer.query.OrderBy;
 public class UploadedPmsiDTO extends AutoCloseableDto<UploadedPmsiDTO.Query> {
 
 	public enum Query implements StatementProvider {
-		TRUNCATE_PMEL,
-		TRUNCATE_PMGR,
+		TRUNCATE_PMEL_PMGR,
 		FINISH_CLEANUP;
 
 		@Override
 		public String getStatement(Entry<?>... entries) throws SQLException {
 			switch (this) {
-			case TRUNCATE_PMEL:
+			case TRUNCATE_PMEL_PMGR:
 				if (entries.length == 1
 				&& entries[0].object != null
 				&& entries[0].object instanceof Long)
-					return "TRUNCATE TABLE pmel.pmel_" + entries[0].object;
-				else
-					throw new SQLException(this.toString() + " needs a not null Long entry");
-			case TRUNCATE_PMGR:
-				if (entries.length == 1
-				&& entries[0].object != null
-				&& entries[0].object instanceof Long)
-					return "TRUNCATE TABLE pmgr.pmgr_" + entries[0].object;
+					return "TRUNCATE TABLE pmel.pmel_" + entries[0].object + ", pmgr.pmgr_" + entries[0].object;
 				else
 					throw new SQLException(this.toString() + " needs a not null Long entry");
 			case FINISH_CLEANUP:
@@ -75,24 +67,13 @@ public class UploadedPmsiDTO extends AutoCloseableDto<UploadedPmsiDTO.Query> {
 			Entry<Long> id = new Entry<>();
 			id.object = model.recordid;
 			id.clazz = Long.class;
-			PreparedStatement ps = getPs(Query.TRUNCATE_PMEL, id);
 
-			// EXECUTE QUERY
+			// TRUNCATE PMGR AND PMEL TOHETHER (ARE RELATED)
+			PreparedStatement ps = getPs(Query.TRUNCATE_PMEL_PMGR, id);
 			ps.execute();
+
 		}
 
-		// TRY TO DELETE ELEMENTS FROM PMSI ELEMENTS IF STATUS IS SUCESSED
-		if (model.processed == UploadedPmsi.Status.successed) {
-			// GET PS
-			Entry<Long> id = new Entry<>();
-			id.object = model.recordid;
-			id.clazz = Long.class;
-			PreparedStatement ps = getPs(Query.TRUNCATE_PMGR, id);
-
-			// EXECUTES QUERY
-			ps.execute();
-		}
-		
 		// INSERT INTO PMEL_CLEANUP THAT TWO TABLES HAVE TO BE DROPPED AND REMOVE FROM PLUD THE INSERTION 
 		PreparedStatement ps = getPs(Query.FINISH_CLEANUP);
 		ps.setLong(1, model.recordid);

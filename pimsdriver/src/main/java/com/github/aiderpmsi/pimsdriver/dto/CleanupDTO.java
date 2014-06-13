@@ -70,6 +70,7 @@ public class CleanupDTO extends AutoCloseableDto<CleanupDTO.Cleanup>{
 		
 		// CREATES THE PREPARED STATEMENT
 		PreparedStatement ps = getPs(Cleanup.DELETE, cleanupEntry);
+		ps.setLong(1, cleanupId);
 		
 		// EXECUTE IT
 		ps.execute();

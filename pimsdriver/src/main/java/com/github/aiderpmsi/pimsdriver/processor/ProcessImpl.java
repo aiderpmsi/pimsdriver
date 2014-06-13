@@ -186,7 +186,7 @@ public class ProcessImpl implements Callable<Boolean> {
 				+ "ALTER TABLE pmgr.pmgr_" + fs + '\n'
 				+ " ADD CONSTRAINT pmgr_inherited_" + fs + "_pkey PRIMARY KEY (pmgr_id);\n"
 				+ "ALTER TABLE pmgr.pmgr_" + fs + '\n'
-				+ " ADD CONSTRAINT pmgr_inherited_" + fs + "_pmel_id_unique UNIQUE (pmel_id);\""
+				+ " ADD CONSTRAINT pmgr_inherited_" + fs + "_pmel_id_unique UNIQUE (pmel_id);\n"
 				+ "ALTER TABLE pmgr.pmgr_" + fs + '\n'
 				+ " ADD CONSTRAINT pmgr_inherited_" + fs + "_pmel_root_fkey FOREIGN KEY (pmel_root)\n"
 				+ " REFERENCES public.plud_pmsiupload (plud_id) MATCH SIMPLE\n"

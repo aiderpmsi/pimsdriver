@@ -39,5 +39,52 @@ public class UploadedPmsi extends UploadPmsi {
 	@XmlElement
 	public HashMap<String, String> attributes;
 
-	
+	public Long getRecordid() {
+		return recordid;
+	}
+
+	public void setRecordid(Long recordid) {
+		this.recordid = recordid;
+	}
+
+	public Date getDateenvoi() {
+		return dateenvoi;
+	}
+
+	public void setDateenvoi(Date dateenvoi) {
+		this.dateenvoi = dateenvoi;
+	}
+
+	public Status getProcessed() {
+		return processed;
+	}
+
+	public void setProcessed(Status processed) {
+		this.processed = processed;
+	}
+
+	public Long getRsfoid() {
+		return rsfoid;
+	}
+
+	public void setRsfoid(Long rsfoid) {
+		this.rsfoid = rsfoid;
+	}
+
+	public Long getRssoid() {
+		return rssoid;
+	}
+
+	public void setRssoid(Long rssoid) {
+		this.rssoid = rssoid;
+	}
+
+	public HashMap<String, String> getAttributes() {
+		return attributes;
+	}
+
+	public void setAttributes(HashMap<String, String> attributes) {
+		this.attributes = attributes;
+	}
+
 }

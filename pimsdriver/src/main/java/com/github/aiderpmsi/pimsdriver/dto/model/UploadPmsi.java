@@ -28,6 +28,30 @@ public class UploadPmsi {
 	@Size(min = 1)
 	public String finess;
 
+	public Integer getMonth() {
+		return month;
+	}
+
+	public void setMonth(Integer month) {
+		this.month = month;
+	}
+
+	public Integer getYear() {
+		return year;
+	}
+
+	public void setYear(Integer year) {
+		this.year = year;
+	}
+
+	public String getFiness() {
+		return finess;
+	}
+
+	public void setFiness(String finess) {
+		this.finess = finess;
+	}
+
 	/**
 	 * Creates the Form with default values : - month = current month - year =
 	 * current year
