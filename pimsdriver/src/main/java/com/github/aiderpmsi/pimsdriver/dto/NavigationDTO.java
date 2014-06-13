@@ -42,7 +42,7 @@ public class NavigationDTO extends AutoCloseableDto<NavigationDTO.Navigation> {
 				+ "WHERE pmel_type != ? \n"
 				+ "GROUP BY pmel_type \n"
 				+ "ORDER BY pmel_type;";
-			default: //SHOULD NEVER TOUCH THIS POINT
+			default: //SHOULD NEVER REACH THIS POINT
 				throw new RuntimeException("This code should never been reached");
 			}
 		}

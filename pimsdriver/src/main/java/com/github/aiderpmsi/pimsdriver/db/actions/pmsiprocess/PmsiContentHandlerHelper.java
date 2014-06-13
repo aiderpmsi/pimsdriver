@@ -1,4 +1,4 @@
-package com.github.aiderpmsi.pimsdriver.db;
+package com.github.aiderpmsi.pimsdriver.db.actions.pmsiprocess;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
@@ -7,7 +7,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 
-public abstract class PmsiContentHandlerHelper extends ContentHandlerHelper {
+public abstract class PmsiContentHandlerHelper extends ContentHandlerHelper implements AutoCloseable {
 
 	protected enum State {
 		LINE_NUMBER, HEADER, ELEMENT, PROPERTY, PROPERTY_HEADER, ELSE;
@@ -171,7 +171,8 @@ public abstract class PmsiContentHandlerHelper extends ContentHandlerHelper {
 	public long getPmsiPosition() {
 		return dblink.pmsiPosition;
 	}
-	
+
+	@Override
 	public void close() throws SAXException {
 		try {
 			if (future != null) {

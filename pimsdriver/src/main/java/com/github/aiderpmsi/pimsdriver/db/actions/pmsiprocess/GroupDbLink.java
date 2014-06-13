@@ -1,4 +1,4 @@
-package com.github.aiderpmsi.pimsdriver.db;
+package com.github.aiderpmsi.pimsdriver.db.actions.pmsiprocess;
 
 import java.io.IOException;
 import java.io.InputStream;
