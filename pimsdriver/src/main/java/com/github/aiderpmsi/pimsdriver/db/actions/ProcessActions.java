@@ -70,7 +70,7 @@ public class ProcessActions {
 					List<String> parameters = new ArrayList<>();
 					parameters.add("rsfversion");parameters.add(rsfVersion);
 					if (rssVersion != null) { parameters.add("rsfversion");parameters.add(rsfVersion); }
-					dto.setStatus(element.recordid, Status.successed, finess, (String[]) parameters.toArray());
+					dto.setStatus(element.recordid, Status.successed, finess, parameters.toArray());
 					
 					// EVERYTHING WENT FINE, COMMIT
 					con.commit();

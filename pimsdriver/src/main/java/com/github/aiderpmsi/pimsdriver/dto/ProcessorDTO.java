@@ -207,7 +207,7 @@ public class ProcessorDTO extends AutoCloseableDto<ProcessorDTO.Query> {
 	}
 
 	public void setStatus(Long recordid, Status successed, String finess,
-			String ... parameters) throws SQLException {
+			Object ... parameters) throws SQLException {
 		if ((parameters.length & 1) != 0) {
 			// ODD NUMBER OF PARAMETERS
 			throw new SQLException("odd number of parameters");
