@@ -69,7 +69,7 @@ public class ProcessActions {
 					// UPDATE STATUS AND REAL FINESS
 					List<String> parameters = new ArrayList<>();
 					parameters.add("rsfversion");parameters.add(rsfVersion);
-					if (rssVersion != null) { parameters.add("rsfversion");parameters.add(rsfVersion); }
+					if (rssVersion != null) { parameters.add("rssversion");parameters.add(rssVersion); }
 					dto.setStatus(element.recordid, Status.successed, finess, parameters.toArray());
 					
 					// EVERYTHING WENT FINE, COMMIT
