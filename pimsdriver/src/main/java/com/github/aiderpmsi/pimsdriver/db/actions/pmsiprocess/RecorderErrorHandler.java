@@ -1,4 +1,4 @@
-package com.github.aiderpmsi.pimsdriver.pmsi;
+package com.github.aiderpmsi.pimsdriver.db.actions.pmsiprocess;
 
 import java.util.LinkedList;
 import java.util.List;

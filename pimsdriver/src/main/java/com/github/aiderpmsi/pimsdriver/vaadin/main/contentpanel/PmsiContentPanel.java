@@ -5,8 +5,8 @@ import java.util.List;
 
 import com.github.aiderpmsi.pimsdriver.db.actions.ActionException;
 import com.github.aiderpmsi.pimsdriver.db.actions.NavigationActions;
+import com.github.aiderpmsi.pimsdriver.dto.NavigationDTO;
 import com.github.aiderpmsi.pimsdriver.dto.model.UploadedPmsi;
-import com.github.aiderpmsi.pimsdriver.dto.model.navigation.PmsiOverviewEntry;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
@@ -62,7 +62,7 @@ public class PmsiContentPanel extends Panel {
 				Layout rssPanel;
 				if (overview.rss == null) {
 					// THERE IS NO RSS FILE
-					rssPanel = createContentHeader("Absence de RSS", new ArrayList<PmsiOverviewEntry>());
+					rssPanel = createContentHeader("Absence de RSS", new ArrayList<NavigationDTO.PmsiOverviewEntry>());
 				} else {
 					// FILLS THE RSS CONTENT
 					rssPanel = createContentHeader("RSS", overview.rss);
@@ -76,7 +76,7 @@ public class PmsiContentPanel extends Panel {
 		}
 	}
 	
-	private Layout createContentHeader(String header, List<PmsiOverviewEntry> entries) {
+	private Layout createContentHeader(String header, List<NavigationDTO.PmsiOverviewEntry> entries) {
 		HorizontalLayout layout = new HorizontalLayout();
 		layout.addStyleName("pims-contentpanel-header-layout");
 
@@ -88,7 +88,7 @@ public class PmsiContentPanel extends Panel {
 		// CONTENT
 		CssLayout contentLayout = new CssLayout();
 		contentLayout.addStyleName("pims-contentpanel-header-content-layout");
-		for (PmsiOverviewEntry entry : entries) {
+		for (NavigationDTO.PmsiOverviewEntry entry : entries) {
 			Label label = new Label(entry.lineName + " : " + Long.toString(entry.number));
 			label.setSizeUndefined();
 			label.addStyleName("pims-contentpanel-header-content-label");

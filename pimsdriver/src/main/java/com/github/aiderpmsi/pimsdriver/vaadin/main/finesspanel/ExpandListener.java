@@ -7,8 +7,8 @@ import java.util.List;
 import com.github.aiderpmsi.pimsdriver.db.actions.ActionException;
 import com.github.aiderpmsi.pimsdriver.db.actions.NavigationActions;
 import com.github.aiderpmsi.pimsdriver.db.vaadin.DBFilterMapper;
+import com.github.aiderpmsi.pimsdriver.dto.NavigationDTO.YM;
 import com.github.aiderpmsi.pimsdriver.dto.model.UploadedPmsi;
-import com.github.aiderpmsi.pimsdriver.dto.model.navigation.YM;
 import com.github.aiderpmsi.pimsdriver.vaadin.utils.UploadPmsiMapping;
 import com.vaadin.data.Container.Filter;
 import com.vaadin.data.Property;
@@ -102,9 +102,9 @@ public class ExpandListener implements Tree.ExpandListener {
 					for (YM ym : yms) {
 						// CREATES THE NODE
 						Object id = createNode(new Object[][] {
-								new Object[] {"caption", ym.getYear() + " M" + ym.getMonth()},
-								new Object[] {"year", ym.getYear()},
-								new Object[] {"month", ym.getMonth()},
+								new Object[] {"caption", ym.year + " M" + ym.month},
+								new Object[] {"year", ym.year},
+								new Object[] {"month", ym.month},
 								new Object[] {"finess", finess},
 								new Object[] {"status", eventStatus},
 								new Object[] {"depth", new Integer(2)}

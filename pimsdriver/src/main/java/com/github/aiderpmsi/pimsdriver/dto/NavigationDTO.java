@@ -8,10 +8,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.github.aiderpmsi.pimsdriver.dto.model.UploadedPmsi;
-import com.github.aiderpmsi.pimsdriver.dto.model.navigation.PmsiOverviewEntry;
-import com.github.aiderpmsi.pimsdriver.dto.model.navigation.YM;
 
 public class NavigationDTO extends AutoCloseableDto<NavigationDTO.Navigation> {
+	
+	public class YM {
+		public Integer year, month;
+	}
+	
+	public class PmsiOverviewEntry {
+		public String lineName;
+		public long number;
+	}
 	
 	public enum Navigation implements StatementProvider {
 		LISTFINESS,
@@ -86,8 +93,8 @@ public class NavigationDTO extends AutoCloseableDto<NavigationDTO.Navigation> {
 			List<YM> yms = new ArrayList<>();
 			while (rs.next()) {
 				YM ym = new YM();
-				ym.setYear(rs.getInt(1));
-				ym.setMonth(rs.getInt(2));
+				ym.year = rs.getInt(1);
+				ym.month = rs.getInt(2);
 				yms.add(ym);
 			}
 			return yms;

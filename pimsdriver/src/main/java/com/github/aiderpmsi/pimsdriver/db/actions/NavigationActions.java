@@ -8,8 +8,6 @@ import com.github.aiderpmsi.pimsdriver.db.DataSourceSingleton;
 import com.github.aiderpmsi.pimsdriver.dto.NavigationDTO;
 import com.github.aiderpmsi.pimsdriver.dto.UploadedPmsiDTO;
 import com.github.aiderpmsi.pimsdriver.dto.model.UploadedPmsi;
-import com.github.aiderpmsi.pimsdriver.dto.model.navigation.PmsiOverviewEntry;
-import com.github.aiderpmsi.pimsdriver.dto.model.navigation.YM;
 import com.vaadin.data.Container.Filter;
 import com.vaadin.data.util.sqlcontainer.query.OrderBy;
 
@@ -88,7 +86,7 @@ public class NavigationActions {
 		}
 	}
 
-	public List<YM> getYM(UploadedPmsi.Status status, String finess) throws ActionException {
+	public List<NavigationDTO.YM> getYM(UploadedPmsi.Status status, String finess) throws ActionException {
 
 		try (Connection con = DataSourceSingleton.getInstance().getConnection();
 			NavigationDTO upd = new NavigationDTO(con);) {
@@ -96,7 +94,7 @@ public class NavigationActions {
 			// CONTINUE WHILE SELECTION HAS NOT SUCCEDED BECAUSE OF SERIALIZATION EXCEPTIONS
 			for (;;) {
 				try {
-					List<YM> yms = upd.readYMList(status, finess);
+					List<NavigationDTO.YM> yms = upd.readYMList(status, finess);
 					// SELECTION HAS SUCCEDDED
 					con.commit();
 					return yms;
@@ -113,8 +111,8 @@ public class NavigationActions {
 	}
 
 	public class Overview {
-		public List<PmsiOverviewEntry> rsf;
-		public List<PmsiOverviewEntry> rss;
+		public List<NavigationDTO.PmsiOverviewEntry> rsf;
+		public List<NavigationDTO.PmsiOverviewEntry> rss;
 	}
 	
 	public Overview getOverview(UploadedPmsi model) throws ActionException {

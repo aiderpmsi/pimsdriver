@@ -23,9 +23,9 @@ import org.xml.sax.SAXParseException;
 import com.github.aiderpmsi.pims.parser.utils.Parser2;
 import com.github.aiderpmsi.pims.treebrowser.TreeBrowserException;
 import com.github.aiderpmsi.pimsdriver.db.actions.pmsiprocess.PmsiContentHandlerHelper;
+import com.github.aiderpmsi.pimsdriver.db.actions.pmsiprocess.RecorderErrorHandler;
 import com.github.aiderpmsi.pimsdriver.dto.StatementProvider.Entry;
 import com.github.aiderpmsi.pimsdriver.dto.model.UploadedPmsi.Status;
-import com.github.aiderpmsi.pimsdriver.pmsi.RecorderErrorHandler;
 
 public class ProcessorDTO extends AutoCloseableDto<ProcessorDTO.Query> {
 
