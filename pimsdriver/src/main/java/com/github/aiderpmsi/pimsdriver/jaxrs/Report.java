@@ -45,7 +45,7 @@ public class Report {
 	@GET
     @Path("/report/{id}/factures.pdf")
     @Produces({"application/pdf"})
-	public Response getPendingUploadedElements(
+	public Response getFactures(
 			@PathParam("id") final Long id) {
 		
 		StreamingOutput stream = new StreamingOutput() {
@@ -53,31 +53,57 @@ public class Report {
 			@Override
 			public void write(OutputStream os) throws IOException, WebApplicationException {
 			
-				OutputStream bos = new BufferedOutputStream(os);
-				try {
+				try (
+						OutputStream bos = new BufferedOutputStream(os);
+						Connection con = DataSourceSingleton.getInstance().getConnection();) {
+
 					JasperReport report = reportFromResourceName("fact_main.jrxml");
 
 					Map<String, Object> parametres = new HashMap<>();
 
 					parametres.put("plud_id", id);
-					
-					Connection con = null;
-					try {
-						con = DataSourceSingleton.getInstance().getConnection();
-					
-						JasperPrint print = JasperFillManager.fillReport(report, parametres, con);
-						JasperExportManager.exportReportToPdfStream(print, bos);
+
+					JasperPrint print = JasperFillManager.fillReport(report, parametres, con);
+					JasperExportManager.exportReportToPdfStream(print, bos);
 						
-						con.commit();
-					} finally {
-						if (con != null) con.close();
-					}
-				} catch (JRException | SQLException e) {
+					con.commit();
+				} catch (SQLException | JRException e) {
 					throw new IOException(e);
-				} finally {
-					bos.flush();
 				}
-				return;
+			}
+		};
+		
+		return Response.ok(stream).build();
+	}
+
+	@GET
+    @Path("/report/{id}/sejours.pdf")
+    @Produces({"application/pdf"})
+	public Response getSejours(
+			@PathParam("id") final Long id) {
+		
+		StreamingOutput stream = new StreamingOutput() {
+	
+			@Override
+			public void write(OutputStream os) throws IOException, WebApplicationException {
+			
+				try (
+						OutputStream bos = new BufferedOutputStream(os);
+						Connection con = DataSourceSingleton.getInstance().getConnection();) {
+
+					JasperReport report = reportFromResourceName("sejour_main.jrxml");
+
+					Map<String, Object> parametres = new HashMap<>();
+
+					parametres.put("plud_id", id);
+
+					JasperPrint print = JasperFillManager.fillReport(report, parametres, con);
+					JasperExportManager.exportReportToPdfStream(print, bos);
+						
+					con.commit();
+				} catch (SQLException | JRException e) {
+					throw new IOException(e);
+				}
 			}
 		};
 		
@@ -85,7 +111,8 @@ public class Report {
 	}
 
 	public static JasperReport reportFromResourceName(String resource) throws IOException {
-		JasperReport report = null;
+		JasperReport report;
+
 		// IF REPORT EXISTS, RETURN IT
 		try {
 			reportsLock.lock();
@@ -95,10 +122,9 @@ public class Report {
 			reportsLock.unlock();
 		}
 		
-		// REPORT DOESN'T EXIST, CREATE IT
-		InputStream is = null;
-		try {
-			is = new BufferedInputStream(Report.class.getClassLoader().getResourceAsStream(rootResource + resource));
+		// IF REPORT DOESN'T EXIST, CREATE IT
+		try (InputStream is = new BufferedInputStream(Report.class.getClassLoader().getResourceAsStream(rootResource + resource))) {
+			
 			JasperDesign design = JRXmlLoader.load(is);
 			report = JasperCompileManager.compileReport(design);
 			// IF REPORT HAS BEEN INSERTED FROM ANOTHER THREAD, DO NOT STORE IT
@@ -112,8 +138,6 @@ public class Report {
 			return report;
 		} catch (JRException e) {
 			throw new IOException(e);
-		} finally {
-			if (is != null) is.close();
 		}
 	}
 	

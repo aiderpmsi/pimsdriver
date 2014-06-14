@@ -14,14 +14,17 @@ public class ReportPmsiCommand implements Command {
 	
 	private UploadedPmsi model;
 	
-	public ReportPmsiCommand(UploadedPmsi model) {
+	private ReportWindow.Category category;
+	
+	public ReportPmsiCommand(UploadedPmsi model, ReportWindow.Category category) {
 		this.model = model;
+		this.category = category;
 	}
 
 	@Override
 	public void menuSelected(MenuItem selectedItem) {
 		// CREATE WINDOW
-		final Window wReport = new ReportWindow(model);
+		final Window wReport = new ReportWindow(model, category);
 				        
 		UI.getCurrent().addWindow(wReport);
 	}

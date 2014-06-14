@@ -2,6 +2,7 @@ package com.github.aiderpmsi.pimsdriver.vaadin.main;
 
 import com.github.aiderpmsi.pimsdriver.dto.model.UploadedPmsi;
 import com.github.aiderpmsi.pimsdriver.dto.model.UploadedPmsi.Status;
+import com.github.aiderpmsi.pimsdriver.vaadin.report.ReportWindow;
 
 public class MenuBar extends com.vaadin.ui.MenuBar {
 
@@ -41,8 +42,8 @@ public class MenuBar extends com.vaadin.ui.MenuBar {
 			navigations.addItem("Séjours", null, null);
 			
 			rapports = addItem("Rapports", null, null);
-			rapports.addItem("Factures", null, new ReportPmsiCommand(model));
-			rapports.addItem("Séjours", null, null);
+			rapports.addItem("Factures", null, new ReportPmsiCommand(model, ReportWindow.Category.factures));
+			rapports.addItem("Séjours", null, new ReportPmsiCommand(model, ReportWindow.Category.sejours));
 		} else {
 		}
 	}

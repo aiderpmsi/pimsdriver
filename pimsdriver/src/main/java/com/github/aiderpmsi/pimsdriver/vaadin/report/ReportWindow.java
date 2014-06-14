@@ -1,5 +1,8 @@
 package com.github.aiderpmsi.pimsdriver.vaadin.report;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import com.github.aiderpmsi.pimsdriver.dto.model.UploadedPmsi;
 import com.vaadin.server.ExternalResource;
 import com.vaadin.ui.HorizontalLayout;
@@ -11,14 +14,32 @@ public class ReportWindow extends Window {
 	/** Serial Id */
 	private static final long serialVersionUID = 5355233025554029932L;
 
-	/** Associated pmsi */
-	private UploadedPmsi pmsi;
+	/** enum of possible reports categories */
+	public enum Category {
+		factures, sejours;
+		
+		public List<Link> getReports(UploadedPmsi pmsi) {
+			LinkedList<Link> links = new LinkedList<>();
+			
+			switch (this) {
+			case factures:
+				links.add(new Link("Factures triées selon numéro de facture", new ExternalResource("rest/report/report/" + pmsi.recordid + "/factures.pdf?order=facture")));
+				links.getLast().setTargetName("facture_" + pmsi.finess + ".pdf");
+				links.add(new Link("Factures ordonnées selon ordre du rsf", new ExternalResource("rest/report/report/" + pmsi.recordid + "/factures.pdf?order=rsf")));
+				links.getLast().setTargetName("facture_" + pmsi.finess + ".pdf");
+				break;
+			case sejours:
+				links.add(new Link("Séjours triés selon numéro de rss", new ExternalResource("rest/report/report/" + pmsi.recordid + "/sejours.pdf")));
+				links.getLast().setTargetName("sejour_" + pmsi.finess + ".pdf");
+				break;
+			}
+			return links;
+		}
+	}
 	
-	public ReportWindow(UploadedPmsi pmsi) {
+	public ReportWindow(UploadedPmsi pmsi, Category category) {
 		// TITLE
 		super("Reporting");
-
-		this.pmsi = pmsi;
 
 		// SET VISUAL ASPECT
 		setWidth("650px");
@@ -33,9 +54,9 @@ public class ReportWindow extends Window {
         setContent(hl);
 
 		// CREATE LINK TO JAX-RS TO EXPORT ELEMENT
-		Link report = new Link("Rapport", new ExternalResource("rest/report/report/" + pmsi.recordid + "/factures.pdf"));
-		report.setTargetName("facture" + pmsi.finess + ".pdf");
-		hl.addComponent(report);
+        for (Link link : category.getReports(pmsi)) {
+        	hl.addComponent(link);
+        }
 	}
 
 }
