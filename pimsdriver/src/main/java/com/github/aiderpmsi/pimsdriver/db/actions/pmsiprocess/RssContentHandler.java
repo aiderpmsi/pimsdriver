@@ -79,7 +79,7 @@ public class RssContentHandler extends PmsiContentHandlerHelper {
 	public void endElement(String uri, String localName, String qName)
 			throws SAXException {
 		// IF WE ARE LEAVING AN ELEMENT, SEND IT TO THE GROUP PROCESSING
-		if (position == State.ELEMENT) {
+		if (position == State.ELEMENT || position == State.HEADER) {
 			GroupEntry entry = new GroupEntry();
 			entry.content = propertyValues;
 			entry.line_type = contentPath.getLast();

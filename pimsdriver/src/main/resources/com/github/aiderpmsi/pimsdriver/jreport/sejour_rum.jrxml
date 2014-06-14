@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version last-->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="sejour_rum" pageWidth="555" pageHeight="802" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="749c7e1f-54e3-4986-bc9e-33d369438a7f">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="pimsdriver"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value="c212YV9yc3NtYWluXzExNl92aWV3IEFTICwxMywwOw=="/>
+	<parameter name="pmel_root" class="java.lang.Long">
+		<parameterDescription><![CDATA[]]></parameterDescription>
+		<defaultValueExpression><![CDATA[4]]></defaultValueExpression>
+	</parameter>
+	<parameter name="numrss" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["140096              "]]></defaultValueExpression>
+	</parameter>
+	<parameter name="order_by" class="java.lang.String">
+		<defaultValueExpression><![CDATA["smva.numrss"]]></defaultValueExpression>
+	</parameter>
+	<queryString language="SQL">
+		<![CDATA[SELECT
+	smva.pmel_position,
+	smva.numrss,
+	smva.numcmd,
+	smva.numghm,
+	smva.numlocalsejour,
+	smva.numrum,
+	smva.ddn,
+	smva.sexe,
+	smva.numunitemedicale,
+	to_date(smva.dateentree, 'DDMMYYYY') dateentree,
+	smva.modeentree,
+	to_date(smva.dateentree, 'DDMMYYYY') datesortie,
+	smva.modesortie,
+	smva.nbseances,
+	smva.dp,
+	smva.dr
+FROM smva_rssmain_116_view smva
+WHERE smva.pmel_root = $P{pmel_root}::bigint
+AND smva.numrss = $P{numrss} 
+ORDER BY $P!{order_by}]]>
+	</queryString>
+	<field name="numrss" class="java.lang.String"/>
+	<field name="dateentree" class="java.sql.Date"/>
+	<field name="datesortie" class="java.sql.Date"/>
+	<field name="numcmd" class="java.lang.String"/>
+	<field name="numghm" class="java.lang.String"/>
+	<field name="numlocalsejour" class="java.lang.String"/>
+	<field name="numrum" class="java.lang.String"/>
+	<field name="ddn" class="java.lang.String"/>
+	<field name="sexe" class="java.lang.String"/>
+	<field name="numunitemedicale" class="java.lang.String"/>
+	<field name="modeentree" class="java.lang.String"/>
+	<field name="modesortie" class="java.lang.String"/>
+	<field name="nbseances" class="java.lang.String"/>
+	<field name="dp" class="java.lang.String"/>
+	<field name="dr" class="java.lang.String"/>
+	<field name="pmel_position" class="java.lang.Long"/>
+	<detail>
+		<band height="82" splitType="Stretch">
+			<property name="local_mesure_unitheight" value="pixel"/>
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<rectangle>
+				<reportElement x="0" y="0" width="555" height="24" backcolor="#ABABAB" uuid="92e435ba-48ac-4354-9ece-899f215e805b">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<graphicElement>
+					<pen lineWidth="0.0"/>
+				</graphicElement>
+			</rectangle>
+			<textField>
+				<reportElement x="0" y="2" width="220" height="20" uuid="91a81f97-0302-44d5-8b45-3cadd000b010">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font fontName="DejaVu Serif" size="14"/>
+					<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA["RUM n° " + $F{numrss}.trim()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="220" y="2" width="200" height="20" uuid="5f2e265f-b18b-43f5-97f7-edd1b963b11a"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="DejaVu Serif"/>
+					<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA["(" + new SimpleDateFormat("dd/MM/yyyy").format($F{dateentree}) + "-" + new SimpleDateFormat("dd/MM/yyyy").format($F{datesortie}) + ")"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="420" y="2" width="135" height="20" uuid="e240995a-a927-4521-a690-39cc102bec7e"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="DejaVu Serif" size="14"/>
+					<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{numcmd}.trim() + $F{numghm}.trim()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="26" width="254" height="16" uuid="8516b925-9e39-4810-a13a-812e48c84f66">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font fontName="DejaVu Serif"/>
+					<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Numéro local de séjour : " + $F{numlocalsejour}.trim()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="370" y="26" width="185" height="16" uuid="4220ac20-9873-4cc6-9e23-0b32cf5d94d0">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="local_mesure_unity" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="DejaVu Serif"/>
+					<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Unité : " + $F{numunitemedicale}.trim()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="370" y="42" width="185" height="16" uuid="ae7faeb9-9efc-4acf-b088-9afa1aa19668">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="local_mesure_unity" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="DejaVu Serif"/>
+					<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Séances : " + $F{nbseances}.trim()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="42" width="254" height="16" uuid="c38ca7a8-9320-43d3-ace9-38c54560ebaf">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font fontName="DejaVu Serif"/>
+					<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA["DP : " + $F{dp}.trim()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="58" width="254" height="16" uuid="bedd49a1-b5e7-4d76-ba04-6a68997d9dcd">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font fontName="DejaVu Serif"/>
+					<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA["DR : " + $F{dr}.trim()]]></textFieldExpression>
+			</textField>
+			<subreport>
+				<reportElement x="0" y="80" width="277" height="1" uuid="fe3f030e-a077-4816-935d-99642e46c711">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<subreportParameter name="pmel_root">
+					<subreportParameterExpression><![CDATA[$P{pmel_root}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="pmel_parent">
+					<subreportParameterExpression><![CDATA[$F{pmel_position}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression class="net.sf.jasperreports.engine.JasperReport">
+					<![CDATA[com.github.aiderpmsi.pimsdriver.jaxrs.Report.reportFromResourceName("sejour_da.jrxml")]]>
+				</subreportExpression>
+			</subreport>
+			<subreport>
+				<reportElement x="278" y="80" width="277" height="1" uuid="122b25e2-93e9-467a-89fd-fcad42b47089">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<subreportParameter name="pmel_root">
+					<subreportParameterExpression><![CDATA[$P{pmel_root}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="pmel_parent">
+					<subreportParameterExpression><![CDATA[$F{pmel_position}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression class="net.sf.jasperreports.engine.JasperReport">
+					<![CDATA[com.github.aiderpmsi.pimsdriver.jaxrs.Report.reportFromResourceName("sejour_acte.jrxml")]]>
+				</subreportExpression>
+			</subreport>
+		</band>
+	</detail>
+</jasperReport>

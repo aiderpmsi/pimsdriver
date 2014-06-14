@@ -197,6 +197,7 @@ public class GroupDbLink extends InputStream implements Callable<Path> {
 			// DEPENDING ON THE LINE TYPE :
 			// 1 - IF IT IS A RSSMAIN, CREATE A NEW RSSCONTENT IN FULLRSS
 			// 2 - IF IT IS A RSSACTE OR RSSDA, JUST INSERT THE DATAS TO CURRENT FULLRSS
+			// 3 - IF IT IS A RSSHEADER, INCREMENT PMSIPOSITION
 			if (groupEntry.line_type.equals("rssmain")) {
 				RssContent newContent = new RssContent();
 
@@ -216,7 +217,8 @@ public class GroupDbLink extends InputStream implements Callable<Path> {
 				newContent.setRssmain(mainContent);
 				fullRss.add(newContent);
 				lastNumRss = groupEntry.content.get("NumRSS");
-				pmsiPositions.add(pmsiPosition++);
+				pmsiPositions.add(pmsiPosition);
+				pmsiPosition++;
 			} else if (groupEntry.line_type.equals("rssacte")) {
 				EnumMap<RssActe, String> acteRss = new EnumMap<>(RssActe.class);
 				acteRss.put(RssActe.activite, groupEntry.content.get("Activite"));
@@ -230,6 +232,8 @@ public class GroupDbLink extends InputStream implements Callable<Path> {
 				daRss.put(RssDa.da, groupEntry.content.get("DA"));
 				
 				fullRss.get(fullRss.size() - 1).getRssda().add(daRss);
+				pmsiPosition++;
+			} else if (groupEntry.line_type.equals("rssheader")) {
 				pmsiPosition++;
 			}
 		}

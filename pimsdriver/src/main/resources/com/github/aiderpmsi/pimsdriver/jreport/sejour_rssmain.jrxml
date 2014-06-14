@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version last-->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="sejour_rssmain" pageWidth="555" pageHeight="802" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="749c7e1f-54e3-4986-bc9e-33d369438a7f">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="pimsdriver"/>
+	<parameter name="pmel_root" class="java.lang.Long">
+		<parameterDescription><![CDATA[]]></parameterDescription>
+		<defaultValueExpression><![CDATA[4]]></defaultValueExpression>
+	</parameter>
+	<parameter name="order_by" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["ORDER BY dr.numrss"]]></defaultValueExpression>
+	</parameter>
+	<queryString language="SQL">
+		<![CDATA[WITH distinct_rss AS (
+SELECT  smva.numrss,
+	COUNT(smva.numrss) nbrums,
+	MIN(smva.pmel_id) pmel_id,
+	MIN(to_date(smva.dateentree, 'DDMMYYYY')) dateentree,
+	MAX(to_date(smva.datesortie, 'DDMMYYYY')) datesortie
+FROM smva_rssmain_116_view smva
+WHERE smva.pmel_root = $P{pmel_root}::bigint
+GROUP BY smva.numrss
+)
+SELECT dr.numrss,
+	dr.nbrums,
+	dr.dateentree,
+	dr.datesortie,
+	pmgr.pmgr_racine,
+	pmgr.pmgr_modalite,
+	pmgr.pmgr_gravite,
+	pmgr.pmgr_erreur
+FROM distinct_rss dr
+JOIN pmgr_pmsigroups pmgr ON
+	dr.pmel_id = pmgr.pmel_id
+	AND pmgr.pmel_root = $P{pmel_root}::bigint
+$P!{order_by}]]>
+	</queryString>
+	<field name="numrss" class="java.lang.String"/>
+	<field name="dateentree" class="java.sql.Date"/>
+	<field name="datesortie" class="java.sql.Date"/>
+	<field name="nbrums" class="java.lang.Long"/>
+	<field name="pmgr_racine" class="java.lang.String"/>
+	<field name="pmgr_modalite" class="java.lang.String"/>
+	<field name="pmgr_gravite" class="java.lang.String"/>
+	<field name="pmgr_erreur" class="java.lang.String"/>
+	<detail>
+		<band height="66" splitType="Stretch">
+			<property name="local_mesure_unitheight" value="pixel"/>
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<rectangle>
+				<reportElement x="0" y="2" width="438" height="21" forecolor="#000000" backcolor="#000000" uuid="d24bcbab-c400-4e20-8e83-2518393efb11">
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+			</rectangle>
+			<textField>
+				<reportElement mode="Transparent" x="0" y="2" width="278" height="20" forecolor="#FFFFFF" backcolor="#000000" uuid="5279eb1d-bf6e-4676-871d-0e557e086cc7"/>
+				<textElement>
+					<font size="16"/>
+					<paragraph leftIndent="2" rightIndent="2" spacingBefore="1" spacingAfter="1"/>
+				</textElement>
+				<textFieldExpression><![CDATA["RSS n° " + $F{numrss}.trim() + " (" + $F{nbrums} + " " + ($F{nbrums} == 1L ? "RUM" : "RUMS") + ")"]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="0" y="0" width="554" height="1" uuid="82b6a037-b2c0-48cd-a842-e602ba10b5f3"/>
+			</line>
+			<textField>
+				<reportElement mode="Transparent" x="278" y="2" width="160" height="20" forecolor="#FFFFFF" backcolor="#000000" uuid="0eefd624-c3f4-4fc2-b7e4-33dbf98cf19e"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10"/>
+					<paragraph leftIndent="2" rightIndent="2" spacingBefore="1" spacingAfter="1"/>
+				</textElement>
+				<textFieldExpression><![CDATA["(" + new SimpleDateFormat("dd/MM/yyyy").format($F{dateentree}) + "-" + new SimpleDateFormat("dd/MM/yyyy").format($F{datesortie}) + ")"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="440" y="2" width="115" height="18" uuid="0429ebef-d594-4ad2-8489-ea22adb9833d">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<printWhenExpression><![CDATA[$F{pmgr_erreur}.length() != 0]]></printWhenExpression>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Erreur :"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="440" y="20" width="115" height="32" uuid="68f08e37-b120-4879-891e-363146244404">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<printWhenExpression><![CDATA[$F{pmgr_erreur}.length() != 0]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{pmgr_erreur}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="520" y="2" width="35" height="25" uuid="32c8d8d4-c98c-406e-a9d4-9aca56ca52c6">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<printWhenExpression><![CDATA[$F{pmgr_erreur}.length() == 0]]></printWhenExpression>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{pmgr_modalite}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="520" y="27" width="35" height="25" uuid="b3338d02-8462-4549-855f-87bbd44277d6">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="local_mesure_unity" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<printWhenExpression><![CDATA[$F{pmgr_erreur}.length() == 0]]></printWhenExpression>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{pmgr_gravite}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="440" y="2" width="80" height="50" uuid="7e55177f-e8db-4143-b7da-3e38539453ba">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<printWhenExpression><![CDATA[$F{pmgr_erreur}.length() == 0]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{pmgr_racine} + $F{pmgr_modalite}]]></textFieldExpression>
+			</textField>
+			<rectangle>
+				<reportElement mode="Transparent" x="440" y="2" width="115" height="50" uuid="8f7d4558-af07-454e-8f0e-d7d0f6f61503">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<graphicElement>
+					<pen lineStyle="Solid"/>
+				</graphicElement>
+			</rectangle>
+			<subreport>
+				<reportElement x="0" y="58" width="554" height="1" uuid="e2b311d9-e90f-4cb8-a6c2-4c4748286f8f">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="local_mesure_unity" value="pixel"/>
+				</reportElement>
+				<subreportParameter name="pmel_root">
+					<subreportParameterExpression><![CDATA[$P{pmel_root}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="numrss">
+					<subreportParameterExpression><![CDATA[$F{numrss}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression class="net.sf.jasperreports.engine.JasperReport">
+					<![CDATA[com.github.aiderpmsi.pimsdriver.jaxrs.Report.reportFromResourceName("sejour_rum.jrxml")]]>
+				</subreportExpression>
+			</subreport>
+			<subreport>
+				<reportElement positionType="Float" x="0" y="63" width="554" height="1" uuid="05ebd418-c478-4836-878f-45d434e95e19">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="local_mesure_unitx" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="local_mesure_unity" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<subreportParameter name="pmel_root">
+					<subreportParameterExpression><![CDATA[$P{pmel_root}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="numrss">
+					<subreportParameterExpression><![CDATA[$F{numrss}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression class="net.sf.jasperreports.engine.JasperReport">
+					<![CDATA[com.github.aiderpmsi.pimsdriver.jaxrs.Report.reportFromResourceName("sejour_fact.jrxml")]]>
+				</subreportExpression>
+			</subreport>
+		</band>
+	</detail>
+</jasperReport>

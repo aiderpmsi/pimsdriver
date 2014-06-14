@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version last-->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="sejour_fact" pageWidth="555" pageHeight="802" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="749c7e1f-54e3-4986-bc9e-33d369438a7f">
+	<property name="com.jaspersoft.studio.data.sql.tables" value="ZmF2YV9yc2ZhXzIwMTJfdmlldyBBUyAsMTUsMDs="/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="pimsdriver"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<parameter name="pmel_root" class="java.lang.Long">
+		<parameterDescription><![CDATA[]]></parameterDescription>
+		<defaultValueExpression><![CDATA[0]]></defaultValueExpression>
+	</parameter>
+	<parameter name="numrss" class="java.lang.String"/>
+	<queryString language="SQL">
+		<![CDATA[ SELECT a.pmel_id,
+	a.pmel_position,
+	a.numrss,
+	a.sexe,
+	a.codess,
+	a.clecodess,
+	a.rangbeneficiaire,
+	a.numfacture,
+	to_date(a.datenaissance, 'DDMMYYYY') datenaissance,
+	to_date(a.dateentree, 'DDMMYYYY') dateentree,
+	to_date(a.datesortie, 'DDMMYYYY') datesortie,
+	a.etatliquidation,
+	a.totalfactureph::integer,
+	a.totalfacturehonoraire::integer
+FROM fava_rsfa_2012_view a
+WHERE a.pmel_root = $P{pmel_root}::bigint
+	AND a.numrss::bytea = $P{numrss}::bytea
+ORDER BY a.numfacture]]>
+	</queryString>
+	<field name="pmel_id" class="java.lang.Long"/>
+	<field name="numrss" class="java.lang.String"/>
+	<field name="sexe" class="java.lang.String"/>
+	<field name="codess" class="java.lang.String"/>
+	<field name="clecodess" class="java.lang.String"/>
+	<field name="rangbeneficiaire" class="java.lang.String"/>
+	<field name="numfacture" class="java.lang.String"/>
+	<field name="datenaissance" class="java.sql.Date"/>
+	<field name="dateentree" class="java.sql.Date"/>
+	<field name="datesortie" class="java.sql.Date"/>
+	<field name="etatliquidation" class="java.lang.String"/>
+	<field name="totalfactureph" class="java.lang.Integer"/>
+	<field name="totalfacturehonoraire" class="java.lang.Integer"/>
+	<field name="pmel_position" class="java.lang.Long"/>
+	<columnHeader>
+		<band height="39">
+			<property name="local_mesure_unitheight" value="pixel"/>
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<line>
+				<reportElement x="0" y="0" width="554" height="1" uuid="87ca4280-07ce-4e15-aec0-75ab8a63cf5f"/>
+				<graphicElement>
+					<pen lineStyle="Dashed" lineColor="#949494"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement mode="Opaque" x="0" y="2" width="555" height="20" backcolor="#ABABAB" uuid="c71e0749-41b9-4510-b2b0-950a08ed8a44"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="DejaVu Serif" size="12"/>
+					<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
+				</textElement>
+				<text><![CDATA[Factures associées :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="10" y="22" width="130" height="16" uuid="4eb91f65-9c39-4f04-9192-9b4b39513320">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="DejaVu Serif"/>
+					<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
+				</textElement>
+				<text><![CDATA[N° facture]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="140" y="22" width="140" height="16" uuid="a6d17e56-55dd-42aa-8f33-93af6d2d34d4">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="DejaVu Serif"/>
+					<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
+				</textElement>
+				<text><![CDATA[Entrée - Sortie]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="280" y="22" width="130" height="16" uuid="dd1b7191-0f16-44e9-9df2-0ffe64875830">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="DejaVu Serif"/>
+					<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
+				</textElement>
+				<text><![CDATA[Prestations hospit]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="410" y="22" width="130" height="16" uuid="b6c61f59-f517-4b40-a376-3af817a56dc2">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="DejaVu Serif"/>
+					<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
+				</textElement>
+				<text><![CDATA[Honoraires]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="38" width="554" height="1" uuid="0f90fd92-cbfe-4571-bb01-bef554c29668"/>
+				<graphicElement>
+					<pen lineColor="#BABABA"/>
+				</graphicElement>
+			</line>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="16" splitType="Stretch">
+			<property name="local_mesure_unitheight" value="pixel"/>
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<textField>
+				<reportElement x="10" y="0" width="130" height="16" uuid="f8f3288b-4f39-4f2b-9ae8-54e88546a2e7">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font fontName="DejaVu Serif"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{numfacture}.trim()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="140" y="0" width="140" height="16" uuid="0a2124c1-0d75-4fc3-b0e6-d2c89eb4b442">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font fontName="DejaVu Serif"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new SimpleDateFormat("dd/MM/yyyy").format($F{dateentree}) + "-" + new SimpleDateFormat("dd/MM/yyyy").format($F{datesortie})]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="280" y="0" width="130" height="16" uuid="27e1c463-c40f-477f-8b44-7c5ffa369b3f">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="DejaVu Sans Mono"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new DecimalFormat("+#,##0.00;-#,##0.00", new DecimalFormatSymbols(Locale.FRANCE)).format(new BigDecimal($F{totalfactureph}).divide(new BigDecimal(100))) + "€"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="410" y="0" width="130" height="16" uuid="2b516005-c8ba-439b-b407-3592ea02f26e">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="DejaVu Sans Mono"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new DecimalFormat("+#,##0.00;-#,##0.00", new DecimalFormatSymbols(Locale.FRANCE)).format(new BigDecimal($F{totalfacturehonoraire}).divide(new BigDecimal(100))) + "€"]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

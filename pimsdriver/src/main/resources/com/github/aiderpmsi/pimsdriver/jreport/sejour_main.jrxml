@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version last-->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="sejour_main" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="71aa2151-39d0-4796-9662-ddeefcb37227">
+	<property name="com.jaspersoft.studio.data.sql.tables" value="cGx1ZF9wbXNpdXBsb2FkIEFTICwwLDEyOw=="/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="pimsdriver"/>
+	<parameter name="plud_id" class="java.lang.Long">
+		<parameterDescription><![CDATA[Id d'insertion]]></parameterDescription>
+		<defaultValueExpression><![CDATA[0]]></defaultValueExpression>
+	</parameter>
+	<parameter name="now" class="java.util.Date" isForPrompting="false">
+		<parameterDescription><![CDATA[Date de génération rapport]]></parameterDescription>
+		<defaultValueExpression><![CDATA[new Date()]]></defaultValueExpression>
+	</parameter>
+	<queryString language="SQL">
+		<![CDATA[SELECT plud_pmsiupload.plud_id,
+	plud_pmsiupload.plud_finess,
+	plud_pmsiupload.plud_year,
+	plud_pmsiupload.plud_month,
+	plud_pmsiupload.plud_dateenvoi
+ FROM plud_pmsiupload
+	WHERE plud_pmsiupload.plud_id = $P{plud_id}::BIGINT]]>
+	</queryString>
+	<field name="plud_id" class="java.lang.Long"/>
+	<field name="plud_finess" class="java.lang.String"/>
+	<field name="plud_year" class="java.lang.Integer"/>
+	<field name="plud_month" class="java.lang.Integer"/>
+	<field name="plud_dateenvoi" class="java.sql.Timestamp"/>
+	<group name="plud_id">
+		<groupExpression><![CDATA[$F{plud_id}]]></groupExpression>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="95" splitType="Stretch">
+			<property name="local_mesure_unitheight" value="pixel"/>
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<textField>
+				<reportElement mode="Opaque" x="0" y="0" width="555" height="30" forecolor="#FFFFFF" backcolor="#000000" uuid="1634a74c-0d85-4ea5-a4e8-356c2f9fbe86">
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<box padding="0" topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="0"/>
+				<textElement textAlignment="Left" verticalAlignment="Top" rotation="None" markup="none">
+					<font fontName="DejaVu Serif" size="20" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single" lineSpacingSize="1.0" firstLineIndent="0" leftIndent="2" rightIndent="0" spacingBefore="2" spacingAfter="0" tabStopWidth="40"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Finess : " + $F{plud_finess}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement mode="Opaque" x="110" y="30" width="445" height="40" uuid="bb60b163-7d16-42c2-bd36-5e159df25a6a">
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="16"/>
+				</textElement>
+				<textFieldExpression><![CDATA["M " + $F{plud_month} + " Y " + $F{plud_year}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement mode="Opaque" x="0" y="30" width="110" height="17" forecolor="#FFFFFF" backcolor="#000000" uuid="7ee09cce-35c5-4c7b-a59c-15fb126e3e30">
+					<property name="local_mesure_unity" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font size="8"/>
+					<paragraph spacingBefore="4" spacingAfter="4" tabStopWidth="40"/>
+				</textElement>
+				<text><![CDATA[Date de stockage]]></text>
+			</staticText>
+			<textField>
+				<reportElement mode="Opaque" x="0" y="47" width="110" height="23" forecolor="#FFFFFF" backcolor="#000000" uuid="b75f9c46-37d3-4f2a-9b4e-b04d165a46f5"/>
+				<box padding="0" topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="0"/>
+				<textElement textAlignment="Center" verticalAlignment="Top" rotation="None" markup="none">
+					<font fontName="SansSerif" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single" lineSpacingSize="1.0" firstLineIndent="0" leftIndent="0" rightIndent="0" spacingBefore="0" spacingAfter="0" tabStopWidth="40"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new SimpleDateFormat("dd-MM-yyyy HH:mm:ss Z").format($F{plud_dateenvoi}.getTime())]]></textFieldExpression>
+			</textField>
+			<subreport runToBottom="true">
+				<reportElement positionType="Float" x="0" y="90" width="555" height="1" uuid="51fe7c28-35fd-4bcc-8d4d-b0fbab7bc2bb">
+					<property name="local_mesure_unity" value="pixel"/>
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<subreportParameter name="pmel_root">
+					<subreportParameterExpression><![CDATA[$F{plud_id}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["sejour_rssmain.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="24" splitType="Stretch">
+			<property name="local_mesure_unitheight" value="pixel"/>
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<staticText>
+				<reportElement x="0" y="12" width="90" height="12" uuid="5e0138ef-9d91-4dea-a95c-345dc84dda01">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="local_mesure_unity" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<text><![CDATA[Date du rapport :]]></text>
+			</staticText>
+			<textField evaluationTime="Report" pattern="">
+				<reportElement x="90" y="12" width="400" height="12" uuid="a0f0b89e-7b2f-4e8e-a5f3-73cc19fb8c71">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[new SimpleDateFormat("dd-MM-yyyy HH:mm:ss Z").format(new Date())]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="0" width="490" height="12" uuid="6b10f31b-d97f-4bc0-9a7a-0a7ea24b0ddf">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<text><![CDATA[Rapport : détails séjours]]></text>
+			</staticText>
+			<textField evaluationTime="Report">
+				<reportElement x="520" y="6" width="35" height="12" uuid="67dcbede-499e-4249-87fe-2842af9e2b4d">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="local_mesure_unity" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA["/ " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="490" y="6" width="30" height="12" uuid="9f4493ec-17aa-4229-a62b-ae8259d1581b">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="local_mesure_unity" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+</jasperReport>
