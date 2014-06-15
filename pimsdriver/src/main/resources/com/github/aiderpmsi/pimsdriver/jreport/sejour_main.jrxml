@@ -89,7 +89,9 @@
 					<subreportParameterExpression><![CDATA[$F{plud_id}]]></subreportParameterExpression>
 				</subreportParameter>
 				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
-				<subreportExpression><![CDATA["sejour_rssmain.jasper"]]></subreportExpression>
+				<subreportExpression class="net.sf.jasperreports.engine.JasperReport">
+					<![CDATA[com.github.aiderpmsi.pimsdriver.jaxrs.Report.reportFromResourceName("sejour_rssmain.jrxml")]]>
+				</subreportExpression>
 			</subreport>
 		</band>
 	</detail>
