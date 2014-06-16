@@ -9,6 +9,7 @@ import java.util.List;
 
 import com.github.aiderpmsi.pimsdriver.db.vaadin.DBQueryBuilder;
 import com.github.aiderpmsi.pimsdriver.dto.model.BaseRsfA;
+import com.github.aiderpmsi.pimsdriver.dto.model.BaseRsfB;
 import com.github.aiderpmsi.pimsdriver.dto.model.UploadedPmsi;
 import com.vaadin.data.Container.Filter;
 import com.vaadin.data.util.sqlcontainer.query.OrderBy;
@@ -135,9 +136,9 @@ public class NavigationDTO extends AutoCloseableDto<NavigationDTO.Navigation> {
 
 		// IN THIS QUERY, IT IS NOT POSSIBLE TO STORE THE QUERY (CAN CHANGE AT EVERY CALL)
 		StringBuilder query = new StringBuilder(
-				"SELECT pmel_id, pmel_line, numrss, sexe, codess, numfacture, datenaissance, "
+				"SELECT pmel_id, pmel_root, pmel_position, pmel_line, numrss, sexe, codess, numfacture, datenaissance, "
 				+ "dateentree, datesortie, totalfacturehonoraire, totalfactureph, etatliquidation "
-				+ "FROM fava_rsfa_2012_view;");
+				+ "FROM fava_rsfa_2012_view");
 		
 		// PREPARES THE LIST OF ARGUMENTS FOR THIS QUERY
 		List<Object> queryArgs = new ArrayList<>();
@@ -170,17 +171,19 @@ public class NavigationDTO extends AutoCloseableDto<NavigationDTO.Navigation> {
 
 					// FILLS THE BEAN
 					element.pmel_id = rs.getLong(1);
-					element.ligne = rs.getString(2);
-					element.numrss = rs.getString(3);
-					element.sexe = rs.getString(4);
-					element.codess = rs.getString(5);
-					element.numfacture = rs.getString(6);
-					element.datenaissance = rs.getString(7);
-					element.dateentree = rs.getString(8);
-					element.datesortie = rs.getString(9);
-					element.totalfacturehonoraire = rs.getString(10);
-					element.totalfactureph = rs.getString(11);
-					element.etatliquidation = rs.getString(12);
+					element.pmel_root = rs.getLong(2);
+					element.pmel_position = rs.getLong(3);
+					element.ligne = rs.getString(4);
+					element.numrss = rs.getString(5);
+					element.sexe = rs.getString(6);
+					element.codess = rs.getString(7);
+					element.numfacture = rs.getString(8);
+					element.datenaissance = rs.getString(9);
+					element.dateentree = rs.getString(10);
+					element.datesortie = rs.getString(11);
+					element.totalfacturehonoraire = rs.getString(12);
+					element.totalfactureph = rs.getString(13);
+					element.etatliquidation = rs.getString(14);
 				
 				// ADDS THE BEAN TO THE ELEMENTS
 				rsfa.add(element);
@@ -217,6 +220,88 @@ public class NavigationDTO extends AutoCloseableDto<NavigationDTO.Navigation> {
 		}
 	}
 
+	public List<BaseRsfB> readRsfBList (List<Filter> filters, List<OrderBy> orders,
+			Integer first, Integer rows) throws SQLException {
+
+		// IN THIS QUERY, IT IS NOT POSSIBLE TO STORE THE QUERY (CAN CHANGE AT EVERY CALL)
+		StringBuilder query = new StringBuilder(
+				"SELECT pmel_id, pmel_line, datedebutsejour, datefinsejour, "
+				+ "codeacte, quantite, numghs, montanttotaldepense "
+				+ "FROM favb_rsfb_2012_view");
+		
+		// PREPARES THE LIST OF ARGUMENTS FOR THIS QUERY
+		List<Object> queryArgs = new ArrayList<>();
+		// CREATES THE FILTERS, THE ORDERS AND FILLS THE ARGUMENTS
+		query.append(DBQueryBuilder.getWhereStringForFilters(filters, queryArgs)).
+			append(DBQueryBuilder.getOrderStringForOrderBys(orders, queryArgs));
+		// OFFSET AND LIMIT
+		if (first != null)
+			query.append(" OFFSET ").append(first.toString()).append(" ");
+		if (rows != null && rows != 0)
+			query.append(" LIMIT ").append(rows.toString()).append(" ");
+		
+		// CREATES THE DB STATEMENT
+		try (PreparedStatement ps = con.prepareStatement(query.toString())) {
+
+			for (int i = 0 ; i < queryArgs.size() ; i++) {
+				ps.setObject(i + 1, queryArgs.get(i));
+			}
+
+			// EXECUTES THE QUERY
+			try (ResultSet rs = ps.executeQuery()) {
+		
+				// LIST OF ELEMENTS
+				List<BaseRsfB> rsfbs = new ArrayList<>();
+			
+				// FILLS THE LIST OF ELEMENTS
+				while (rs.next()) {
+					// BEAN FOR THIS ITEM
+					BaseRsfB element = new BaseRsfB();
+
+					// FILLS THE BEAN
+					element.pmel_id = rs.getLong(1);
+					element.pmel_line = rs.getLong(2);
+					element.datedebutsejour = rs.getString(3);
+					element.datefinsejour = rs.getString(4);
+					element.codeacte = rs.getString(5);
+					element.quantite = rs.getString(6);
+					element.numghs = rs.getString(7);
+					element.montanttotaldepense = rs.getString(8);
+				
+				// ADDS THE BEAN TO THE ELEMENTS
+				rsfbs.add(element);
+
+				}
+				return rsfbs;
+			}
+		}
+	}
+
+	public long readRsfBSize(List<Filter> filters) throws SQLException {
+		// IN THIS QUERY, IT IS NOT POSSIBLE TO STORE THE QUERY (CAN CHANGE AT EVERY CALL)
+		StringBuilder query = new StringBuilder(
+				"SELECT COUNT(*) FROM favb_rsfb_2012_view");
+		
+		// PREPARES THE LIST OF ARGUMENTS FOR THIS QUERY
+		List<Object> queryArgs = new ArrayList<>();
+		// CREATES THE FILTERS, THE ORDERS AND FILLS THE ARGUMENTS
+		query.append(DBQueryBuilder.getWhereStringForFilters(filters, queryArgs));
+		
+		// CREATE THE DB STATEMENT
+		try (PreparedStatement ps = con.prepareStatement(query.toString())) {
+			for (int i = 0 ; i < queryArgs.size() ; i++) {
+				ps.setObject(i + 1, queryArgs.get(i));
+			}
+
+			// EXECUTE QUERY
+			try (ResultSet rs = ps.executeQuery()) {
+
+				// RESULT
+				rs.next();
+				return rs.getLong(1);
+			}
+		}
+	}
 
 
 }

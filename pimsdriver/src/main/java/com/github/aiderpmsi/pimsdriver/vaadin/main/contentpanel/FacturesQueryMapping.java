@@ -9,6 +9,7 @@ public class FacturesQueryMapping {
 	static {
 		sqlMapping.put("pmel_id", "pmel_id");
 		sqlMapping.put("pmel_root", "pmel_root");
+		sqlMapping.put("pmel_position", "pmel_position");
 		sqlMapping.put("ligne", "pmel_line");
 		sqlMapping.put("numfacture", "numfacture");
 		sqlMapping.put("numrss", "numrss");

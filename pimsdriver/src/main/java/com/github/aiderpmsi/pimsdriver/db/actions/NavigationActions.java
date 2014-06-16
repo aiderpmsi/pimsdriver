@@ -8,6 +8,7 @@ import com.github.aiderpmsi.pimsdriver.db.DataSourceSingleton;
 import com.github.aiderpmsi.pimsdriver.dto.NavigationDTO;
 import com.github.aiderpmsi.pimsdriver.dto.UploadedPmsiDTO;
 import com.github.aiderpmsi.pimsdriver.dto.model.BaseRsfA;
+import com.github.aiderpmsi.pimsdriver.dto.model.BaseRsfB;
 import com.github.aiderpmsi.pimsdriver.dto.model.UploadedPmsi;
 import com.vaadin.data.Container.Filter;
 import com.vaadin.data.util.sqlcontainer.query.OrderBy;
@@ -73,6 +74,55 @@ public class NavigationActions {
 			for (;;) {
 				try {
 					int size = (int) nad.readRsfASize(filters);
+					// SELECTION HAS SUCCEDDED
+					con.commit();
+					return size;
+				} catch (SQLException e) {
+					if (e instanceof SQLException && !((SQLException)e).getSQLState().equals("40001")) {
+						con.rollback();
+						throw (SQLException) e;
+					}
+				}
+			}
+		} catch (SQLException e) {
+			throw new ActionException(e);
+		}
+	}
+
+	public List<BaseRsfB> getFacturesB(List<Filter> filters, List<OrderBy> orders,
+			Integer first, Integer rows) throws ActionException {
+
+		try (Connection con = DataSourceSingleton.getInstance().getConnection();
+			NavigationDTO nad = new NavigationDTO(con);) {
+			
+			// CONTINUE WHILE SELECTION HAS NOT SUCCEDED BECAUSE OF SERIALIZATION EXCEPTIONS
+			for (;;) {
+				try {
+					List<BaseRsfB> rsfbs = nad.readRsfBList(filters, orders, first, rows);
+					// SELECTION HAS SUCCEDDED
+					con.commit();
+					return rsfbs;
+				} catch (SQLException e) {
+					if (e instanceof SQLException && !((SQLException)e).getSQLState().equals("40001")) {
+						con.rollback();
+						throw (SQLException) e;
+					}
+				}
+			}
+		} catch (SQLException e) {
+			throw new ActionException(e);
+		}
+	}
+
+	public int getFacturesBSize(List<Filter> filters) throws ActionException {
+
+		try (Connection con = DataSourceSingleton.getInstance().getConnection();
+			NavigationDTO nad = new NavigationDTO(con);) {
+			
+			// CONTINUE WHILE SELECTION HAS NOT SUCCEDED BECAUSE OF SERIALIZATION EXCEPTIONS
+			for (;;) {
+				try {
+					int size = (int) nad.readRsfBSize(filters);
 					// SELECTION HAS SUCCEDDED
 					con.commit();
 					return size;

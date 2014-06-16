@@ -111,6 +111,9 @@ public class PmsiContentPanel extends Panel {
         processtable.setColumnHeaders(new String[] {"Ligne", "Facture", "Rss", "Code sécu", "Sexe", "Naissance", "Entrée", "Sortie", "Honoraires", "Prestations", "Liquidation"} );
         processtable.setSelectable(true);
         processtable.setSizeFull();
+        
+        processtable.addActionHandler(new FactureSelectedHandler(lqc));
+        
         body.addComponent(processtable);
 	}
 	

@@ -4,6 +4,10 @@ public class BaseRsfA {
 
 	public Long pmel_id;
 	
+	public Long pmel_root;
+	
+	public Long pmel_position;
+	
 	public String ligne;
 	
 	public String numfacture;
@@ -32,6 +36,22 @@ public class BaseRsfA {
 
 	public void setPmel_id(Long pmel_id) {
 		this.pmel_id = pmel_id;
+	}
+
+	public Long getPmel_root() {
+		return pmel_root;
+	}
+
+	public void setPmel_root(Long pmel_root) {
+		this.pmel_root = pmel_root;
+	}
+
+	public Long getPmel_position() {
+		return pmel_position;
+	}
+
+	public void setPmel_position(Long pmel_position) {
+		this.pmel_position = pmel_position;
 	}
 
 	public String getLigne() {
