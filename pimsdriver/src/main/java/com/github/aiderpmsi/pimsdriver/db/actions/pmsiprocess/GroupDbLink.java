@@ -14,11 +14,12 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.ArrayUtils;
+
 import com.github.aiderpmsi.pims.grouper.model.RssActe;
 import com.github.aiderpmsi.pims.grouper.model.RssContent;
 import com.github.aiderpmsi.pims.grouper.model.RssDa;
 import com.github.aiderpmsi.pims.grouper.model.RssMain;
-import com.github.aiderpmsi.pims.grouper.tags.Group;
+import com.github.aiderpmsi.pims.grouper.tags.GroupFactory.Group;
 import com.github.aiderpmsi.pims.grouper.utils.Grouper;
 import com.github.aiderpmsi.pims.treebrowser.TreeBrowserException;
 
@@ -245,13 +246,13 @@ public class GroupDbLink extends InputStream implements Callable<Path> {
 		try {
 			group = grouper.group(rums);
 			StringBuilder line = new StringBuilder();
-			escape(group.getRacine(), line);
+			escape(group.racine, line);
 			line.append('|');
-			escape(group.getModalite(), line);
+			escape(group.modalite, line);
 			line.append('|');
-			escape(group.getGravite(), line);
+			escape(group.gravite, line);
 			line.append('|');
-			escape(group.getErreur(), line);
+			escape(group.erreur, line);
 			line.append('\n');
 			String postfix = line.toString();
 			for (Long pmsiPosition : pmsiPositions) {

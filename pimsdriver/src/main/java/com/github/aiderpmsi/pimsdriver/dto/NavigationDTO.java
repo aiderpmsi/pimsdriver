@@ -7,7 +7,11 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.github.aiderpmsi.pimsdriver.db.vaadin.DBQueryBuilder;
+import com.github.aiderpmsi.pimsdriver.dto.model.BaseRsfA;
 import com.github.aiderpmsi.pimsdriver.dto.model.UploadedPmsi;
+import com.vaadin.data.Container.Filter;
+import com.vaadin.data.util.sqlcontainer.query.OrderBy;
 
 public class NavigationDTO extends AutoCloseableDto<NavigationDTO.Navigation> {
 	
@@ -125,5 +129,94 @@ public class NavigationDTO extends AutoCloseableDto<NavigationDTO.Navigation> {
 			return lines;
 		}
 	}
+	
+	public List<BaseRsfA> readRsfAList (List<Filter> filters, List<OrderBy> orders,
+			Integer first, Integer rows) throws SQLException {
+
+		// IN THIS QUERY, IT IS NOT POSSIBLE TO STORE THE QUERY (CAN CHANGE AT EVERY CALL)
+		StringBuilder query = new StringBuilder(
+				"SELECT pmel_id, pmel_line, numrss, sexe, codess, numfacture, datenaissance, "
+				+ "dateentree, datesortie, totalfacturehonoraire, totalfactureph, etatliquidation "
+				+ "FROM fava_rsfa_2012_view;");
+		
+		// PREPARES THE LIST OF ARGUMENTS FOR THIS QUERY
+		List<Object> queryArgs = new ArrayList<>();
+		// CREATES THE FILTERS, THE ORDERS AND FILLS THE ARGUMENTS
+		query.append(DBQueryBuilder.getWhereStringForFilters(filters, queryArgs)).
+			append(DBQueryBuilder.getOrderStringForOrderBys(orders, queryArgs));
+		// OFFSET AND LIMIT
+		if (first != null)
+			query.append(" OFFSET ").append(first.toString()).append(" ");
+		if (rows != null && rows != 0)
+			query.append(" LIMIT ").append(rows.toString()).append(" ");
+		
+		// CREATES THE DB STATEMENT
+		try (PreparedStatement ps = con.prepareStatement(query.toString())) {
+
+			for (int i = 0 ; i < queryArgs.size() ; i++) {
+				ps.setObject(i + 1, queryArgs.get(i));
+			}
+
+			// EXECUTES THE QUERY
+			try (ResultSet rs = ps.executeQuery()) {
+		
+				// LIST OF ELEMENTS
+				List<BaseRsfA> rsfa = new ArrayList<>();
+			
+				// FILLS THE LIST OF ELEMENTS
+				while (rs.next()) {
+					// BEAN FOR THIS ITEM
+					BaseRsfA element = new BaseRsfA();
+
+					// FILLS THE BEAN
+					element.pmel_id = rs.getLong(1);
+					element.ligne = rs.getString(2);
+					element.numrss = rs.getString(3);
+					element.sexe = rs.getString(4);
+					element.codess = rs.getString(5);
+					element.numfacture = rs.getString(6);
+					element.datenaissance = rs.getString(7);
+					element.dateentree = rs.getString(8);
+					element.datesortie = rs.getString(9);
+					element.totalfacturehonoraire = rs.getString(10);
+					element.totalfactureph = rs.getString(11);
+					element.etatliquidation = rs.getString(12);
+				
+				// ADDS THE BEAN TO THE ELEMENTS
+				rsfa.add(element);
+
+				}
+				return rsfa;
+			}
+		}
+	}
+
+	public long readRsfASize(List<Filter> filters) throws SQLException {
+		// IN THIS QUERY, IT IS NOT POSSIBLE TO STORE THE QUERY (CAN CHANGE AT EVERY CALL)
+		StringBuilder query = new StringBuilder(
+				"SELECT COUNT(*) FROM fava_rsfa_2012_view");
+		
+		// PREPARES THE LIST OF ARGUMENTS FOR THIS QUERY
+		List<Object> queryArgs = new ArrayList<>();
+		// CREATES THE FILTERS, THE ORDERS AND FILLS THE ARGUMENTS
+		query.append(DBQueryBuilder.getWhereStringForFilters(filters, queryArgs));
+		
+		// CREATE THE DB STATEMENT
+		try (PreparedStatement ps = con.prepareStatement(query.toString())) {
+			for (int i = 0 ; i < queryArgs.size() ; i++) {
+				ps.setObject(i + 1, queryArgs.get(i));
+			}
+
+			// EXECUTE QUERY
+			try (ResultSet rs = ps.executeQuery()) {
+
+				// RESULT
+				rs.next();
+				return rs.getLong(1);
+			}
+		}
+	}
+
+
 
 }

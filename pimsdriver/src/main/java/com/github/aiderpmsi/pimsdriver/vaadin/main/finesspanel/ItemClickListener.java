@@ -16,8 +16,8 @@ public class ItemClickListener implements ItemClickEvent.ItemClickListener {
 	
 	private HierarchicalContainer hc;
 	
-	public ItemClickListener(RootWindow rootEement, HierarchicalContainer hc) {
-		this.rootElement = rootEement;
+	public ItemClickListener(RootWindow rootElement, HierarchicalContainer hc) {
+		this.rootElement = rootElement;
 		this.hc = hc;
 	}
 

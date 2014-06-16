@@ -14,9 +14,13 @@ public class MenuBar extends com.vaadin.ui.MenuBar {
 	
 	private MenuItem rapports = null;
 	
-	public MenuBar() {
+	private RootWindow rootWindow;
+	
+	public MenuBar(RootWindow rootWindow) {
 		super();
 		addStyleName("pims-main-menubar");
+		
+		this.rootWindow = rootWindow;
 	
 		files = addItem("Fichiers", null, null);
 		files.addItem("Ajouter Pmsi", null, new UploadPmsiCommand());
@@ -38,8 +42,8 @@ public class MenuBar extends com.vaadin.ui.MenuBar {
 		// IF NEW MODEL, CREATE THE LINKS
 		if (model != null) {
 			navigations = addItem("Navs", null, null);
-			navigations.addItem("Factures", null, null);
-			navigations.addItem("Séjours", null, null);
+			navigations.addItem("Factures", null, new NavPmsiCommand(model, NavSelectedEvent.Type.factures, rootWindow));
+			navigations.addItem("Séjours", null, new NavPmsiCommand(model, NavSelectedEvent.Type.sejours, rootWindow));
 			
 			rapports = addItem("Rapports", null, null);
 			rapports.addItem("Factures", null, new ReportPmsiCommand(model, ReportWindow.Category.factures));

@@ -7,6 +7,7 @@ import java.util.List;
 import com.github.aiderpmsi.pimsdriver.db.DataSourceSingleton;
 import com.github.aiderpmsi.pimsdriver.dto.NavigationDTO;
 import com.github.aiderpmsi.pimsdriver.dto.UploadedPmsiDTO;
+import com.github.aiderpmsi.pimsdriver.dto.model.BaseRsfA;
 import com.github.aiderpmsi.pimsdriver.dto.model.UploadedPmsi;
 import com.vaadin.data.Container.Filter;
 import com.vaadin.data.util.sqlcontainer.query.OrderBy;
@@ -38,6 +39,55 @@ public class NavigationActions {
 		}
 	}
 		
+	public List<BaseRsfA> getFactures(List<Filter> filters, List<OrderBy> orders,
+			Integer first, Integer rows) throws ActionException {
+
+		try (Connection con = DataSourceSingleton.getInstance().getConnection();
+			NavigationDTO nad = new NavigationDTO(con);) {
+			
+			// CONTINUE WHILE SELECTION HAS NOT SUCCEDED BECAUSE OF SERIALIZATION EXCEPTIONS
+			for (;;) {
+				try {
+					List<BaseRsfA> rsfas = nad.readRsfAList(filters, orders, first, rows);
+					// SELECTION HAS SUCCEDDED
+					con.commit();
+					return rsfas;
+				} catch (SQLException e) {
+					if (e instanceof SQLException && !((SQLException)e).getSQLState().equals("40001")) {
+						con.rollback();
+						throw (SQLException) e;
+					}
+				}
+			}
+		} catch (SQLException e) {
+			throw new ActionException(e);
+		}
+	}
+
+	public int getFacturesSize(List<Filter> filters) throws ActionException {
+
+		try (Connection con = DataSourceSingleton.getInstance().getConnection();
+			NavigationDTO nad = new NavigationDTO(con);) {
+			
+			// CONTINUE WHILE SELECTION HAS NOT SUCCEDED BECAUSE OF SERIALIZATION EXCEPTIONS
+			for (;;) {
+				try {
+					int size = (int) nad.readRsfASize(filters);
+					// SELECTION HAS SUCCEDDED
+					con.commit();
+					return size;
+				} catch (SQLException e) {
+					if (e instanceof SQLException && !((SQLException)e).getSQLState().equals("40001")) {
+						con.rollback();
+						throw (SQLException) e;
+					}
+				}
+			}
+		} catch (SQLException e) {
+			throw new ActionException(e);
+		}
+	}
+
 	public Integer getUploadedPmsiSize(List<Filter> filters) throws ActionException {
 
 		try (Connection con = DataSourceSingleton.getInstance().getConnection();

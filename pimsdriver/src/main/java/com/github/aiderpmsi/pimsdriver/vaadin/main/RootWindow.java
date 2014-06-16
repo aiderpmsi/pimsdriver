@@ -28,7 +28,7 @@ public class RootWindow extends UI {
 		// ADDS EACH WIDGET INSIDE LAYOUT
 		Header header = new Header();
 		layout.addComponent(header);
-		MenuBar menuBar = new MenuBar();
+		MenuBar menuBar = new MenuBar(this);
 		layout.addComponent(menuBar);
 		splitPanel = new SplitPanel(this);
 		layout.addComponent(splitPanel);
@@ -38,6 +38,8 @@ public class RootWindow extends UI {
 
 		// REGISTER A FINESS SELECTED LISTENER WHEN A FINESS CHANGES
 		addListener(new FinessSelectedListener(splitPanel.getContentPanel(), menuBar));
+		// REGISTER A NAV SELECTED LISTENER WHEN WE WANT TO NAVIGATE THROUGH FACTURES OR SEJOURS
+		addListener(new NavSelectedListener(splitPanel.getContentPanel()));
 	}
 	
 	private Layout createLayout() {
@@ -54,4 +56,8 @@ public class RootWindow extends UI {
 		fireEvent(fse);
 	}
 	
+	public void fireNavPmsiSelected(NavSelectedEvent.Type type, UploadedPmsi model) {
+		NavSelectedEvent nse = new NavSelectedEvent(type, model, this);
+		fireEvent(nse);
+	}
 }
