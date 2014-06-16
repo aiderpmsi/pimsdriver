@@ -7,6 +7,8 @@ public class RsfBDetailsQueryMapping {
 	public static final HashMap<Object, Object> sqlMapping = new HashMap<>();
 	
 	static {
+		sqlMapping.put("pmel_root", "pmel_root");
+		sqlMapping.put("pmel_position", "pmel_position");
 		sqlMapping.put("pmel_id", "pmel_id");
 		sqlMapping.put("pmel_line", "pmel_line");
 		sqlMapping.put("datedebutsejour", "datedebutsejour");
