@@ -20,8 +20,8 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-import com.github.aiderpmsi.pims.parser.utils.Parser2;
-import com.github.aiderpmsi.pims.treebrowser.TreeBrowserException;
+import com.github.aiderpmsi.pims.parser.utils.Parser;
+import com.github.aiderpmsi.pims.parser.utils.ParserFactory;
 import com.github.aiderpmsi.pimsdriver.db.actions.pmsiprocess.PmsiContentHandlerHelper;
 import com.github.aiderpmsi.pimsdriver.db.actions.pmsiprocess.RecorderErrorHandler;
 import com.github.aiderpmsi.pimsdriver.dto.StatementProvider.Entry;
@@ -151,7 +151,7 @@ public class ProcessorDTO extends AutoCloseableDto<ProcessorDTO.Query> {
 		ps.execute();
 	}
 
-	public void processPmsi(String type, PmsiContentHandlerHelper ch, Long oid) throws SQLException {
+	public void processPmsi(String type, PmsiContentHandlerHelper ch, ParserFactory pf, Long oid) throws SQLException {
 		Connection innerCon;
 		if(con instanceof DelegatingConnection
 				&& (innerCon = ((DelegatingConnection<?>) con).getInnermostDelegateInternal()) instanceof PGConnection) {
@@ -170,7 +170,7 @@ public class ProcessorDTO extends AutoCloseableDto<ProcessorDTO.Query> {
 			
 				// PARSE AND STORE PMSI
 				RecorderErrorHandler eh = new RecorderErrorHandler();
-				Parser2 parser = new Parser2(type);
+				Parser parser = pf.newParser(type);
 				parser.setContentHandler(ch);
 				parser.setErrorHandler(eh);
 				try (Reader tmpFile = Files.newBufferedReader(tmpPath, Charset.forName("ISO-8859-1"))) {
@@ -190,7 +190,7 @@ public class ProcessorDTO extends AutoCloseableDto<ProcessorDTO.Query> {
 					throw e;
 				}
 
-			} catch (IOException | SAXException | TreeBrowserException e) {
+			} catch (IOException | SAXException e) {
 				throw new SQLException(e);
 			} finally {
 				// BE SURE TO DELETE TEMP PATH

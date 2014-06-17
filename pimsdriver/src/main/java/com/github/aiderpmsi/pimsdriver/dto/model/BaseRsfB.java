@@ -1,22 +1,25 @@
 package com.github.aiderpmsi.pimsdriver.dto.model;
 
+import java.math.BigDecimal;
+import java.util.Date;
+
 public class BaseRsfB {
 
 	public Long pmel_id;
 	
 	public Long pmel_line;
 	
-	public String datedebutsejour;
+	public Date datedebutsejour;
 	
-	public String datefinsejour;
+	public Date datefinsejour;
 	
 	public String codeacte;
 	
-	public String quantite;
+	public Integer quantite;
 	
 	public String numghs;
 	
-	public String montanttotaldepense;
+	public BigDecimal montanttotaldepense;
 
 	public Long getPmel_id() {
 		return pmel_id;
@@ -34,19 +37,19 @@ public class BaseRsfB {
 		this.pmel_line = pmel_line;
 	}
 
-	public String getDatedebutsejour() {
+	public Date getDatedebutsejour() {
 		return datedebutsejour;
 	}
 
-	public void setDatedebutsejour(String datedebutsejour) {
+	public void setDatedebutsejour(Date datedebutsejour) {
 		this.datedebutsejour = datedebutsejour;
 	}
 
-	public String getDatefinsejour() {
+	public Date getDatefinsejour() {
 		return datefinsejour;
 	}
 
-	public void setDatefinsejour(String datefinsejour) {
+	public void setDatefinsejour(Date datefinsejour) {
 		this.datefinsejour = datefinsejour;
 	}
 
@@ -58,11 +61,11 @@ public class BaseRsfB {
 		this.codeacte = codeacte;
 	}
 
-	public String getQuantite() {
+	public Integer getQuantite() {
 		return quantite;
 	}
 
-	public void setQuantite(String quantite) {
+	public void setQuantite(Integer quantite) {
 		this.quantite = quantite;
 	}
 
@@ -74,11 +77,11 @@ public class BaseRsfB {
 		this.numghs = numghs;
 	}
 
-	public String getMontanttotaldepense() {
+	public BigDecimal getMontanttotaldepense() {
 		return montanttotaldepense;
 	}
 
-	public void setMontanttotaldepense(String montanttotaldepense) {
+	public void setMontanttotaldepense(BigDecimal montanttotaldepense) {
 		this.montanttotaldepense = montanttotaldepense;
 	}
 

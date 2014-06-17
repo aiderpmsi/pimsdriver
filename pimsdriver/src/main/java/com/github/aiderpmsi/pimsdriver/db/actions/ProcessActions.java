@@ -8,6 +8,8 @@ import java.util.List;
 
 import org.xml.sax.SAXException;
 
+import com.github.aiderpmsi.pims.parser.utils.ParserFactory;
+import com.github.aiderpmsi.pims.treebrowser.TreeBrowserException;
 import com.github.aiderpmsi.pimsdriver.db.DataSourceSingleton;
 import com.github.aiderpmsi.pimsdriver.db.actions.pmsiprocess.RsfContentHandler;
 import com.github.aiderpmsi.pimsdriver.db.actions.pmsiprocess.RssContentHandler;
@@ -33,10 +35,12 @@ public class ProcessActions {
 					String finess = null, rsfVersion = null, rssVersion = null;
 					{
 						long pmsiPosition = 0;
+						
+						ParserFactory pf = new ParserFactory();
 		
 						// PROCESS RSF
 						try (RsfContentHandler ch = new RsfContentHandler(con, element.recordid, pmsiPosition)) {
-							dto.processPmsi("rsfheader", ch, element.rsfoid);
+							dto.processPmsi("rsfheader", ch, pf, element.rsfoid);
 							pmsiPosition = ch.getPmsiPosition();
 							finess = ch.getFiness();
 							rsfVersion = ch.getVersion();
@@ -45,7 +49,7 @@ public class ProcessActions {
 						// PROCESS RSS IF NEEDED
 						if (element.rssoid != null) {
 							try (RssContentHandler ch = new RssContentHandler(con, element.recordid, pmsiPosition)) {
-								dto.processPmsi("rssheader", ch, element.rssoid);
+								dto.processPmsi("rssheader", ch, pf, element.rssoid);
 								pmsiPosition = ch.getPmsiPosition();
 								rssVersion = ch.getVersion();
 								
@@ -74,7 +78,7 @@ public class ProcessActions {
 					
 					// EVERYTHING WENT FINE, COMMIT
 					con.commit();
-				} catch (IOException | SQLException | SAXException e) {
+				} catch (IOException | SQLException | SAXException | TreeBrowserException e) {
 					// IF THE EXCEPTION IS DUE TO A SERIALIZATION EXCEPTION, WE HAVE TO RETRY THIS TREATMENT
 					if (e instanceof SQLException && ((SQLException) e).getSQLState().equals("40001")) {
 						// ROLLBACK, BUT RETRY LATER (DO NOT UPDATE STATUS)

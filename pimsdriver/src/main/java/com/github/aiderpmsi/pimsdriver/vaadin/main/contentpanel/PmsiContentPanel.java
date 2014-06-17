@@ -1,6 +1,8 @@
 package com.github.aiderpmsi.pimsdriver.vaadin.main.contentpanel;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -10,6 +12,7 @@ import org.vaadin.addons.lazyquerycontainer.LazyQueryDefinition;
 import com.github.aiderpmsi.pimsdriver.db.actions.ActionException;
 import com.github.aiderpmsi.pimsdriver.db.actions.NavigationActions;
 import com.github.aiderpmsi.pimsdriver.dto.NavigationDTO;
+import com.github.aiderpmsi.pimsdriver.dto.model.BaseRsfA;
 import com.github.aiderpmsi.pimsdriver.dto.model.UploadedPmsi;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.HorizontalLayout;
@@ -18,6 +21,7 @@ import com.vaadin.ui.Layout;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table;
+import com.vaadin.ui.Table.Align;
 import com.vaadin.ui.VerticalLayout;
 
 public class PmsiContentPanel extends Panel {
@@ -94,22 +98,29 @@ public class PmsiContentPanel extends Panel {
         		new FacturesQueryFactory(model.recordid));
 
         lqc.addContainerProperty("pmel_id", Long.class, null, true, true);
-        lqc.addContainerProperty("ligne", String.class, null, true, true);
+        lqc.addContainerProperty("ligne", Long.class, null, true, true);
         lqc.addContainerProperty("numfacture", String.class, null, true, true);
         lqc.addContainerProperty("numrss", String.class, null, true, true);
         lqc.addContainerProperty("codess", String.class, null, true, true);
         lqc.addContainerProperty("sexe", String.class, null, true, true);
-        lqc.addContainerProperty("datenaissance", String.class, null, true, true);
-        lqc.addContainerProperty("dateentree", String.class, null, true, true);
-        lqc.addContainerProperty("datesortie", String.class, null, true, true);
-        lqc.addContainerProperty("totalfacturehonoraire", String.class, null, true, true);
-        lqc.addContainerProperty("totalfactureph", String.class, null, true, true);
+        lqc.addContainerProperty("datenaissance", Date.class, null, true, true);
+        lqc.addContainerProperty("dateentree", Date.class, null, true, true);
+        lqc.addContainerProperty("datesortie", Date.class, null, true, true);
+        lqc.addContainerProperty("totalfacturehonoraire", BigDecimal.class, null, true, true);
+        lqc.addContainerProperty("totalfactureph", BigDecimal.class, null, true, true);
         lqc.addContainerProperty("etatliquidation", String.class, null, true, true);
         
         processtable.setContainerDataSource(lqc);
         processtable.setVisibleColumns(new Object[] {"ligne", "numfacture", "numrss", "codess", "sexe", "datenaissance", "dateentree", "datesortie", "totalfacturehonoraire", "totalfactureph", "etatliquidation"});
         processtable.setColumnHeaders(new String[] {"Ligne", "Facture", "Rss", "Code sécu", "Sexe", "Naissance", "Entrée", "Sortie", "Honoraires", "Prestations", "Liquidation"} );
+        processtable.setColumnAlignments(Align.RIGHT, Align.LEFT, Align.LEFT, Align.LEFT, Align.CENTER, Align.LEFT, Align.LEFT, Align.LEFT, Align.RIGHT, Align.RIGHT, Align.CENTER);
         processtable.setSelectable(true);
+
+        BaseRsfA summary = new NavigationActions().GetFacturesSummary(model.recordid);
+        processtable.setFooterVisible(true);
+        processtable.setColumnFooter("totalfacturehonoraire", summary.totalfacturehonoraire.toString());
+        processtable.setColumnFooter("totalfactureph", summary.totalfactureph.toString());
+        
         processtable.setSizeFull();
         
         processtable.addActionHandler(new FactureSelectedHandler(lqc));

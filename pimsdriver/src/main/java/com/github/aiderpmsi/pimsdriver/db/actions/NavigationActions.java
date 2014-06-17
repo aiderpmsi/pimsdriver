@@ -89,6 +89,29 @@ public class NavigationActions {
 		}
 	}
 
+	public BaseRsfA GetFacturesSummary (Long pmel_root) throws ActionException {
+		try (Connection con = DataSourceSingleton.getInstance().getConnection();
+			NavigationDTO nad = new NavigationDTO(con)) {
+
+			// CONTINUE WHILE SELECTION HAS NOT SUCCEDED BECAUSE OF SERIALIZATION EXCEPTIONS
+			for (;;) {
+				try {
+					BaseRsfA rsfa = nad.readRsfASummary(pmel_root);
+					// SELECTION HAS SUCCEDDED
+					con.commit();
+					return rsfa;
+				} catch (SQLException e) {
+					if (e instanceof SQLException && !((SQLException)e).getSQLState().equals("40001")) {
+						con.rollback();
+						throw (SQLException) e;
+					}
+				}
+			}
+		} catch (SQLException e) {
+			throw new ActionException(e);
+		} 
+	}
+
 	public List<BaseRsfB> getFacturesB(List<Filter> filters, List<OrderBy> orders,
 			Integer first, Integer rows) throws ActionException {
 

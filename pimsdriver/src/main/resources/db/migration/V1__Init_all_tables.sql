@@ -1,7 +1,37 @@
 CREATE SCHEMA pmel;
 CREATE SCHEMA pmgr;
 
+/* Create Types */
 CREATE TYPE public.plud_status AS ENUM ('pending', 'successed', 'failed');
+
+/* Create functions */
+CREATE FUNCTION public.cast_to_int(text, integer) RETURNS INTEGER AS
+$$
+BEGIN
+    RETURN CAST($1 AS integer);
+EXCEPTION
+    WHEN invalid_text_representation THEN
+        RETURN $2;
+end;
+$$
+language plpgsql immutable;
+
+CREATE FUNCTION public.cast_to_date(text, date) RETURNS DATE AS
+$$
+BEGIN
+	IF char_length($1) = 0 THEN
+		RETURN NULL;
+	ELSE
+		RETURN to_date($1, 'DDMMYYYY');
+	END IF;
+EXCEPTION
+    WHEN invalid_text_representation THEN
+        RETURN $2;
+    WHEN invalid_datetime_format THEN
+    	RETURN $2;
+end;
+$$
+language plpgsql immutable;
 
 CREATE TABLE public.plud_pmsiupload (
   plud_id bigserial NOT NULL,

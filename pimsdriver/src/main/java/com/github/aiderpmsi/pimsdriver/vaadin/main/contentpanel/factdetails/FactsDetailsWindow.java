@@ -52,7 +52,14 @@ public class FactsDetailsWindow extends Window {
         rsfbTable.setVisibleColumns(new Object[] {"pmel_line", "datedebutsejour", "datefinsejour", "codeacte", "quantite", "numghs", "montanttotaldepense"});
         rsfbTable.setColumnHeaders(new String[] {"Ligne", "Début séjour", "Fin séjour", "Acte", "Quantité", "GHS", "montant"} );
         rsfbTable.setSelectable(true);
-        rsfbTable.setSizeFull();
+        rsfbTable.setPageLength(4);
+        rsfbTable.setWidth("100%");
+        rsfbTable.setCaption("RSF B");
+        
+        /*
+        rsfbTable.setFooterVisible(true);
+        rsfbTable.setColumnF
+        */
         
         layout.addComponent(rsfbTable);
         

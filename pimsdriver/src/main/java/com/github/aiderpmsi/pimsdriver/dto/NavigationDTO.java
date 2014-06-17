@@ -1,5 +1,6 @@
 package com.github.aiderpmsi.pimsdriver.dto;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -16,6 +17,8 @@ import com.vaadin.data.util.sqlcontainer.query.OrderBy;
 
 public class NavigationDTO extends AutoCloseableDto<NavigationDTO.Navigation> {
 	
+	private static BigDecimal coeff = new BigDecimal(100);
+	
 	public class YM {
 		public Integer year, month;
 	}
@@ -28,7 +31,8 @@ public class NavigationDTO extends AutoCloseableDto<NavigationDTO.Navigation> {
 	public enum Navigation implements StatementProvider {
 		LISTFINESS,
 		LISTYM,
-		PMSIOVERVIEW;
+		PMSIOVERVIEW,
+		RSFASUMMARY;
 
 		@Override
 		public String getStatement(Entry<?>... entries) throws SQLException {
@@ -54,6 +58,10 @@ public class NavigationDTO extends AutoCloseableDto<NavigationDTO.Navigation> {
 				+ "WHERE pmel_type != ? \n"
 				+ "GROUP BY pmel_type \n"
 				+ "ORDER BY pmel_type;";
+			case RSFASUMMARY:
+				return "SELECT SUM(cast_to_int(totalfacturehonoraire, NULL)) totalfacturehonoraire, "
+				+ "SUM(cast_to_int(totalfactureph, NULL)) totalfactureph "
+				+ "FROM fava_rsfa_2012_view WHERE pmel_root = ?";
 			default: //SHOULD NEVER REACH THIS POINT
 				throw new RuntimeException("This code should never been reached");
 			}
@@ -136,8 +144,11 @@ public class NavigationDTO extends AutoCloseableDto<NavigationDTO.Navigation> {
 
 		// IN THIS QUERY, IT IS NOT POSSIBLE TO STORE THE QUERY (CAN CHANGE AT EVERY CALL)
 		StringBuilder query = new StringBuilder(
-				"SELECT pmel_id, pmel_root, pmel_position, pmel_line, numrss, sexe, codess, numfacture, datenaissance, "
-				+ "dateentree, datesortie, totalfacturehonoraire, totalfactureph, etatliquidation "
+				"SELECT pmel_id, pmel_root, pmel_position, pmel_line, trim(numrss) numrss, "
+				+ "trim(sexe) sexe, trim(codess) codess, trim(numfacture) numfacture, "
+				+ "cast_to_date(datenaissance, NULL) datenaissance, cast_to_date(dateentree, NULL) dateentree, "
+				+ "cast_to_date(datesortie, NULL) datesortie, cast_to_int(totalfacturehonoraire, NULL) totalfacturehonoraire, "
+				+ "cast_to_int(totalfactureph, NULL) totalfactureph, trim(etatliquidation) etatliquidation "
 				+ "FROM fava_rsfa_2012_view");
 		
 		// PREPARES THE LIST OF ARGUMENTS FOR THIS QUERY
@@ -173,16 +184,20 @@ public class NavigationDTO extends AutoCloseableDto<NavigationDTO.Navigation> {
 					element.pmel_id = rs.getLong(1);
 					element.pmel_root = rs.getLong(2);
 					element.pmel_position = rs.getLong(3);
-					element.ligne = rs.getString(4);
+					element.ligne = rs.getLong(4);
 					element.numrss = rs.getString(5);
 					element.sexe = rs.getString(6);
 					element.codess = rs.getString(7);
 					element.numfacture = rs.getString(8);
-					element.datenaissance = rs.getString(9);
-					element.dateentree = rs.getString(10);
-					element.datesortie = rs.getString(11);
-					element.totalfacturehonoraire = rs.getString(12);
-					element.totalfactureph = rs.getString(13);
+					element.datenaissance = rs.getDate(9);
+					element.dateentree = rs.getDate(10);
+					element.datesortie = rs.getDate(11);
+					element.totalfacturehonoraire = rs.getBigDecimal(12);
+					if (element.totalfacturehonoraire != null)
+						element.totalfacturehonoraire = element.totalfacturehonoraire.divide(coeff);
+					element.totalfactureph = rs.getBigDecimal(13);
+					if (element.totalfactureph != null)
+						element.totalfactureph = element.totalfactureph.divide(coeff);
 					element.etatliquidation = rs.getString(14);
 				
 				// ADDS THE BEAN TO THE ELEMENTS
@@ -190,6 +205,34 @@ public class NavigationDTO extends AutoCloseableDto<NavigationDTO.Navigation> {
 
 				}
 				return rsfa;
+			}
+		}
+	}
+
+	public BaseRsfA readRsfASummary (Long pmel_root) throws SQLException {
+		// GETS THE PREPARED STATEMENT
+		PreparedStatement ps = getPs(Navigation.RSFASUMMARY);
+
+		ps.setLong(1, pmel_root);
+		
+		// EXECUTES THE QUERY
+		try (ResultSet rs = ps.executeQuery()) {
+		
+			if (rs.next()) {
+				// ELEMENT TO RETURN
+				BaseRsfA rsfa = new BaseRsfA();
+				
+				rsfa.totalfacturehonoraire = rs.getBigDecimal(1);
+				if (rsfa.totalfacturehonoraire != null)
+					rsfa.totalfacturehonoraire = rsfa.totalfacturehonoraire.divide(coeff);
+
+				rsfa.totalfactureph = rs.getBigDecimal(1);
+				if (rsfa.totalfactureph != null)
+					rsfa.totalfactureph = rsfa.totalfactureph.divide(coeff);
+				
+				return rsfa;
+			} else {
+				throw new SQLException("Query for root " + pmel_root + " has no row");
 			}
 		}
 	}
@@ -225,8 +268,9 @@ public class NavigationDTO extends AutoCloseableDto<NavigationDTO.Navigation> {
 
 		// IN THIS QUERY, IT IS NOT POSSIBLE TO STORE THE QUERY (CAN CHANGE AT EVERY CALL)
 		StringBuilder query = new StringBuilder(
-				"SELECT pmel_id, pmel_line, datedebutsejour, datefinsejour, "
-				+ "codeacte, quantite, numghs, montanttotaldepense "
+				"SELECT pmel_id, pmel_line, cast_to_date(datedebutsejour) datedebutsejour, "
+				+ "cast_to_date(datefinsejour) datefinsejour, trim(codeacte) codeacte, "
+				+ "cast_to_int(quantite) quantite, trim(numghs) numghs, cast_to_int(montanttotaldepense) montanttotaldepense "
 				+ "FROM favb_rsfb_2012_view");
 		
 		// PREPARES THE LIST OF ARGUMENTS FOR THIS QUERY
@@ -261,12 +305,12 @@ public class NavigationDTO extends AutoCloseableDto<NavigationDTO.Navigation> {
 					// FILLS THE BEAN
 					element.pmel_id = rs.getLong(1);
 					element.pmel_line = rs.getLong(2);
-					element.datedebutsejour = rs.getString(3);
-					element.datefinsejour = rs.getString(4);
+					element.datedebutsejour = rs.getDate(3);
+					element.datefinsejour = rs.getDate(4);
 					element.codeacte = rs.getString(5);
-					element.quantite = rs.getString(6);
+					element.quantite = rs.getInt(6);
 					element.numghs = rs.getString(7);
-					element.montanttotaldepense = rs.getString(8);
+					element.montanttotaldepense = rs.getBigDecimal(8);
 				
 				// ADDS THE BEAN TO THE ELEMENTS
 				rsfbs.add(element);

@@ -1,5 +1,8 @@
 package com.github.aiderpmsi.pimsdriver.dto.model;
 
+import java.math.BigDecimal;
+import java.sql.Date;
+
 public class BaseRsfA {
 
 	public Long pmel_id;
@@ -8,7 +11,7 @@ public class BaseRsfA {
 	
 	public Long pmel_position;
 	
-	public String ligne;
+	public Long ligne;
 	
 	public String numfacture;
 	
@@ -18,15 +21,15 @@ public class BaseRsfA {
 	
 	public String sexe;
 	
-	public String datenaissance;
+	public Date datenaissance;
 	
-	public String dateentree;
+	public Date dateentree;
 	
-	public String datesortie;
+	public Date datesortie;
 	
-	public String totalfacturehonoraire;
+	public BigDecimal totalfacturehonoraire;
 	
-	public String totalfactureph;
+	public BigDecimal totalfactureph;
 	
 	public String etatliquidation;
 
@@ -54,11 +57,11 @@ public class BaseRsfA {
 		this.pmel_position = pmel_position;
 	}
 
-	public String getLigne() {
+	public Long getLigne() {
 		return ligne;
 	}
 
-	public void setLigne(String ligne) {
+	public void setLigne(Long ligne) {
 		this.ligne = ligne;
 	}
 
@@ -94,43 +97,43 @@ public class BaseRsfA {
 		this.sexe = sexe;
 	}
 
-	public String getDatenaissance() {
+	public Date getDatenaissance() {
 		return datenaissance;
 	}
 
-	public void setDatenaissance(String datenaissance) {
+	public void setDatenaissance(Date datenaissance) {
 		this.datenaissance = datenaissance;
 	}
 
-	public String getDateentree() {
+	public Date getDateentree() {
 		return dateentree;
 	}
 
-	public void setDateentree(String dateentree) {
+	public void setDateentree(Date dateentree) {
 		this.dateentree = dateentree;
 	}
 
-	public String getDatesortie() {
+	public Date getDatesortie() {
 		return datesortie;
 	}
 
-	public void setDatesortie(String datesortie) {
+	public void setDatesortie(Date datesortie) {
 		this.datesortie = datesortie;
 	}
 
-	public String getTotalfacturehonoraire() {
+	public BigDecimal getTotalfacturehonoraire() {
 		return totalfacturehonoraire;
 	}
 
-	public void setTotalfacturehonoraire(String totalfacturehonoraire) {
+	public void setTotalfacturehonoraire(BigDecimal totalfacturehonoraire) {
 		this.totalfacturehonoraire = totalfacturehonoraire;
 	}
 
-	public String getTotalfactureph() {
+	public BigDecimal getTotalfactureph() {
 		return totalfactureph;
 	}
 
-	public void setTotalfactureph(String totalfactureph) {
+	public void setTotalfactureph(BigDecimal totalfactureph) {
 		this.totalfactureph = totalfactureph;
 	}
 
