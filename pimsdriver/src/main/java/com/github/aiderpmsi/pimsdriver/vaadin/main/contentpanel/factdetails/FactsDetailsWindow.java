@@ -36,8 +36,10 @@ public class FactsDetailsWindow extends Window {
         Table rsfbTable = new Table();
         rsfbTable.setLocale(Locale.FRANCE);
         LazyQueryContainer lqc = new LazyQueryContainer(
-        		new LazyQueryDefinition(false, 1000, "recordid"),
+        		new LazyQueryDefinition(false, 1000, "pmel_id"),
         		new RsfBDetailsQueryFactory(pmel_root, pmel_position));
+       
+        lqc.addContainerProperty("pmel_id", Long.class, null, true, true);
         lqc.addContainerProperty("pmel_line", Long.class, null, true, true);
         lqc.addContainerProperty("datedebutsejour", String.class, null, true, true);
         lqc.addContainerProperty("datefinsejour", String.class, null, true, true);

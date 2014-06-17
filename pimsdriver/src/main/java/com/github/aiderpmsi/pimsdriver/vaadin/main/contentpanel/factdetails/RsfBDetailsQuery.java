@@ -31,7 +31,7 @@ public class RsfBDetailsQuery implements Query{
 		
 		// MAP FILTERS
 		qd.getFilters().add(new Compare.Equal("pmel_root", pmel_root));
-		qd.getFilters().add(new Compare.Equal("pmel_position", pmel_position));
+		qd.getFilters().add(new Compare.Equal("pmel_parent", pmel_position));
 		sqlFilters = fm.mapFilters(qd.getFilters());
 		
 		// CREATES THE ORDERS

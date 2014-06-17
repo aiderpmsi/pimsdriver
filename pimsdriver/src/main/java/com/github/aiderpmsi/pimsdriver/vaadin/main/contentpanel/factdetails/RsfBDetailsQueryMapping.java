@@ -9,6 +9,7 @@ public class RsfBDetailsQueryMapping {
 	static {
 		sqlMapping.put("pmel_root", "pmel_root");
 		sqlMapping.put("pmel_position", "pmel_position");
+		sqlMapping.put("pmel_parent", "pmel_parent");
 		sqlMapping.put("pmel_id", "pmel_id");
 		sqlMapping.put("pmel_line", "pmel_line");
 		sqlMapping.put("datedebutsejour", "datedebutsejour");
