@@ -1,10 +1,21 @@
 package com.github.aiderpmsi.pimsdriver.dto.model;
 
 import java.math.BigDecimal;
-import java.sql.Date;
+import java.util.Date;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
 
 public class BaseRsfA {
+	
+	private static DecimalFormat df =
+			new DecimalFormat("+#,##0.00;-#,##0.00", new DecimalFormatSymbols(Locale.FRANCE));
 
+	private static SimpleDateFormat sdf =
+			new SimpleDateFormat("dd/MM/yyyy");
+	
 	public Long pmel_id;
 	
 	public Long pmel_root;
@@ -105,12 +116,28 @@ public class BaseRsfA {
 		this.datenaissance = datenaissance;
 	}
 
+	public String getFormatteddatenaissance() {
+		return sdf.format(datenaissance);
+	}
+
+	public void setFormatteddatenaissance(String formatteddatenaissance) throws ParseException {
+		this.datenaissance = sdf.parse(formatteddatenaissance);
+	}
+
 	public Date getDateentree() {
 		return dateentree;
 	}
 
 	public void setDateentree(Date dateentree) {
 		this.dateentree = dateentree;
+	}
+
+	public String getFormatteddateentree() {
+		return sdf.format(dateentree);
+	}
+
+	public void setFormatteddateentree(String formatteddateentree) throws ParseException {
+		this.dateentree = sdf.parse(formatteddateentree);
 	}
 
 	public Date getDatesortie() {
@@ -121,6 +148,14 @@ public class BaseRsfA {
 		this.datesortie = datesortie;
 	}
 
+	public String getFormatteddatesortie() {
+		return sdf.format(datesortie);
+	}
+
+	public void setFormatteddatesortie(String formatteddatesortie) throws ParseException {
+		this.datesortie = sdf.parse(formatteddatesortie);
+	}
+
 	public BigDecimal getTotalfacturehonoraire() {
 		return totalfacturehonoraire;
 	}
@@ -129,12 +164,28 @@ public class BaseRsfA {
 		this.totalfacturehonoraire = totalfacturehonoraire;
 	}
 
+	public String getFormattedtotalfacturehonoraire() {
+		return df.format(totalfacturehonoraire);
+	}
+
+	public void setFormattedtotalfacturehonoraire(String formattedtotalfacturehonoraire) throws ParseException {
+		this.totalfacturehonoraire = (BigDecimal) df.parse(formattedtotalfacturehonoraire);
+	}
+
 	public BigDecimal getTotalfactureph() {
 		return totalfactureph;
 	}
 
 	public void setTotalfactureph(BigDecimal totalfactureph) {
 		this.totalfactureph = totalfactureph;
+	}
+
+	public String getFormattedtotalfactureph() {
+		return df.format(totalfactureph);
+	}
+
+	public void setFormattedtotalfactureph(String formattedtotalfactureph) throws ParseException {
+		this.totalfactureph = (BigDecimal) df.parse(formattedtotalfactureph);
 	}
 
 	public String getEtatliquidation() {

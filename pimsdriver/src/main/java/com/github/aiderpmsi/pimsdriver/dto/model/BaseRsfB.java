@@ -1,10 +1,21 @@
 package com.github.aiderpmsi.pimsdriver.dto.model;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 public class BaseRsfB {
 
+	private static DecimalFormat df =
+			new DecimalFormat("+#,##0.00;-#,##0.00", new DecimalFormatSymbols(Locale.FRANCE));
+
+	private static SimpleDateFormat sdf =
+			new SimpleDateFormat("dd/MM/yyyy");
+	
 	public Long pmel_id;
 	
 	public Long pmel_line;
@@ -45,12 +56,28 @@ public class BaseRsfB {
 		this.datedebutsejour = datedebutsejour;
 	}
 
+	public String getFormatteddatedebutsejour() {
+		return sdf.format(datedebutsejour);
+	}
+
+	public void setFormatteddatedebutsejour(String formatteddatedebutsejour) throws ParseException {
+		this.datedebutsejour = sdf.parse(formatteddatedebutsejour);
+	}
+
 	public Date getDatefinsejour() {
 		return datefinsejour;
 	}
 
 	public void setDatefinsejour(Date datefinsejour) {
 		this.datefinsejour = datefinsejour;
+	}
+
+	public String getFormatteddatefinsejour() {
+		return sdf.format(datefinsejour);
+	}
+
+	public void setFormatteddatefinsejour(String formatteddatefinsejour) throws ParseException {
+		this.datefinsejour = sdf.parse(formatteddatefinsejour);
 	}
 
 	public String getCodeacte() {
@@ -85,4 +112,11 @@ public class BaseRsfB {
 		this.montanttotaldepense = montanttotaldepense;
 	}
 
+	public String getFormattedmontanttotaldepense() {
+		return df.format(montanttotaldepense);
+	}
+
+	public void setFormattedmontanttotaldepense(String formattedmontanttotaldepense) throws ParseException {
+		this.montanttotaldepense = (BigDecimal) df.parse(formattedmontanttotaldepense);
+	}
 }

@@ -32,7 +32,8 @@ public class NavigationDTO extends AutoCloseableDto<NavigationDTO.Navigation> {
 		LISTFINESS,
 		LISTYM,
 		PMSIOVERVIEW,
-		RSFASUMMARY;
+		RSFASUMMARY,
+		RSFBSUMMARY;
 
 		@Override
 		public String getStatement(Entry<?>... entries) throws SQLException {
@@ -62,6 +63,9 @@ public class NavigationDTO extends AutoCloseableDto<NavigationDTO.Navigation> {
 				return "SELECT SUM(cast_to_int(totalfacturehonoraire, NULL)) totalfacturehonoraire, "
 				+ "SUM(cast_to_int(totalfactureph, NULL)) totalfactureph "
 				+ "FROM fava_rsfa_2012_view WHERE pmel_root = ?";
+			case RSFBSUMMARY:
+				return "SELECT SUM(cast_to_int(montanttotaldepense, NULL)) montanttotaldepense "
+				+ "FROM favb_rsfb_2012_view WHERE pmel_root = ? and pmel_parent = ?";
 			default: //SHOULD NEVER REACH THIS POINT
 				throw new RuntimeException("This code should never been reached");
 			}
@@ -226,7 +230,7 @@ public class NavigationDTO extends AutoCloseableDto<NavigationDTO.Navigation> {
 				if (rsfa.totalfacturehonoraire != null)
 					rsfa.totalfacturehonoraire = rsfa.totalfacturehonoraire.divide(coeff);
 
-				rsfa.totalfactureph = rs.getBigDecimal(1);
+				rsfa.totalfactureph = rs.getBigDecimal(2);
 				if (rsfa.totalfactureph != null)
 					rsfa.totalfactureph = rsfa.totalfactureph.divide(coeff);
 				
@@ -268,9 +272,9 @@ public class NavigationDTO extends AutoCloseableDto<NavigationDTO.Navigation> {
 
 		// IN THIS QUERY, IT IS NOT POSSIBLE TO STORE THE QUERY (CAN CHANGE AT EVERY CALL)
 		StringBuilder query = new StringBuilder(
-				"SELECT pmel_id, pmel_line, cast_to_date(datedebutsejour) datedebutsejour, "
-				+ "cast_to_date(datefinsejour) datefinsejour, trim(codeacte) codeacte, "
-				+ "cast_to_int(quantite) quantite, trim(numghs) numghs, cast_to_int(montanttotaldepense) montanttotaldepense "
+				"SELECT pmel_id, pmel_line, cast_to_date(datedebutsejour, NULL) datedebutsejour, "
+				+ "cast_to_date(datefinsejour, NULL) datefinsejour, trim(codeacte) codeacte, "
+				+ "cast_to_int(quantite, NULL) quantite, trim(numghs) numghs, cast_to_int(montanttotaldepense, NULL) montanttotaldepense "
 				+ "FROM favb_rsfb_2012_view");
 		
 		// PREPARES THE LIST OF ARGUMENTS FOR THIS QUERY
@@ -317,6 +321,31 @@ public class NavigationDTO extends AutoCloseableDto<NavigationDTO.Navigation> {
 
 				}
 				return rsfbs;
+			}
+		}
+	}
+
+	public BaseRsfB readRsfBSummary (Long pmel_root, Long pmel_position) throws SQLException {
+		// GETS THE PREPARED STATEMENT
+		PreparedStatement ps = getPs(Navigation.RSFBSUMMARY);
+
+		ps.setLong(1, pmel_root);
+		ps.setLong(2, pmel_position);
+		
+		// EXECUTES THE QUERY
+		try (ResultSet rs = ps.executeQuery()) {
+		
+			if (rs.next()) {
+				// ELEMENT TO RETURN
+				BaseRsfB rsfb = new BaseRsfB();
+				
+				rsfb.montanttotaldepense = rs.getBigDecimal(1);
+				if (rsfb.montanttotaldepense != null)
+					rsfb.montanttotaldepense = rsfb.montanttotaldepense.divide(coeff);
+				
+				return rsfb;
+			} else {
+				throw new SQLException("Query for root " + pmel_root + " has no row");
 			}
 		}
 	}

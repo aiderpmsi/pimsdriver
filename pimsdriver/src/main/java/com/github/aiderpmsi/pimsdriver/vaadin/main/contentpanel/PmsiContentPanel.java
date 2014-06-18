@@ -1,8 +1,6 @@
 package com.github.aiderpmsi.pimsdriver.vaadin.main.contentpanel;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -103,23 +101,27 @@ public class PmsiContentPanel extends Panel {
         lqc.addContainerProperty("numrss", String.class, null, true, true);
         lqc.addContainerProperty("codess", String.class, null, true, true);
         lqc.addContainerProperty("sexe", String.class, null, true, true);
-        lqc.addContainerProperty("datenaissance", Date.class, null, true, true);
-        lqc.addContainerProperty("dateentree", Date.class, null, true, true);
-        lqc.addContainerProperty("datesortie", Date.class, null, true, true);
-        lqc.addContainerProperty("totalfacturehonoraire", BigDecimal.class, null, true, true);
-        lqc.addContainerProperty("totalfactureph", BigDecimal.class, null, true, true);
+        lqc.addContainerProperty("formatteddatenaissance", String.class, null, true, true);
+        lqc.addContainerProperty("formatteddateentree", String.class, null, true, true);
+        lqc.addContainerProperty("formatteddatesortie", String.class, null, true, true);
+        lqc.addContainerProperty("formattedtotalfacturehonoraire", String.class, null, true, true);
+        lqc.addContainerProperty("formattedtotalfactureph", String.class, null, true, true);
         lqc.addContainerProperty("etatliquidation", String.class, null, true, true);
         
         processtable.setContainerDataSource(lqc);
-        processtable.setVisibleColumns(new Object[] {"ligne", "numfacture", "numrss", "codess", "sexe", "datenaissance", "dateentree", "datesortie", "totalfacturehonoraire", "totalfactureph", "etatliquidation"});
+        processtable.setVisibleColumns(new Object[] {"ligne", "numfacture", "numrss", "codess", "sexe", "formatteddatenaissance", "formatteddateentree", "formatteddatesortie", "formattedtotalfacturehonoraire", "formattedtotalfactureph", "etatliquidation"});
         processtable.setColumnHeaders(new String[] {"Ligne", "Facture", "Rss", "Code sécu", "Sexe", "Naissance", "Entrée", "Sortie", "Honoraires", "Prestations", "Liquidation"} );
         processtable.setColumnAlignments(Align.RIGHT, Align.LEFT, Align.LEFT, Align.LEFT, Align.CENTER, Align.LEFT, Align.LEFT, Align.LEFT, Align.RIGHT, Align.RIGHT, Align.CENTER);
         processtable.setSelectable(true);
 
-        BaseRsfA summary = new NavigationActions().GetFacturesSummary(model.recordid);
-        processtable.setFooterVisible(true);
-        processtable.setColumnFooter("totalfacturehonoraire", summary.totalfacturehonoraire.toString());
-        processtable.setColumnFooter("totalfactureph", summary.totalfactureph.toString());
+		try {
+	        BaseRsfA summary = new NavigationActions().GetFacturesSummary(model.recordid);
+	        processtable.setFooterVisible(true);
+	        processtable.setColumnFooter("formattedtotalfacturehonoraire", summary.getFormattedtotalfacturehonoraire());
+	        processtable.setColumnFooter("formattedtotalfactureph", summary.getFormattedtotalfactureph());
+		} catch (ActionException e) {
+			Notification.show("Erreur de lecture du résumé des factures", Notification.Type.WARNING_MESSAGE);
+		}
         
         processtable.setSizeFull();
         

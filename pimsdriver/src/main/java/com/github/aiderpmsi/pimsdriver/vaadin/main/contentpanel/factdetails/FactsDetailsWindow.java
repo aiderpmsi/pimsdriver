@@ -5,6 +5,10 @@ import java.util.Locale;
 import org.vaadin.addons.lazyquerycontainer.LazyQueryContainer;
 import org.vaadin.addons.lazyquerycontainer.LazyQueryDefinition;
 
+import com.github.aiderpmsi.pimsdriver.db.actions.ActionException;
+import com.github.aiderpmsi.pimsdriver.db.actions.NavigationActions;
+import com.github.aiderpmsi.pimsdriver.dto.model.BaseRsfB;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
@@ -41,21 +45,28 @@ public class FactsDetailsWindow extends Window {
        
         lqc.addContainerProperty("pmel_id", Long.class, null, true, true);
         lqc.addContainerProperty("pmel_line", Long.class, null, true, true);
-        lqc.addContainerProperty("datedebutsejour", String.class, null, true, true);
-        lqc.addContainerProperty("datefinsejour", String.class, null, true, true);
+        lqc.addContainerProperty("formatteddatedebutsejour", String.class, null, true, true);
+        lqc.addContainerProperty("formatteddatefinsejour", String.class, null, true, true);
         lqc.addContainerProperty("codeacte", String.class, null, true, true);
-        lqc.addContainerProperty("quantite", String.class, null, true, true);
+        lqc.addContainerProperty("quantite", Integer.class, null, true, true);
         lqc.addContainerProperty("numghs", String.class, null, true, true);
-        lqc.addContainerProperty("montanttotaldepense", String.class, null, true, true);
+        lqc.addContainerProperty("formattedmontanttotaldepense", String.class, null, true, true);
 
         rsfbTable.setContainerDataSource(lqc);
-        rsfbTable.setVisibleColumns(new Object[] {"pmel_line", "datedebutsejour", "datefinsejour", "codeacte", "quantite", "numghs", "montanttotaldepense"});
+        rsfbTable.setVisibleColumns(new Object[] {"pmel_line", "formatteddatedebutsejour", "formatteddatefinsejour", "codeacte", "quantite", "numghs", "formattedmontanttotaldepense"});
         rsfbTable.setColumnHeaders(new String[] {"Ligne", "Début séjour", "Fin séjour", "Acte", "Quantité", "GHS", "montant"} );
         rsfbTable.setSelectable(true);
         rsfbTable.setPageLength(4);
         rsfbTable.setWidth("100%");
         rsfbTable.setCaption("RSF B");
         
+		try {
+	        BaseRsfB summary = new NavigationActions().GetFacturesBSummary(pmel_root, pmel_position);
+	        rsfbTable.setFooterVisible(true);
+	        rsfbTable.setColumnFooter("formattedmontanttotaldepense", summary.getFormattedmontanttotaldepense());
+		} catch (ActionException e) {
+			Notification.show("Erreur de lecture du résumé des factures B", Notification.Type.WARNING_MESSAGE);
+		}
         /*
         rsfbTable.setFooterVisible(true);
         rsfbTable.setColumnF
