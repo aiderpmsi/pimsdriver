@@ -1,7 +1,8 @@
-package com.github.aiderpmsi.pimsdriver.db.vaadin;
+package com.github.aiderpmsi.pimsdriver.db.vaadin.translators;
 
 import java.util.List;
 
+import com.github.aiderpmsi.pimsdriver.db.vaadin.query.DBQueryBuilder;
 import com.vaadin.data.Container.Filter;
 import com.vaadin.data.util.filter.And;
 

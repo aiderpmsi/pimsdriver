@@ -8,9 +8,10 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.github.aiderpmsi.pimsdriver.db.vaadin.DBQueryBuilder;
+import com.github.aiderpmsi.pimsdriver.db.vaadin.query.DBQueryBuilder;
 import com.github.aiderpmsi.pimsdriver.dto.model.BaseRsfA;
 import com.github.aiderpmsi.pimsdriver.dto.model.BaseRsfB;
+import com.github.aiderpmsi.pimsdriver.dto.model.BaseRsfC;
 import com.github.aiderpmsi.pimsdriver.dto.model.UploadedPmsi;
 import com.vaadin.data.Container.Filter;
 import com.vaadin.data.util.sqlcontainer.query.OrderBy;
@@ -34,7 +35,8 @@ public class NavigationDTO extends AutoCloseableDto<NavigationDTO.Navigation> {
 		PMSIOVERVIEW,
 		RSFASUMMARY,
 		RSFBSUMMARY,
-		PMSISOURCE;
+		PMSISOURCE,
+		RSFCSUMMARY;
 
 		@Override
 		public String getStatement(Entry<?>... entries) throws SQLException {
@@ -67,6 +69,9 @@ public class NavigationDTO extends AutoCloseableDto<NavigationDTO.Navigation> {
 			case RSFBSUMMARY:
 				return "SELECT SUM(cast_to_int(montanttotaldepense, NULL)) montanttotaldepense "
 				+ "FROM favb_rsfb_2012_view WHERE pmel_root = ? and pmel_parent = ?";
+			case RSFCSUMMARY:
+				return "SELECT SUM(cast_to_int(montanttotalhonoraire, NULL)) montanttotalhonoraire "
+				+ "FROM favc_rsfc_2012_view WHERE pmel_root = ? and pmel_parent = ?";
 			case PMSISOURCE:
 				return "WITH RECURSIVE complete AS ( "
 						+ "SELECT pmel_root, pmel_line, pmel_position, pmel_content "
@@ -371,6 +376,114 @@ public class NavigationDTO extends AutoCloseableDto<NavigationDTO.Navigation> {
 		// IN THIS QUERY, IT IS NOT POSSIBLE TO STORE THE QUERY (CAN CHANGE AT EVERY CALL)
 		StringBuilder query = new StringBuilder(
 				"SELECT COUNT(*) FROM favb_rsfb_2012_view");
+		
+		// PREPARES THE LIST OF ARGUMENTS FOR THIS QUERY
+		List<Object> queryArgs = new ArrayList<>();
+		// CREATES THE FILTERS, THE ORDERS AND FILLS THE ARGUMENTS
+		query.append(DBQueryBuilder.getWhereStringForFilters(filters, queryArgs));
+		
+		// CREATE THE DB STATEMENT
+		try (PreparedStatement ps = con.prepareStatement(query.toString())) {
+			for (int i = 0 ; i < queryArgs.size() ; i++) {
+				ps.setObject(i + 1, queryArgs.get(i));
+			}
+
+			// EXECUTE QUERY
+			try (ResultSet rs = ps.executeQuery()) {
+
+				// RESULT
+				rs.next();
+				return rs.getLong(1);
+			}
+		}
+	}
+
+	public List<BaseRsfC> readRsfCList (List<Filter> filters, List<OrderBy> orders,
+			Integer first, Integer rows) throws SQLException {
+
+		// IN THIS QUERY, IT IS NOT POSSIBLE TO STORE THE QUERY (CAN CHANGE AT EVERY CALL)
+		StringBuilder query = new StringBuilder(
+				"SELECT pmel_id, pmel_line, cast_to_date(dateacte, NULL) dateacte, trim(codeacte) codeacte, "
+				+ "cast_to_int(quantite, NULL) quantite, cast_to_int(montanttotalhonoraire) montanttotalhonoraire "
+				+ "FROM favc_rsfc_2012_view");
+		
+		// PREPARES THE LIST OF ARGUMENTS FOR THIS QUERY
+		List<Object> queryArgs = new ArrayList<>();
+		// CREATES THE FILTERS, THE ORDERS AND FILLS THE ARGUMENTS
+		query.append(DBQueryBuilder.getWhereStringForFilters(filters, queryArgs)).
+			append(DBQueryBuilder.getOrderStringForOrderBys(orders, queryArgs));
+		// OFFSET AND LIMIT
+		if (first != null)
+			query.append(" OFFSET ").append(first.toString()).append(" ");
+		if (rows != null && rows != 0)
+			query.append(" LIMIT ").append(rows.toString()).append(" ");
+		
+		// CREATES THE DB STATEMENT
+		try (PreparedStatement ps = con.prepareStatement(query.toString())) {
+
+			for (int i = 0 ; i < queryArgs.size() ; i++) {
+				ps.setObject(i + 1, queryArgs.get(i));
+			}
+
+			// EXECUTES THE QUERY
+			try (ResultSet rs = ps.executeQuery()) {
+		
+				// LIST OF ELEMENTS
+				List<BaseRsfC> rsfcs = new ArrayList<>();
+			
+				// FILLS THE LIST OF ELEMENTS
+				while (rs.next()) {
+					// BEAN FOR THIS ITEM
+					BaseRsfC element = new BaseRsfC();
+
+					// FILLS THE BEAN
+					element.pmel_id = rs.getLong(1);
+					element.pmel_line = rs.getLong(2);
+					element.dateacte = rs.getDate(3);
+					element.codeacte = rs.getString(4);
+					element.quantite = rs.getInt(5);
+					element.montanttotalhonoraire = rs.getBigDecimal(6);
+					if (element.montanttotalhonoraire != null)
+						element.montanttotalhonoraire = element.montanttotalhonoraire.divide(coeff);
+				
+					// ADDS THE BEAN TO THE ELEMENTS
+					rsfcs.add(element);
+
+				}
+				return rsfcs;
+			}
+		}
+	}
+
+	public BaseRsfC readRsfCSummary (Long pmel_root, Long pmel_position) throws SQLException {
+		// GETS THE PREPARED STATEMENT
+		PreparedStatement ps = getPs(Navigation.RSFCSUMMARY);
+
+		ps.setLong(1, pmel_root);
+		ps.setLong(2, pmel_position);
+		
+		// EXECUTES THE QUERY
+		try (ResultSet rs = ps.executeQuery()) {
+		
+			if (rs.next()) {
+				// ELEMENT TO RETURN
+				BaseRsfC rsfc = new BaseRsfC();
+				
+				rsfc.montanttotalhonoraire = rs.getBigDecimal(1);
+				if (rsfc.montanttotalhonoraire != null)
+					rsfc.montanttotalhonoraire = rsfc.montanttotalhonoraire.divide(coeff);
+				
+				return rsfc;
+			} else {
+				throw new SQLException("Query for root " + pmel_root + " has no row");
+			}
+		}
+	}
+
+	public long readRsfCSize(List<Filter> filters) throws SQLException {
+		// IN THIS QUERY, IT IS NOT POSSIBLE TO STORE THE QUERY (CAN CHANGE AT EVERY CALL)
+		StringBuilder query = new StringBuilder(
+				"SELECT COUNT(*) FROM favc_rsfc_2012_view");
 		
 		// PREPARES THE LIST OF ARGUMENTS FOR THIS QUERY
 		List<Object> queryArgs = new ArrayList<>();

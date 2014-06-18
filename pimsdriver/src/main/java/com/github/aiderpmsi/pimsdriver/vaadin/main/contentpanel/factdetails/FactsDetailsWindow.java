@@ -8,6 +8,7 @@ import org.vaadin.addons.lazyquerycontainer.LazyQueryDefinition;
 import com.github.aiderpmsi.pimsdriver.db.actions.ActionException;
 import com.github.aiderpmsi.pimsdriver.db.actions.NavigationActions;
 import com.github.aiderpmsi.pimsdriver.dto.model.BaseRsfB;
+import com.github.aiderpmsi.pimsdriver.dto.model.BaseRsfC;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
@@ -39,20 +40,20 @@ public class FactsDetailsWindow extends Window {
         // ADDS RSFB ELEMENTS
         Table rsfbTable = new Table();
         rsfbTable.setLocale(Locale.FRANCE);
-        LazyQueryContainer lqc = new LazyQueryContainer(
+        LazyQueryContainer lqcb = new LazyQueryContainer(
         		new LazyQueryDefinition(false, 1000, "pmel_id"),
         		new RsfBDetailsQueryFactory(pmel_root, pmel_position));
        
-        lqc.addContainerProperty("pmel_id", Long.class, null, true, true);
-        lqc.addContainerProperty("pmel_line", Long.class, null, true, true);
-        lqc.addContainerProperty("formatteddatedebutsejour", String.class, null, true, true);
-        lqc.addContainerProperty("formatteddatefinsejour", String.class, null, true, true);
-        lqc.addContainerProperty("codeacte", String.class, null, true, true);
-        lqc.addContainerProperty("quantite", Integer.class, null, true, true);
-        lqc.addContainerProperty("numghs", String.class, null, true, true);
-        lqc.addContainerProperty("formattedmontanttotaldepense", String.class, null, true, true);
+        lqcb.addContainerProperty("pmel_id", Long.class, null, true, true);
+        lqcb.addContainerProperty("pmel_line", Long.class, null, true, true);
+        lqcb.addContainerProperty("formatteddatedebutsejour", String.class, null, true, true);
+        lqcb.addContainerProperty("formatteddatefinsejour", String.class, null, true, true);
+        lqcb.addContainerProperty("codeacte", String.class, null, true, true);
+        lqcb.addContainerProperty("quantite", Integer.class, null, true, true);
+        lqcb.addContainerProperty("numghs", String.class, null, true, true);
+        lqcb.addContainerProperty("formattedmontanttotaldepense", String.class, null, true, true);
 
-        rsfbTable.setContainerDataSource(lqc);
+        rsfbTable.setContainerDataSource(lqcb);
         rsfbTable.setVisibleColumns(new Object[] {"pmel_line", "formatteddatedebutsejour", "formatteddatefinsejour", "codeacte", "quantite", "numghs", "formattedmontanttotaldepense"});
         rsfbTable.setColumnHeaders(new String[] {"Ligne", "Début séjour", "Fin séjour", "Acte", "Quantité", "GHS", "montant"} );
         rsfbTable.setSelectable(true);
@@ -68,7 +69,37 @@ public class FactsDetailsWindow extends Window {
 			Notification.show("Erreur de lecture du résumé des factures B", Notification.Type.WARNING_MESSAGE);
 		}
         
-        layout.addComponent(rsfbTable);
+        // ADDS RSFC ELEMENTS
+        Table rsfcTable = new Table();
+        rsfcTable.setLocale(Locale.FRANCE);
+        LazyQueryContainer lqcc = new LazyQueryContainer(
+        		new LazyQueryDefinition(false, 1000, "pmel_id"),
+        		new RsfCDetailsQueryFactory(pmel_root, pmel_position));
+       
+        lqcc.addContainerProperty("pmel_id", Long.class, null, true, true);
+        lqcc.addContainerProperty("pmel_line", Long.class, null, true, true);
+        lqcc.addContainerProperty("formatteddateacte", String.class, null, true, true);
+        lqcc.addContainerProperty("codeacte", String.class, null, true, true);
+        lqcc.addContainerProperty("quantite", Integer.class, null, true, true);
+        lqcc.addContainerProperty("formattedmontanttotalhonoraire", String.class, null, true, true);
+
+        rsfcTable.setContainerDataSource(lqcc);
+        rsfcTable.setVisibleColumns(new Object[] {"pmel_line", "formatteddateacte", "codeacte", "quantite", "formattedmontanttotalhonoraire"});
+        rsfcTable.setColumnHeaders(new String[] {"Ligne", "Date d'acte", "Code acte", "Quantité", "Montant"} );
+        rsfcTable.setSelectable(true);
+        rsfcTable.setPageLength(4);
+        rsfcTable.setWidth("100%");
+        rsfcTable.setCaption("RSF C");
+        
+		try {
+	        BaseRsfC summary = new NavigationActions().GetFacturesCSummary(pmel_root, pmel_position);
+	        rsfcTable.setFooterVisible(true);
+	        rsfcTable.setColumnFooter("formattedmontanttotalhonoraire", summary.getFormattedmontanttotalhonoraire());
+		} catch (ActionException e) {
+			Notification.show("Erreur de lecture du résumé des factures C", Notification.Type.WARNING_MESSAGE);
+		}
+
+		layout.addComponent(rsfcTable);
         
 	}
 

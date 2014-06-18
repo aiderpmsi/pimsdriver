@@ -6,7 +6,8 @@ import java.util.List;
 
 import com.github.aiderpmsi.pimsdriver.db.actions.ActionException;
 import com.github.aiderpmsi.pimsdriver.db.actions.NavigationActions;
-import com.github.aiderpmsi.pimsdriver.db.vaadin.DBFilterMapper;
+import com.github.aiderpmsi.pimsdriver.db.vaadin.query.DBFilterMapper;
+import com.github.aiderpmsi.pimsdriver.db.vaadin.query.Entry;
 import com.github.aiderpmsi.pimsdriver.dto.NavigationDTO.YM;
 import com.github.aiderpmsi.pimsdriver.dto.model.UploadedPmsi;
 import com.github.aiderpmsi.pimsdriver.vaadin.utils.UploadPmsiMapping;
@@ -132,8 +133,10 @@ public class ExpandListener implements Tree.ExpandListener {
 					new Compare.Equal("year", year),
 					new Compare.Equal("month", month)
 			));
-			List<OrderBy> orders = new ArrayList<>();
-			orders.add(new OrderBy("dateenvoi", false));
+			List<Entry<Object, Boolean>> orders = new ArrayList<>(1);
+			Entry<Object, Boolean> orderby = new Entry<>();
+			orderby.a = "dateenvoi"; orderby.b = false;
+			orders.add(orderby);
 			
 			// TRANSLATE THE FILTERS AND ORDERS
 			DBFilterMapper fm = new DBFilterMapper(UploadPmsiMapping.sqlMapping);

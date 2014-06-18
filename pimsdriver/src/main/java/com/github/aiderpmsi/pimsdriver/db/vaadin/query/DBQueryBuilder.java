@@ -1,9 +1,18 @@
-package com.github.aiderpmsi.pimsdriver.db.vaadin;
+package com.github.aiderpmsi.pimsdriver.db.vaadin.query;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import com.github.aiderpmsi.pimsdriver.db.vaadin.translators.AndTranslator;
+import com.github.aiderpmsi.pimsdriver.db.vaadin.translators.BetweenTranslator;
+import com.github.aiderpmsi.pimsdriver.db.vaadin.translators.CompareTranslator;
+import com.github.aiderpmsi.pimsdriver.db.vaadin.translators.DBTranslator;
+import com.github.aiderpmsi.pimsdriver.db.vaadin.translators.IsNullTranslator;
+import com.github.aiderpmsi.pimsdriver.db.vaadin.translators.LikeTranslator;
+import com.github.aiderpmsi.pimsdriver.db.vaadin.translators.NotTranslator;
+import com.github.aiderpmsi.pimsdriver.db.vaadin.translators.OrTranslator;
+import com.github.aiderpmsi.pimsdriver.db.vaadin.translators.SimpleStringTranslator;
 import com.vaadin.data.Container.Filter;
 import com.vaadin.data.util.sqlcontainer.query.OrderBy;
 

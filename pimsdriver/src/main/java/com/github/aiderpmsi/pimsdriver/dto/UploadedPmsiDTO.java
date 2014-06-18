@@ -11,7 +11,7 @@ import java.util.List;
 import org.apache.commons.dbcp2.DelegatingConnection;
 import org.postgresql.largeobject.LargeObjectManager;
 
-import com.github.aiderpmsi.pimsdriver.db.vaadin.DBQueryBuilder;
+import com.github.aiderpmsi.pimsdriver.db.vaadin.query.DBQueryBuilder;
 import com.github.aiderpmsi.pimsdriver.dto.StatementProvider.Entry;
 import com.github.aiderpmsi.pimsdriver.dto.model.UploadedPmsi;
 import com.vaadin.data.Container.Filter;

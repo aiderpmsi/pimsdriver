@@ -34,10 +34,9 @@ public class PmsiSourceWindow extends Window {
 	        String stringContent = new NavigationActions().getPmsiSource(pmel_root, pmel_position);
 
 	        // ADDS TEXT FIELD
-	        TextArea content = new TextArea("PMSI Source :");
+	        TextArea content = new TextArea("PMSI Source :", stringContent);
 	        content.setReadOnly(true);
 	        content.setWordwrap(false);
-	        content.setValue(stringContent);
 	        content.setSizeFull();
 	        
 	        layout.addComponent(content);

@@ -13,7 +13,7 @@ public class FactureSelectedHandler implements Action.Handler {
 	private static final long serialVersionUID = 1L;
 
 	static final Action ACTION_DETAILS = new Action("détails");
-	static final Action ACTION_SOURCE = new Action("détails");
+	static final Action ACTION_SOURCE = new Action("source");
 	static final Action[] ACTIONS = new Action[] { ACTION_DETAILS, ACTION_SOURCE };
 	static final Action[] NO_ACTION = new Action[] {};
 	

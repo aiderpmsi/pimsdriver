@@ -1,4 +1,4 @@
-package com.github.aiderpmsi.pimsdriver.db.vaadin;
+package com.github.aiderpmsi.pimsdriver.db.vaadin.translators;
 
 import java.util.List;
 

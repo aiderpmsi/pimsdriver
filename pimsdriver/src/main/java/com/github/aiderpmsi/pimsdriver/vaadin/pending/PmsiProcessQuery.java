@@ -8,7 +8,7 @@ import org.vaadin.addons.lazyquerycontainer.QueryDefinition;
 
 import com.github.aiderpmsi.pimsdriver.db.actions.ActionException;
 import com.github.aiderpmsi.pimsdriver.db.actions.NavigationActions;
-import com.github.aiderpmsi.pimsdriver.db.vaadin.DBFilterMapper;
+import com.github.aiderpmsi.pimsdriver.db.vaadin.query.DBFilterMapper;
 import com.github.aiderpmsi.pimsdriver.dto.model.UploadedPmsi;
 import com.github.aiderpmsi.pimsdriver.vaadin.utils.UploadPmsiMapping;
 import com.vaadin.data.Container.Filter;

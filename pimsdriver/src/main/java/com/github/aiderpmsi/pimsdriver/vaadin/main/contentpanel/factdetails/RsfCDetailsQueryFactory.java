@@ -13,12 +13,12 @@ import com.github.aiderpmsi.pimsdriver.db.vaadin.query.BaseQuery;
 import com.github.aiderpmsi.pimsdriver.db.vaadin.query.DBQueryMapping;
 import com.github.aiderpmsi.pimsdriver.db.vaadin.query.BaseQuery.BaseQueryInit;
 import com.github.aiderpmsi.pimsdriver.db.vaadin.query.Entry;
-import com.github.aiderpmsi.pimsdriver.dto.model.BaseRsfB;
+import com.github.aiderpmsi.pimsdriver.dto.model.BaseRsfC;
 import com.vaadin.data.Container.Filter;
 import com.vaadin.data.util.filter.Compare;
 import com.vaadin.data.util.sqlcontainer.query.OrderBy;
 
-public class RsfBDetailsQueryFactory implements QueryFactory {
+public class RsfCDetailsQueryFactory implements QueryFactory {
 	
 	private Object[][] mappings = new Object[][] {
 			{"pmel_id", "pmel_id"},
@@ -26,21 +26,19 @@ public class RsfBDetailsQueryFactory implements QueryFactory {
 			{"pmel_parent", "pmel_parent"},
 			{"pmel_position", "pmel_position"},
 			{"pmel_line", "pmel_line"},
-			{"formatteddatedebutsejour", "cast_to_date(datedebutsejour, NULL)"},
-			{"formatteddatefinsejour", "cast_to_date(datefinsejour, NULL)"},
+			{"formatteddateacte", "cast_to_date(dateacte, NULL)"},
 			{"codeacte", "codeacte"},
 			{"quantite", "quantite"},
-			{"numghs", "numghs"},
-			{"formattedmontanttotaldepense", "cast_to_int(montanttotaldepense, NULL)"}
+			{"formattedmontanttotalhonoraire", "cast_to_int(montanttotalhonoraire, NULL)"}
 	};
 
-	private BaseQueryInit<BaseRsfB> bqi;
+	private BaseQueryInit<BaseRsfC> bqi;
 	
 	private DBQueryMapping mapping;
 	
-	public RsfBDetailsQueryFactory(final Long pmel_root, final Long pmel_position) {
+	public RsfCDetailsQueryFactory(final Long pmel_root, final Long pmel_position) {
 		// CREATES THE QUERY INITIALIZER
-		bqi = new BaseQueryInit<BaseRsfB>() {
+		bqi = new BaseQueryInit<BaseRsfC>() {
 
 			@Override
 			public void initFilters(List<Filter> filters) {
@@ -58,30 +56,30 @@ public class RsfBDetailsQueryFactory implements QueryFactory {
 			}
 
 			@Override
-			public BaseRsfB constructBean() {
-				return new BaseRsfB();
+			public BaseRsfC constructBean() {
+				return new BaseRsfC();
 			}
 
 			@Override
-			public List<BaseRsfB> loadBeans(List<Filter> filters,
+			public List<BaseRsfC> loadBeans(List<Filter> filters,
 					List<OrderBy> orderBys, int startIndex, int count)
 					throws ActionException {
-					return new NavigationActions().getFacturesB(filters, orderBys, startIndex, count);
+					return new NavigationActions().getFacturesC(filters, orderBys, startIndex, count);
 			}
 
 			@Override
 			public String loadBeansError(Exception e) {
-				return "Erreur de lecture de la liste des factures B";
+				return "Erreur de lecture de la liste des factures";
 			}
 
 			@Override
 			public int size(List<Filter> Filters) throws ActionException {
-				return new NavigationActions().getFacturesBSize(Filters);
+				return new NavigationActions().getFacturesCSize(Filters);
 			}
 
 			@Override
 			public String sizeError(Exception e) {
-				return "Erreur de lecture de la liste des factures B";
+				return "Erreur de lecture de la liste des factures";
 			}
 		};
 		

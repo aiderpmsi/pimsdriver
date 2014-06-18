@@ -1,4 +1,4 @@
-package com.github.aiderpmsi.pimsdriver.db.vaadin;
+package com.github.aiderpmsi.pimsdriver.db.vaadin.query;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,17 +37,6 @@ public class DBFilterMapper {
 		return sqlFilters;
 	}
 
-	public List<OrderBy> mapOrderBys(List<OrderBy> orders) {
-		// MAPS THE VAADIN ORDERING TO SQL ORDERING
-		List<OrderBy> sqlOrderBys = new ArrayList<>(orders.size());
-		for (OrderBy order : orders){
-			sqlOrderBys.add(new OrderBy(
-					(String) map.get(order.getColumn()),
-					order.isAscending()));
-		}
-		return sqlOrderBys;
-	}
-	
 	private Filter map(Filter filter) {
 		if (filter instanceof And) {
 			// OLD FILTER
@@ -158,6 +147,19 @@ public class DBFilterMapper {
 		} else {
 			return null;
 		}
+	}
+
+	public List<OrderBy> mapOrderBys(List<Entry<Object, Boolean>> vaadinOrderBys) {
+		List<OrderBy> orderBys = new ArrayList<>(vaadinOrderBys.size());
+		for (Entry<Object, Boolean> vaadinOrderBy : vaadinOrderBys) {
+			Object mappedTo;
+			if ((mappedTo = map.get(vaadinOrderBy.a)) == null) {
+				throw new IllegalArgumentException("Entry " + vaadinOrderBy.a.toString() + " unknown");
+			} else {
+				orderBys.add(new OrderBy(mappedTo.toString(), vaadinOrderBy.b));
+			}
+		}
+		return orderBys;
 	}
 
 }

@@ -96,7 +96,7 @@ public class PmsiContentPanel extends Panel {
         		new FacturesQueryFactory(model.recordid));
 
         lqc.addContainerProperty("pmel_id", Long.class, null, true, true);
-        lqc.addContainerProperty("ligne", Long.class, null, true, true);
+        lqc.addContainerProperty("pmel_line", Long.class, null, true, true);
         lqc.addContainerProperty("numfacture", String.class, null, true, true);
         lqc.addContainerProperty("numrss", String.class, null, true, true);
         lqc.addContainerProperty("codess", String.class, null, true, true);
