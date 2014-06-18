@@ -49,8 +49,8 @@ public class BaseQuery<R> implements Query {
 		for (int i = 0 ; i < qd.getSortPropertyIds().length ; i++) {
 			Entry<Object, Boolean> entry = new Entry<>();
 			entry.a = qd.getSortPropertyIds()[i];
-			entry.b = qd.getDefaultSortPropertyAscendingStates().length < i ? true :
-				qd.getDefaultSortPropertyAscendingStates()[i];
+			entry.b = qd.getSortPropertyAscendingStates().length < i ? true :
+				qd.getSortPropertyAscendingStates()[i];
 			vaadinOrderBys.add(entry);
 		}
 		// INIT ORDERS LIST

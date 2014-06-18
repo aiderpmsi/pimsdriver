@@ -2,7 +2,7 @@ package com.github.aiderpmsi.pimsdriver.vaadin.main.contentpanel;
 
 import org.vaadin.addons.lazyquerycontainer.LazyQueryContainer;
 
-import com.github.aiderpmsi.pimsdriver.vaadin.main.contentpanel.factdetails.FactsDetailsWindow;
+import com.github.aiderpmsi.pimsdriver.vaadin.main.contentpanel.pmsidetails.PmsiDetailsWindow;
 import com.github.aiderpmsi.pimsdriver.vaadin.main.contentpanel.pmsisource.PmsiSourceWindow;
 import com.vaadin.event.Action;
 import com.vaadin.ui.UI;
@@ -44,7 +44,7 @@ public class FactureSelectedHandler implements Action.Handler {
 
 			if (action.equals(ACTION_DETAILS)) {
 				// SHOWS FACT DETAILS
-				final Window wProcess = new FactsDetailsWindow(pmel_root, pmel_position, numfacture);
+				final Window wProcess = new PmsiDetailsWindow(pmel_root, pmel_position, numfacture);
 				UI.getCurrent().addWindow(wProcess);
 			} else if (action.equals(ACTION_SOURCE)) {
 				// SHOWS FACT DETAILS

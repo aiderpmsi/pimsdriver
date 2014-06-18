@@ -1,4 +1,4 @@
-package com.github.aiderpmsi.pimsdriver.vaadin.main.contentpanel.factdetails;
+package com.github.aiderpmsi.pimsdriver.vaadin.main.contentpanel.pmsidetails;
 
 import java.util.LinkedList;
 import java.util.List;
