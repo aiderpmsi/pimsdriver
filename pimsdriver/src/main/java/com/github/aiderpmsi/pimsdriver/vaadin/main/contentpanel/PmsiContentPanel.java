@@ -20,7 +20,6 @@ import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Layout;
-import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.Table.Align;
@@ -96,14 +95,22 @@ public class PmsiContentPanel extends Panel {
 	public void showFactures(UploadedPmsi model) {
 		// REMOVE ALL COMPONENTS OF BODY
 		body.removeAllComponents();
+		
+		// CREATES THE FACTS TABLE
+		Table factures = createFactTable(model);
+		
+		body.addComponent(factures);
 
-		// CREATES THE CONTAINER
-        LazyQueryContainer lqc = new LazyQueryContainer(
+	}
+	
+	private Table createFactTable(final UploadedPmsi model) {
+        // RSFB CONTAINER
+        LazyQueryContainer datasContainer = new LazyQueryContainer(
         		new LazyQueryDefinition(false, 1000, "pmel_id"),
         		new FacturesQueryFactory(model.recordid));
 
-        // CREATES THE TABLE
-        LazyColumnType[] columns = new LazyColumnType[] {
+        // COLUMNS DEFINITIONS
+        LazyColumnType[] cols = new LazyColumnType[] {
         		new LazyColumnType("pmel_id", Long.class, null, null),
         		new LazyColumnType("pmel_line", Long.class, "Ligne", Align.RIGHT),
         		new LazyColumnType("numfacture", String.class, "Facture", Align.LEFT),
@@ -117,25 +124,29 @@ public class PmsiContentPanel extends Panel {
         		new LazyColumnType("formattedtotalfactureph", String.class, "Prestations", Align.RIGHT),
         		new LazyColumnType("etatliquidation", String.class, "Liquidation", Align.RIGHT)
         };
+        
+        final Table table = new LazyTable(cols, Locale.FRANCE, datasContainer);
 
-        Table processtable = new LazyTable(columns, Locale.FRANCE, lqc);
-        processtable.setSelectable(true);
-        processtable.setSizeFull();
+        table.setSelectable(true);
+        table.setSizeFull();
+        table.setCaption("Factures");
 
-		try {
-	        BaseRsfA summary = new NavigationActions().GetFacturesSummary(model.recordid);
-	        processtable.setFooterVisible(true);
-	        processtable.setColumnFooter("formattedtotalfacturehonoraire", summary.getFormattedtotalfacturehonoraire());
-	        processtable.setColumnFooter("formattedtotalfactureph", summary.getFormattedtotalfactureph());
-		} catch (ActionException e) {
-			Notification.show("Erreur de lecture du résumé des factures", Notification.Type.WARNING_MESSAGE);
-		}
+        // EXECUTE AN ACTION
+        ActionEncloser.execute(new ActionEncloser.ActionExecuter() {
+			@Override
+			public void action() throws ActionException {
+		        BaseRsfA summary = new NavigationActions().GetFacturesSummary(model.recordid);
+		        table.setFooterVisible(true);
+		        table.setColumnFooter("formattedtotalfacturehonoraire", summary.getFormattedtotalfacturehonoraire());
+		        table.setColumnFooter("formattedtotalfactureph", summary.getFormattedtotalfactureph());
+			}
+			@Override
+			public String msgError(ActionException e) {
+				return "Erreur de lecture du résumé des factures";
+			}
+		});
         
-        processtable.setSizeFull();
-        
-        processtable.addActionHandler(new FactureSelectedHandler(lqc));
-        
-        body.addComponent(processtable);
+        return table;
 	}
 	
 	private void fillContentHeader(Object[][] configs) {
