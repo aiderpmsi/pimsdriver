@@ -15,7 +15,21 @@ import javax.xml.bind.annotation.XmlElement;
 @XmlAccessorType(XmlAccessType.NONE)
 public class UploadedPmsi extends UploadPmsi {
 
-	public enum Status {pending, successed, failed};
+	public enum Status {
+		pending("En cours"),
+		successed("Traités"),
+		failed("Erreurs");
+		
+		private String label;
+		
+		private Status(String label) {
+			this.label = label;
+		}
+		
+		public String getLabel() {
+			return label;
+		}
+	};
 	
 	/** Primary key */
 	@XmlElement

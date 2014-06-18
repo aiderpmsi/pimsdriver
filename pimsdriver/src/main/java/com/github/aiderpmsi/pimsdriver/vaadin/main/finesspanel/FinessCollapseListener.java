@@ -6,16 +6,16 @@ import com.vaadin.data.util.HierarchicalContainer;
 import com.vaadin.ui.Tree.CollapseEvent;
 import com.vaadin.ui.Tree;
 
-public class CollapseListener implements Tree.CollapseListener {
+public class FinessCollapseListener implements Tree.CollapseListener {
 
 	private static final long serialVersionUID = -350653571633059983L;
 
 	private HierarchicalContainer hc;
 	
 	@SuppressWarnings("unused")
-	private CollapseListener() { }
+	private FinessCollapseListener() { }
 	
-	public CollapseListener(HierarchicalContainer hc) {
+	public FinessCollapseListener(HierarchicalContainer hc) {
 		this.hc = hc;
 	}
 

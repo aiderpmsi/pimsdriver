@@ -51,8 +51,7 @@ public class RsfBDetailsQueryFactory implements QueryFactory {
 			@Override
 			public void initOrders(LinkedList<Entry<Object, Boolean>> orderbys) {
 				if (orderbys.size() == 0) {
-					Entry<Object, Boolean> entry = new Entry<>();
-					entry.a = "pmel_position"; entry.b = true;
+					Entry<Object, Boolean> entry = new Entry<>((Object)"pmel_position", true);
 					orderbys.add(entry);
 				}
 			}
