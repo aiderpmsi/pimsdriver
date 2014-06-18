@@ -30,6 +30,12 @@ public class PmsiContentPanel extends Panel {
 
 	/** Generated serial id */
 	private static final long serialVersionUID = 9173237483341882407L;
+
+	/** content layout */
+	private Layout content = null;
+	
+	/** header layout */
+	private Layout header = null;
 	
 	/** body layout */
 	private Layout body = null;
@@ -37,53 +43,47 @@ public class PmsiContentPanel extends Panel {
 	public PmsiContentPanel() {
 		super();
 		setCaption(null);
-		setVisible(false);
 		addStyleName("pims-contentpanel");
 		
-		// SETS THE LAYOUT
-		setContent(new VerticalLayout());
+		// CREATES A DEFAULT LAYOUT FOR CONTENT
+		content = new VerticalLayout();
+		
+		// CREATE A DEFAULT LAYOUT FOR BODY
+		body = new VerticalLayout();
+
+		// CREATE A DEFAULT LAYOUT FOR HEADER
+		header = new VerticalLayout();
+	
+		// SETS LAYOUT HIERARCHY
+		content.addComponent(header);
+		content.addComponent(body);
+		setContent(content);
 	}
 	
 	public void setUpload(final UploadedPmsi model, UploadedPmsi.Status status) {
-		// IF MODEL AND STATUS ARE NULL, OR STATUS IS FAILED, REMOVE EVERYTHING IN PANEL
-		if (model == null)  {
-			removeAllActionHandlers();
-			setContent(new VerticalLayout());
-			setVisible(false);
-			
-			body = null;
-		}
-		else {
+		// FIRST, CLEANUP BODY AND HEADER
+		body.removeAllComponents();
+		header.removeAllComponents();
+		// CLEANUP HANDLERS
+		removeAllActionHandlers();
+		
+		// IF STATUS IS NOT NULL AND SUCCESSED, ADD HEADER CONTENT
+		if (model != null && status != null && status == UploadedPmsi.Status.successed)  {
 			ActionEncloser.execute(new ActionExecuter() {
 				@Override
 				public void action() throws ActionException {
-					NavigationActions na = new NavigationActions();
-					// GETS THE OVERVIEW OF RSF AND RSS
-					NavigationActions.Overview overview = na.getOverview(model);
-
-					// SETS THE GENERAL LAYOUT
-					setContent(new VerticalLayout());
-					getContent().addStyleName("pims-contentpanel-headerlayout");
+					// GETS THE SUMMARY OF RSF AND RSS
+					NavigationActions.Overview overview = new NavigationActions().getOverview(model);
 					
-					// SETS THE HEADERLAYOUT
-					VerticalLayout headerlayout = new VerticalLayout();
-					((Layout) getContent()).addComponent(headerlayout);
-
-					// RSF PANEL
-					Layout rsfPanel = createContentHeader("RSF", overview.rsf);
-					headerlayout.addComponent(rsfPanel);
+					// CREATES THE CONFIG TABLE
+					Object[][] headers = new Object[][] {
+							{"RSF", overview.rsf},
+							{overview.rss == null ? "Absence de RSS" : "RSS",
+									overview.rss == null ? new ArrayList<NavigationDTO.PmsiOverviewEntry>() : overview.rss}
+					};
 					
-					// RSS PANEL
-					Layout rssPanel = (overview.rss == null) ?
-							createContentHeader("Absence de RSS", new ArrayList<NavigationDTO.PmsiOverviewEntry>()) :
-								createContentHeader("RSS", overview.rss);;
-					headerlayout.addComponent(rssPanel);
-
-					// SETS THE LAYOUT FOR THE BODY
-					body = new VerticalLayout();
-					((Layout) getContent()).addComponent(body);
-					
-					setVisible(true);
+					// USE THIS CONFIG TABLE TO FILL THE HEADER
+					fillContentHeader(headers);
 				}
 				@Override
 				public String msgError(ActionException e) {
@@ -136,6 +136,16 @@ public class PmsiContentPanel extends Panel {
         processtable.addActionHandler(new FactureSelectedHandler(lqc));
         
         body.addComponent(processtable);
+	}
+	
+	private void fillContentHeader(Object[][] configs) {
+
+		for (Object[] config : configs) {
+			@SuppressWarnings("unchecked")
+			Layout layout = createContentHeader((String) config[0], (List<NavigationDTO.PmsiOverviewEntry>) config[1]);
+			header.addComponent(layout);
+		}
+
 	}
 	
 	private Layout createContentHeader(String header, List<NavigationDTO.PmsiOverviewEntry> entries) {
