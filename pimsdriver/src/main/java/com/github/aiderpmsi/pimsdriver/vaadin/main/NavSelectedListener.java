@@ -10,7 +10,6 @@ public class NavSelectedListener implements Listener {
 
 	private PmsiContentPanel pcp;
 	
-	
 	public NavSelectedListener(PmsiContentPanel pcp) {
 		this.pcp = pcp;
 	}
@@ -20,14 +19,7 @@ public class NavSelectedListener implements Listener {
 		// CHECK IF THE EVENT IS ONE NAVSELECTEDEVENT
 		if (event.getClass() == NavSelectedEvent.class) {
 			NavSelectedEvent nse = (NavSelectedEvent) event;
-			switch (nse.getType()) {
-			case factures:
-				pcp.showFactures(nse.getModel());
-				break;
-			case sejours:
-				// DO NOTHING
-				break;
-			}
+			pcp.show(nse.getType(), nse.getModel());
 		}
 		// IF ITS NOT, DO NOTHING
 	}

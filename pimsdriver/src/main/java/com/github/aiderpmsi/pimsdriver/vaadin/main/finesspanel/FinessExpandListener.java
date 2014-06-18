@@ -120,7 +120,7 @@ public class FinessExpandListener implements Tree.ExpandListener {
 			}
 		}
 	}
-	
+
 	public void createUploadsNodes(HierarchicalContainer hc, Object itemId, UploadedPmsi.Status status, String finess, Integer year, Integer month) throws ActionException {
 		@SuppressWarnings("unchecked")
 		Entry<Object, Object> entries[] = new Entry[7];

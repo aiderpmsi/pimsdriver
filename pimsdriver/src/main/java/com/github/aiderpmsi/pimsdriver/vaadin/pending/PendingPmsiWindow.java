@@ -38,7 +38,7 @@ public class PendingPmsiWindow extends Window {
         processtable.setLocale(Locale.FRANCE);
         LazyQueryContainer lqc = new LazyQueryContainer(
         		new LazyQueryDefinition(false, 1000, "recordid"),
-        		new PmsiQueryFactory());
+        		new PmsiPendingQueryFactory());
         lqc.addContainerProperty("finess", String.class, "", true, true);
         lqc.addContainerProperty("year", Integer.class, null, true, true);
         lqc.addContainerProperty("month", Integer.class, null, true, true);

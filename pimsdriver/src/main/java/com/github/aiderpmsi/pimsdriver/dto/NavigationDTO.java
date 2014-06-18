@@ -12,6 +12,7 @@ import com.github.aiderpmsi.pimsdriver.db.vaadin.query.DBQueryBuilder;
 import com.github.aiderpmsi.pimsdriver.dto.model.BaseRsfA;
 import com.github.aiderpmsi.pimsdriver.dto.model.BaseRsfB;
 import com.github.aiderpmsi.pimsdriver.dto.model.BaseRsfC;
+import com.github.aiderpmsi.pimsdriver.dto.model.BaseRssMain;
 import com.github.aiderpmsi.pimsdriver.dto.model.UploadedPmsi;
 import com.vaadin.data.Container.Filter;
 import com.vaadin.data.util.sqlcontainer.query.OrderBy;
@@ -506,6 +507,73 @@ public class NavigationDTO extends AutoCloseableDto<NavigationDTO.Navigation> {
 		}
 	}
 
+	public List<BaseRssMain> readRssMainList (List<Filter> filters, List<OrderBy> orders,
+			Integer first, Integer rows) throws SQLException {
+
+		// IN THIS QUERY, IT IS NOT POSSIBLE TO STORE THE QUERY (CAN CHANGE AT EVERY CALL)
+		StringBuilder query = new StringBuilder(
+				"SELECT smva.pmel_id, smva.pmel_position, smva.pmel_line, trim(smva.numcmd) || trim(smva.numghm) ghm, "
+				+ "pmgr.pmgr_racine || pmgr.pmgr_modalite || pmgr.pmgr_gravite || pmgr.pmgr_erreur ghmcorrige, "
+				+ "trim(smva.numlocalsejour) numlocalsejour, trim(smva.numrum) numrum, "
+				+ "trim(smva.numunitemedicale) numunitemedicale, cast_to_date(smva.dateentree, NULL) dateentree, "
+				+ "cast_to_date(smva.datesortie, NULL) datesortie, cast_to_int(smva.nbseances, NULL) nbseances, "
+				+ "trim(smva.dp) dp, trim(smva.dr) dr "
+				+ "FROM smva_rssmain_116_view smva "
+				+ "JOIN pmgr_pmsigroups pmgr ON "
+				+ "    smva.pmel_root = pmgr.pmel_root "
+				+ "    AND smva.pmel_id = pmgr.pmel_id ");
+
+		
+		// PREPARES THE LIST OF ARGUMENTS FOR THIS QUERY
+		List<Object> queryArgs = new ArrayList<>();
+		// CREATES THE FILTERS, THE ORDERS AND FILLS THE ARGUMENTS
+		query.append(DBQueryBuilder.getWhereStringForFilters(filters, queryArgs)).
+			append(DBQueryBuilder.getOrderStringForOrderBys(orders, queryArgs));
+		// OFFSET AND LIMIT
+		if (first != null)
+			query.append(" OFFSET ").append(first.toString()).append(" ");
+		if (rows != null && rows != 0)
+			query.append(" LIMIT ").append(rows.toString()).append(" ");
+		
+		// CREATES THE DB STATEMENT
+		try (PreparedStatement ps = con.prepareStatement(query.toString())) {
+
+			for (int i = 0 ; i < queryArgs.size() ; i++) {
+				ps.setObject(i + 1, queryArgs.get(i));
+			}
+
+			// EXECUTES THE QUERY
+			try (ResultSet rs = ps.executeQuery()) {
+		
+				// LIST OF ELEMENTS
+				List<BaseRssMain> rssmains = new ArrayList<>();
+			
+				// FILLS THE LIST OF ELEMENTS
+				while (rs.next()) {
+					// BEAN FOR THIS ITEM
+					BaseRssMain rssMain = new BaseRssMain();
+
+					// FILLS THE BEAN
+					rssMain.pmel_id = rs.getLong(1);
+					rssMain.pmel_position = rs.getLong(2);
+					rssMain.pmel_line = rs.getLong(3);
+					rssMain.ghm = rs.getString(4);
+					rssMain.ghmcorrige = rs.getString(5);
+					rssMain.numlocalsejour = rs.getString(6);
+					rssMain.numrum = rs.getString(7);
+					rssMain.numunitemedicale = rs.getString(8);
+					rssMain.dateentree = rs.getDate(9);
+					rssMain.datesortie = rs.getDate(10);
+					rssMain.nbseances = rs.getInt(11);
+					rssMain.dp = rs.getString(12);
+					rssMain.dr = rs.getString(13);
+
+				}
+				return rssmains;
+			}
+		}
+	}
+	
 	public String pmsiSource(long pmel_root, long pmel_position) throws SQLException {
 		// GETS THE PREPARED STATEMENT
 		PreparedStatement ps = getPs(Navigation.PMSISOURCE);

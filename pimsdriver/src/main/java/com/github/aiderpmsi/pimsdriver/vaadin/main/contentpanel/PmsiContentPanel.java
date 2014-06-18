@@ -12,6 +12,7 @@ import com.github.aiderpmsi.pimsdriver.db.actions.NavigationActions;
 import com.github.aiderpmsi.pimsdriver.dto.NavigationDTO;
 import com.github.aiderpmsi.pimsdriver.dto.model.BaseRsfA;
 import com.github.aiderpmsi.pimsdriver.dto.model.UploadedPmsi;
+import com.github.aiderpmsi.pimsdriver.vaadin.main.NavSelectedEvent.Type;
 import com.github.aiderpmsi.pimsdriver.vaadin.utils.LazyColumnType;
 import com.github.aiderpmsi.pimsdriver.vaadin.utils.LazyTable;
 import com.github.aiderpmsi.pimsdriver.vaadin.utils.aop.ActionEncloser;
@@ -81,18 +82,26 @@ public class PmsiContentPanel extends VerticalLayout {
 		}
 	}
 	
-	public void showFactures(UploadedPmsi model) {
+	public void show(Type type, UploadedPmsi model) {
 		// REMOVE ALL COMPONENTS OF BODY
 		body.removeAllComponents();
+
+		// CREATES THE CORRESPONDING TABLE
+		switch (type) {
+		case sejours:
+		case factures:
+			body.addComponent(createFactTable(type, model));
+			break;
+		}
+	}
+
+	public void showFactures(UploadedPmsi model) {
 		
 		// CREATES THE FACTS TABLE
-		Table factures = createFactTable(model);
-		
-		body.addComponent(factures);
 
 	}
 	
-	private Table createFactTable(final UploadedPmsi model) {
+	private Table createFactTable(final Type type, final UploadedPmsi model) {
         // RSFB CONTAINER
         LazyQueryContainer datasContainer = new LazyQueryContainer(
         		new LazyQueryDefinition(false, 1000, "pmel_id"),
@@ -119,6 +128,7 @@ public class PmsiContentPanel extends VerticalLayout {
         table.setSelectable(true);
         table.setSizeFull();
         table.setCaption("Factures");
+        table.addActionHandler(new PmsiSelectedHandler(type, datasContainer));
 
         // EXECUTE AN ACTION
         ActionEncloser.execute(new ActionEncloser.ActionExecuter() {
@@ -169,5 +179,6 @@ public class PmsiContentPanel extends VerticalLayout {
 		layout.addComponent(contentLayout);
 		return layout;
 	}
+
 	
 }

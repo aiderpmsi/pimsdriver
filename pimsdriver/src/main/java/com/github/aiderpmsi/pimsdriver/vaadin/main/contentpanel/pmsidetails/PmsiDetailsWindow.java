@@ -9,6 +9,7 @@ import com.github.aiderpmsi.pimsdriver.db.actions.ActionException;
 import com.github.aiderpmsi.pimsdriver.db.actions.NavigationActions;
 import com.github.aiderpmsi.pimsdriver.dto.model.BaseRsfB;
 import com.github.aiderpmsi.pimsdriver.dto.model.BaseRsfC;
+import com.github.aiderpmsi.pimsdriver.vaadin.main.NavSelectedEvent.Type;
 import com.github.aiderpmsi.pimsdriver.vaadin.utils.LazyColumnType;
 import com.github.aiderpmsi.pimsdriver.vaadin.utils.LazyTable;
 import com.github.aiderpmsi.pimsdriver.vaadin.utils.aop.ActionEncloser;
@@ -18,13 +19,13 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
 public class PmsiDetailsWindow extends Window {
-
+	
 	/** Generated serial Id */
 	private static final long serialVersionUID = -7803472921198470202L;
 
-	public PmsiDetailsWindow(final Long pmel_root, final Long pmel_position, final String numfacture) {
+	public PmsiDetailsWindow(final Long pmel_root, final Long pmel_position, final Type type, final String typeLabel) {
 		// TITLE
-		super(numfacture);
+		super(type.getLabel() + " : " + typeLabel);
 
 		// SET VISUAL ASPECT
         setWidth("650px");
@@ -40,14 +41,19 @@ public class PmsiDetailsWindow extends Window {
         layout.setSizeFull();
         setContent(layout);
 
-        // RSFB TABLE
-        Table rsfB = getRsfBTable(pmel_root, pmel_position);
-		layout.addComponent(rsfB);
+        switch (type) {
+        case factures:
+        	// RSFB TABLE
+        	Table rsfB = getRsfBTable(pmel_root, pmel_position);
+        	layout.addComponent(rsfB);
 
-        // RSFC TABLE
-        Table rsfC = getRsfCTable(pmel_root, pmel_position);
-		layout.addComponent(rsfC);
-        
+        	// RSFC TABLE
+        	Table rsfC = getRsfCTable(pmel_root, pmel_position);
+        	layout.addComponent(rsfC);
+        	break;
+        case sejours:
+        	break;
+        }
 	}
 
 	public Table getRsfBTable(final Long pmel_root, final Long pmel_position) {
