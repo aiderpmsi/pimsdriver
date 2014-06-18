@@ -208,7 +208,7 @@ public class NavigationDTO extends AutoCloseableDto<NavigationDTO.Navigation> {
 					element.pmel_id = rs.getLong(1);
 					element.pmel_root = rs.getLong(2);
 					element.pmel_position = rs.getLong(3);
-					element.ligne = rs.getLong(4);
+					element.pmel_line = rs.getLong(4);
 					element.numrss = rs.getString(5);
 					element.sexe = rs.getString(6);
 					element.codess = rs.getString(7);
@@ -404,7 +404,7 @@ public class NavigationDTO extends AutoCloseableDto<NavigationDTO.Navigation> {
 		// IN THIS QUERY, IT IS NOT POSSIBLE TO STORE THE QUERY (CAN CHANGE AT EVERY CALL)
 		StringBuilder query = new StringBuilder(
 				"SELECT pmel_id, pmel_line, cast_to_date(dateacte, NULL) dateacte, trim(codeacte) codeacte, "
-				+ "cast_to_int(quantite, NULL) quantite, cast_to_int(montanttotalhonoraire) montanttotalhonoraire "
+				+ "cast_to_int(quantite, NULL) quantite, cast_to_int(montanttotalhonoraire, NULL) montanttotalhonoraire "
 				+ "FROM favc_rsfc_2012_view");
 		
 		// PREPARES THE LIST OF ARGUMENTS FOR THIS QUERY

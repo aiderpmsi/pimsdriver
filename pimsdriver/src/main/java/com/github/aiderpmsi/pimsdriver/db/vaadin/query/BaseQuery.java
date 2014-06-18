@@ -8,11 +8,11 @@ import org.vaadin.addons.lazyquerycontainer.Query;
 import org.vaadin.addons.lazyquerycontainer.QueryDefinition;
 
 import com.github.aiderpmsi.pimsdriver.db.actions.ActionException;
+import com.github.aiderpmsi.pimsdriver.vaadin.utils.aop.ActionEncloser;
 import com.vaadin.data.Container.Filter;
 import com.vaadin.data.Item;
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.util.sqlcontainer.query.OrderBy;
-import com.vaadin.ui.Notification;
 
 public class BaseQuery<R> implements Query {
 
@@ -71,23 +71,28 @@ public class BaseQuery<R> implements Query {
 	}
 
 	@Override
-	public List<Item> loadItems(int startIndex, int count) {
+	public List<Item> loadItems(final int startIndex, final int count) {
 		// CREATES LIST OF ITEMS
 		List<Item> items = new ArrayList<>(count);
-
-		try {
-			// GETS THE LIST OF BEANS
-			List<R> beans = bqi.loadBeans(sqlFilters, sqlOrderBys, startIndex, count);
-			
+		
+		List<R> beans = ActionEncloser.executer(new ActionEncloser.ActionReturner<List<R>>() {
+			@Override
+			public List<R> action() throws ActionException {
+				return bqi.loadBeans(sqlFilters, sqlOrderBys, startIndex, count);
+			}
+			@Override
+			public String msgError(ActionException e) {
+				return bqi.loadBeansError(e);
+			}
+		});
+		
+		if (beans != null) {
 			// FILS THE LIST OF ITEMS FROM THE BEANS
 			for (R bean : beans) {
 				items.add(new BeanItem<R>(bean));
 			}
-			
-		} catch (ActionException e) {
-			Notification.show(bqi.loadBeansError(e), Notification.Type.WARNING_MESSAGE);
 		}
-		
+
 		return items;
 	}
 
@@ -99,16 +104,20 @@ public class BaseQuery<R> implements Query {
 	@Override
 	public int size() {
 		// SIZE
-		Integer size = 0;
+		Integer size = ActionEncloser.executer(new ActionEncloser.ActionReturner<Integer>() {
+			@Override
+			public Integer action() throws ActionException {
+				return bqi.size(sqlFilters);
+			}
+			@Override
+			public String msgError(ActionException e) {
+				return bqi.sizeError(e);
+			}
+		});
 
-		try {
-			// GETS THE LIST OF BEANS
-			size = bqi.size(sqlFilters);
-			
-		} catch (ActionException e) {
-			Notification.show(bqi.sizeError(e), Notification.Type.WARNING_MESSAGE);
-		}
-
+		if (size == null)
+			size = 0;
+		
 		return size;
 	}
 

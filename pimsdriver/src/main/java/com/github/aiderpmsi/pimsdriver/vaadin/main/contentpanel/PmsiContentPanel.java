@@ -12,6 +12,10 @@ import com.github.aiderpmsi.pimsdriver.db.actions.NavigationActions;
 import com.github.aiderpmsi.pimsdriver.dto.NavigationDTO;
 import com.github.aiderpmsi.pimsdriver.dto.model.BaseRsfA;
 import com.github.aiderpmsi.pimsdriver.dto.model.UploadedPmsi;
+import com.github.aiderpmsi.pimsdriver.vaadin.utils.LazyColumnType;
+import com.github.aiderpmsi.pimsdriver.vaadin.utils.LazyTable;
+import com.github.aiderpmsi.pimsdriver.vaadin.utils.aop.ActionEncloser;
+import com.github.aiderpmsi.pimsdriver.vaadin.utils.aop.ActionEncloser.ActionExecuter;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
@@ -40,7 +44,7 @@ public class PmsiContentPanel extends Panel {
 		setContent(new VerticalLayout());
 	}
 	
-	public void setUpload(UploadedPmsi model, UploadedPmsi.Status status) {
+	public void setUpload(final UploadedPmsi model, UploadedPmsi.Status status) {
 		// IF MODEL AND STATUS ARE NULL, OR STATUS IS FAILED, REMOVE EVERYTHING IN PANEL
 		if (model == null)  {
 			removeAllActionHandlers();
@@ -50,37 +54,42 @@ public class PmsiContentPanel extends Panel {
 			body = null;
 		}
 		else {
-			try {
-				NavigationActions na = new NavigationActions();
-				// GETS THE OVERVIEW OF RSF AND RSS
-				NavigationActions.Overview overview = na.getOverview(model);
+			ActionEncloser.execute(new ActionExecuter() {
+				@Override
+				public void action() throws ActionException {
+					NavigationActions na = new NavigationActions();
+					// GETS THE OVERVIEW OF RSF AND RSS
+					NavigationActions.Overview overview = na.getOverview(model);
 
-				// SETS THE GENERAL LAYOUT
-				setContent(new VerticalLayout());
-				getContent().addStyleName("pims-contentpanel-headerlayout");
-				
-				// SETS THE HEADERLAYOUT
-				VerticalLayout headerlayout = new VerticalLayout();
-				((Layout) getContent()).addComponent(headerlayout);
+					// SETS THE GENERAL LAYOUT
+					setContent(new VerticalLayout());
+					getContent().addStyleName("pims-contentpanel-headerlayout");
+					
+					// SETS THE HEADERLAYOUT
+					VerticalLayout headerlayout = new VerticalLayout();
+					((Layout) getContent()).addComponent(headerlayout);
 
-				// RSF PANEL
-				Layout rsfPanel = createContentHeader("RSF", overview.rsf);
-				headerlayout.addComponent(rsfPanel);
-				
-				// RSS PANEL
-				Layout rssPanel = (overview.rss == null) ?
-						createContentHeader("Absence de RSS", new ArrayList<NavigationDTO.PmsiOverviewEntry>()) :
-							createContentHeader("RSS", overview.rss);;
-				headerlayout.addComponent(rssPanel);
+					// RSF PANEL
+					Layout rsfPanel = createContentHeader("RSF", overview.rsf);
+					headerlayout.addComponent(rsfPanel);
+					
+					// RSS PANEL
+					Layout rssPanel = (overview.rss == null) ?
+							createContentHeader("Absence de RSS", new ArrayList<NavigationDTO.PmsiOverviewEntry>()) :
+								createContentHeader("RSS", overview.rss);;
+					headerlayout.addComponent(rssPanel);
 
-				// SETS THE LAYOUT FOR THE BODY
-				body = new VerticalLayout();
-				((Layout) getContent()).addComponent(body);
-				
-				setVisible(true);
-			} catch (ActionException e) {
-				Notification.show("Erreur lors de la récupération des éléments des rsf et rss ", Notification.Type.WARNING_MESSAGE);
-			}
+					// SETS THE LAYOUT FOR THE BODY
+					body = new VerticalLayout();
+					((Layout) getContent()).addComponent(body);
+					
+					setVisible(true);
+				}
+				@Override
+				public String msgError(ActionException e) {
+					return "Erreur lors de la récupération des éléments des rsf et rss ";
+				}
+			});
 		}
 	}
 	
@@ -88,31 +97,30 @@ public class PmsiContentPanel extends Panel {
 		// REMOVE ALL COMPONENTS OF BODY
 		body.removeAllComponents();
 
-		// CREATE THE TABLE
-        Table processtable = new Table();
-        processtable.setLocale(Locale.FRANCE);
+		// CREATES THE CONTAINER
         LazyQueryContainer lqc = new LazyQueryContainer(
         		new LazyQueryDefinition(false, 1000, "pmel_id"),
         		new FacturesQueryFactory(model.recordid));
 
-        lqc.addContainerProperty("pmel_id", Long.class, null, true, true);
-        lqc.addContainerProperty("pmel_line", Long.class, null, true, true);
-        lqc.addContainerProperty("numfacture", String.class, null, true, true);
-        lqc.addContainerProperty("numrss", String.class, null, true, true);
-        lqc.addContainerProperty("codess", String.class, null, true, true);
-        lqc.addContainerProperty("sexe", String.class, null, true, true);
-        lqc.addContainerProperty("formatteddatenaissance", String.class, null, true, true);
-        lqc.addContainerProperty("formatteddateentree", String.class, null, true, true);
-        lqc.addContainerProperty("formatteddatesortie", String.class, null, true, true);
-        lqc.addContainerProperty("formattedtotalfacturehonoraire", String.class, null, true, true);
-        lqc.addContainerProperty("formattedtotalfactureph", String.class, null, true, true);
-        lqc.addContainerProperty("etatliquidation", String.class, null, true, true);
-        
-        processtable.setContainerDataSource(lqc);
-        processtable.setVisibleColumns(new Object[] {"ligne", "numfacture", "numrss", "codess", "sexe", "formatteddatenaissance", "formatteddateentree", "formatteddatesortie", "formattedtotalfacturehonoraire", "formattedtotalfactureph", "etatliquidation"});
-        processtable.setColumnHeaders(new String[] {"Ligne", "Facture", "Rss", "Code sécu", "Sexe", "Naissance", "Entrée", "Sortie", "Honoraires", "Prestations", "Liquidation"} );
-        processtable.setColumnAlignments(Align.RIGHT, Align.LEFT, Align.LEFT, Align.LEFT, Align.CENTER, Align.LEFT, Align.LEFT, Align.LEFT, Align.RIGHT, Align.RIGHT, Align.CENTER);
+        // CREATES THE TABLE
+        LazyColumnType[] columns = new LazyColumnType[] {
+        		new LazyColumnType("pmel_id", Long.class, null, null),
+        		new LazyColumnType("pmel_line", Long.class, "Ligne", Align.RIGHT),
+        		new LazyColumnType("numfacture", String.class, "Facture", Align.LEFT),
+        		new LazyColumnType("numrss", String.class, "Rss", Align.LEFT),
+        		new LazyColumnType("codess", String.class, "Code Sécu", Align.LEFT),
+        		new LazyColumnType("sexe", String.class, "Sexe", Align.CENTER),
+        		new LazyColumnType("formatteddatenaissance", String.class, "Naissance", Align.CENTER),
+        		new LazyColumnType("formatteddateentree", String.class, "Entrée", Align.CENTER),
+        		new LazyColumnType("formatteddatesortie", String.class, "Sortie", Align.CENTER),
+        		new LazyColumnType("formattedtotalfacturehonoraire", String.class, "Honoraires", Align.RIGHT),
+        		new LazyColumnType("formattedtotalfactureph", String.class, "Prestations", Align.RIGHT),
+        		new LazyColumnType("etatliquidation", String.class, "Liquidation", Align.RIGHT)
+        };
+
+        Table processtable = new LazyTable(columns, Locale.FRANCE, lqc);
         processtable.setSelectable(true);
+        processtable.setSizeFull();
 
 		try {
 	        BaseRsfA summary = new NavigationActions().GetFacturesSummary(model.recordid);

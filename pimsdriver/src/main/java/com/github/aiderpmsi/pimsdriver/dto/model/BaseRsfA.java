@@ -22,7 +22,7 @@ public class BaseRsfA {
 	
 	public Long pmel_position;
 	
-	public Long ligne;
+	public Long pmel_line;
 	
 	public String numfacture;
 	
@@ -68,12 +68,12 @@ public class BaseRsfA {
 		this.pmel_position = pmel_position;
 	}
 
-	public Long getLigne() {
-		return ligne;
+	public Long getPmel_line() {
+		return pmel_line;
 	}
 
-	public void setLigne(Long ligne) {
-		this.ligne = ligne;
+	public void setPmel_line(Long pmel_line) {
+		this.pmel_line = pmel_line;
 	}
 
 	public String getNumfacture() {
