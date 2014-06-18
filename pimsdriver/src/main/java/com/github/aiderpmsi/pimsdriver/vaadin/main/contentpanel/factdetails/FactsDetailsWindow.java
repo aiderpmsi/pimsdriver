@@ -67,10 +67,6 @@ public class FactsDetailsWindow extends Window {
 		} catch (ActionException e) {
 			Notification.show("Erreur de lecture du résumé des factures B", Notification.Type.WARNING_MESSAGE);
 		}
-        /*
-        rsfbTable.setFooterVisible(true);
-        rsfbTable.setColumnF
-        */
         
         layout.addComponent(rsfbTable);
         

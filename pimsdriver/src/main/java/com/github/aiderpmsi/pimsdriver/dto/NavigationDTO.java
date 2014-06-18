@@ -33,7 +33,8 @@ public class NavigationDTO extends AutoCloseableDto<NavigationDTO.Navigation> {
 		LISTYM,
 		PMSIOVERVIEW,
 		RSFASUMMARY,
-		RSFBSUMMARY;
+		RSFBSUMMARY,
+		PMSISOURCE;
 
 		@Override
 		public String getStatement(Entry<?>... entries) throws SQLException {
@@ -66,6 +67,20 @@ public class NavigationDTO extends AutoCloseableDto<NavigationDTO.Navigation> {
 			case RSFBSUMMARY:
 				return "SELECT SUM(cast_to_int(montanttotaldepense, NULL)) montanttotaldepense "
 				+ "FROM favb_rsfb_2012_view WHERE pmel_root = ? and pmel_parent = ?";
+			case PMSISOURCE:
+				return "WITH RECURSIVE complete AS ( "
+						+ "SELECT pmel_root, pmel_line, pmel_position, pmel_content "
+						+ "FROM pmel_pmsielement "
+						+ "WHERE pmel_root = ? AND pmel_position = ? "
+						+ "UNION ALL "
+						+ "SELECT pmel.pmel_root, pmel.pmel_line, pmel.pmel_position, pmel.pmel_content "
+						+ "FROM pmel_pmsielement pmel "
+						+ "JOIN complete cp ON pmel.pmel_root = cp.pmel_root AND pmel.pmel_parent = cp.pmel_position "
+						+ ") "
+						+ "SELECT string_agg(o.pmel_content, '') "
+						+ "FROM (SELECT pmel_line, pmel_content FROM complete ORDER BY pmel_position) o "
+						+ "GROUP BY pmel_line "
+						+ "ORDER BY pmel_line;";
 			default: //SHOULD NEVER REACH THIS POINT
 				throw new RuntimeException("This code should never been reached");
 			}
@@ -315,6 +330,8 @@ public class NavigationDTO extends AutoCloseableDto<NavigationDTO.Navigation> {
 					element.quantite = rs.getInt(6);
 					element.numghs = rs.getString(7);
 					element.montanttotaldepense = rs.getBigDecimal(8);
+					if (element.montanttotaldepense != null)
+						element.montanttotaldepense = element.montanttotaldepense.divide(coeff);
 				
 				// ADDS THE BEAN TO THE ELEMENTS
 				rsfbs.add(element);
@@ -376,5 +393,29 @@ public class NavigationDTO extends AutoCloseableDto<NavigationDTO.Navigation> {
 		}
 	}
 
+	public String pmsiSource(long pmel_root, long pmel_position) throws SQLException {
+		// GETS THE PREPARED STATEMENT
+		PreparedStatement ps = getPs(Navigation.PMSISOURCE);
+
+		ps.setLong(1, pmel_root);
+		ps.setLong(2, pmel_position);
+		
+		// EXECUTES THE QUERY
+		try (ResultSet rs = ps.executeQuery()) {
+		
+			// ELEMENT TO RETURN
+			StringBuilder source = new StringBuilder();
+			while (rs.next()) {
+				
+				String current = rs.getString(1); 
+				
+				if (current != null) {
+					source.append(current).append('\n');
+				}
+				
+			}
+			return source.toString();
+		}
+	}
 
 }

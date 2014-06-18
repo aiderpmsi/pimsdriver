@@ -292,5 +292,28 @@ public class NavigationActions {
 			throw new ActionException(e);
 		}
 	}
+	
+	public String getPmsiSource(long pmel_root, long pmel_position) throws ActionException {
+		try (Connection con = DataSourceSingleton.getInstance().getConnection();
+				NavigationDTO upd = new NavigationDTO(con);) {
+				
+				// CONTINUE WHILE SELECTION HAS NOT SUCCEDED BECAUSE OF SERIALIZATION EXCEPTIONS
+				for (;;) {
+					try {
+						final String source = upd.pmsiSource(pmel_root, pmel_position);
+						// 	SELECTION HAS SUCCEDDED
+						con.commit();
+						return source;
+					} catch (SQLException e) {
+						if (e instanceof SQLException && !((SQLException)e).getSQLState().equals("40001")) {
+							con.rollback();
+							throw (SQLException) e;
+						}
+					}
+				}
+			} catch (SQLException e) {
+				throw new ActionException(e);
+			}
+	}
 
 }
