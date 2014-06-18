@@ -135,14 +135,14 @@ public class FinessExpandListener implements Tree.ExpandListener {
 		// CREATE THE QUERY FILTER
 		List<Filter> filters = new ArrayList<>(1);
 		filters.add(new And(
-				new Compare.Equal("finess", finess),
-				new Compare.Equal("processed", status),
-				new Compare.Equal("year", year),
-				new Compare.Equal("month", month)));
+				new Compare.Equal("plud_finess", finess),
+				new Compare.Equal("plud_processed", status),
+				new Compare.Equal("plud_year", year),
+				new Compare.Equal("plud_month", month)));
 		
 		// CREATE THE QUERY ORDER BY
 		List<OrderBy> orderBys = new ArrayList<>(1);
-		orderBys.add(new OrderBy("dateenvoi", true));
+		orderBys.add(new OrderBy("plud_dateenvoi", true));
 
 		// LOAD THE ITEMS
 		List<UploadedPmsi> ups = new NavigationActions().getUploadedPmsi(filters, orderBys, null, null);
