@@ -27,12 +27,12 @@ public class FinessExpandListener implements Tree.ExpandListener {
 	
 	private HierarchicalContainer hc;
 	
-	private FinessPanel fp;
+	private FinessComponent fp;
 	
 	@SuppressWarnings("unused")
 	private FinessExpandListener() {}
 	
-	public FinessExpandListener(HierarchicalContainer hc, FinessPanel fp) {
+	public FinessExpandListener(HierarchicalContainer hc, FinessComponent fp) {
 		this.hc = hc;
 		this.fp = fp;
 	}

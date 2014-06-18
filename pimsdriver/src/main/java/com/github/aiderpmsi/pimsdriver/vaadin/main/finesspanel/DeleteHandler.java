@@ -17,12 +17,12 @@ public class DeleteHandler implements Action.Handler {
 	
 	private HierarchicalContainer hc;
 	
-	private FinessPanel fp;
+	private FinessComponent fp;
 	
 	@SuppressWarnings("unused")
 	private DeleteHandler() {}
 	
-	public DeleteHandler(HierarchicalContainer hc, FinessPanel fp) {
+	public DeleteHandler(HierarchicalContainer hc, FinessComponent fp) {
 		this.hc = hc;
 		this.fp = fp;
 	}

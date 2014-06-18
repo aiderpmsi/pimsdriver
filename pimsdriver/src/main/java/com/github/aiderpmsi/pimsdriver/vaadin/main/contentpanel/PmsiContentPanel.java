@@ -20,19 +20,15 @@ import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Layout;
-import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.Table.Align;
 import com.vaadin.ui.VerticalLayout;
 
-public class PmsiContentPanel extends Panel {
+public class PmsiContentPanel extends VerticalLayout {
 
 	/** Generated serial id */
 	private static final long serialVersionUID = 9173237483341882407L;
 
-	/** content layout */
-	private Layout content = null;
-	
 	/** header layout */
 	private Layout header = null;
 	
@@ -41,11 +37,7 @@ public class PmsiContentPanel extends Panel {
 	
 	public PmsiContentPanel() {
 		super();
-		setCaption(null);
 		addStyleName("pims-contentpanel");
-		
-		// CREATES A DEFAULT LAYOUT FOR CONTENT
-		content = new VerticalLayout();
 		
 		// CREATE A DEFAULT LAYOUT FOR BODY
 		body = new VerticalLayout();
@@ -54,18 +46,15 @@ public class PmsiContentPanel extends Panel {
 		header = new VerticalLayout();
 	
 		// SETS LAYOUT HIERARCHY
-		content.addComponent(header);
-		content.addComponent(body);
-		setContent(content);
+		addComponent(header);
+		addComponent(body);
 	}
 	
 	public void setUpload(final UploadedPmsi model, UploadedPmsi.Status status) {
 		// FIRST, CLEANUP BODY AND HEADER
 		body.removeAllComponents();
 		header.removeAllComponents();
-		// CLEANUP HANDLERS
-		removeAllActionHandlers();
-		
+
 		// IF STATUS IS NOT NULL AND SUCCESSED, ADD HEADER CONTENT
 		if (model != null && status != null && status == UploadedPmsi.Status.successed)  {
 			ActionEncloser.execute(new ActionExecuter() {

@@ -1,7 +1,7 @@
 package com.github.aiderpmsi.pimsdriver.vaadin.main;
 
 import com.github.aiderpmsi.pimsdriver.vaadin.main.contentpanel.PmsiContentPanel;
-import com.github.aiderpmsi.pimsdriver.vaadin.main.finesspanel.FinessPanel;
+import com.github.aiderpmsi.pimsdriver.vaadin.main.finesspanel.FinessComponent;
 import com.vaadin.ui.HorizontalSplitPanel;
 import com.vaadin.ui.VerticalLayout;
 
@@ -11,7 +11,7 @@ public class SplitPanel extends HorizontalSplitPanel{
 
 	private PmsiContentPanel contentPanel;
 	
-	private FinessPanel finessPanel;
+	private FinessComponent finessPanel;
 	
 	@SuppressWarnings("unused")
 	private SplitPanel() {};
@@ -24,7 +24,7 @@ public class SplitPanel extends HorizontalSplitPanel{
 
 		// CREATES THE SUB COMPONENTS
 		contentPanel = new PmsiContentPanel();
-		finessPanel = new FinessPanel(rootWindow);
+		finessPanel = new FinessComponent(rootWindow);
 
 		// CREATES AND FILLS THE LEFT AND RIGHT LAYOUTS
 		VerticalLayout layout1 = new VerticalLayout(finessPanel);
@@ -40,7 +40,7 @@ public class SplitPanel extends HorizontalSplitPanel{
 		return contentPanel;
 	}
 
-	public FinessPanel getFinessPanel() {
+	public FinessComponent getFinessPanel() {
 		return finessPanel;
 	}
 }

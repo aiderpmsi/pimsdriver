@@ -6,12 +6,12 @@ import com.github.aiderpmsi.pimsdriver.vaadin.main.RootWindow;
 import com.vaadin.data.util.HierarchicalContainer;
 import com.vaadin.ui.Tree;
 
-public class FinessPanel extends Tree {
+public class FinessComponent extends Tree {
 
 	/** Generated serial id */
 	private static final long serialVersionUID = 5192397393504372354L;
 		
-	public FinessPanel(RootWindow rootElement) {
+	public FinessComponent(RootWindow rootElement) {
 	
 		super();
 
