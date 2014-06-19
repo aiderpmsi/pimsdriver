@@ -89,20 +89,47 @@ public class PmsiContentPanel extends VerticalLayout {
 		// CREATES THE CORRESPONDING TABLE
 		switch (type) {
 		case sejours:
+			body.addComponent(createSejoursTable(type, model));
 		case factures:
 			body.addComponent(createFactTable(type, model));
 			break;
 		}
 	}
-
-	public void showFactures(UploadedPmsi model) {
-		
-		// CREATES THE FACTS TABLE
-
-	}
 	
+	private Table createSejoursTable(final Type type, final UploadedPmsi model) {
+        // RSS MAIN CONTAINER
+        LazyQueryContainer datasContainer = new LazyQueryContainer(
+        		new LazyQueryDefinition(false, 1000, "pmel_id"),
+        		new SejoursQueryFactory(model.recordid));
+		
+        // COLUMNS DEFINITIONS
+        LazyColumnType[] cols = new LazyColumnType[] {
+        		new LazyColumnType("pmel_id", Long.class, null, null),
+        		new LazyColumnType("pmel_line", Long.class, "Ligne", Align.RIGHT),
+        		new LazyColumnType("numrss", String.class, "Rss", Align.LEFT),
+        		new LazyColumnType("numlocalsejour", String.class, "Séjour", Align.LEFT),
+        		new LazyColumnType("numrum", String.class, "Rum", Align.LEFT),
+        		new LazyColumnType("numunitemedicale", String.class, "Unité", Align.LEFT),
+        		new LazyColumnType("ghm", String.class, "GHM", Align.CENTER),
+        		new LazyColumnType("ghmcorrige", String.class, "GHM corrigé", Align.CENTER),
+        		new LazyColumnType("dp", String.class, "DP", Align.CENTER),
+        		new LazyColumnType("dr", String.class, "DR", Align.CENTER),
+        		new LazyColumnType("nbseances", String.class, "Séances", Align.RIGHT),
+        		new LazyColumnType("formatteddateentree", String.class, "Prestations", Align.RIGHT),
+        		new LazyColumnType("formatteddatesortie", String.class, "Liquidation", Align.RIGHT)
+        };
+
+        final Table table = new LazyTable(cols, Locale.FRANCE, datasContainer);
+
+        table.setSelectable(true);
+        table.setSizeFull();
+        table.setCaption("Séjours");
+
+        return table;
+	}
+
 	private Table createFactTable(final Type type, final UploadedPmsi model) {
-        // RSFB CONTAINER
+        // RSFA CONTAINER
         LazyQueryContainer datasContainer = new LazyQueryContainer(
         		new LazyQueryDefinition(false, 1000, "pmel_id"),
         		new FacturesQueryFactory(model.recordid));

@@ -9,6 +9,7 @@ import com.github.aiderpmsi.pimsdriver.dto.UploadedPmsiDTO;
 import com.github.aiderpmsi.pimsdriver.dto.model.BaseRsfA;
 import com.github.aiderpmsi.pimsdriver.dto.model.BaseRsfB;
 import com.github.aiderpmsi.pimsdriver.dto.model.BaseRsfC;
+import com.github.aiderpmsi.pimsdriver.dto.model.BaseRssMain;
 import com.github.aiderpmsi.pimsdriver.dto.model.UploadedPmsi;
 import com.vaadin.data.Container.Filter;
 import com.vaadin.data.util.sqlcontainer.query.OrderBy;
@@ -143,6 +144,33 @@ public class NavigationActions extends DbAction {
 			public Integer execute(Connection con) throws SQLException {
 				try(NavigationDTO nad = new NavigationDTO(con)) {
 					return (int) nad.readRsfCSize(filters);
+				}
+			}
+		});
+
+	}
+
+	public List<BaseRssMain> getRssMainList(final List<Filter> filters, final List<OrderBy> orders,
+			final Integer first, final Integer rows) throws ActionException {
+
+		return execute(new DbExecution<List<BaseRssMain>>() {
+			@Override
+			public List<BaseRssMain> execute(Connection con) throws SQLException {
+				try(NavigationDTO nad = new NavigationDTO(con)) {
+					return nad.readRssMainList(filters, orders, first, rows);
+				}
+			}
+		});
+
+	}
+
+	public int getRssMainSize(final List<Filter> filters) throws ActionException {
+
+		return execute(new DbExecution<Integer>() {
+			@Override
+			public Integer execute(Connection con) throws SQLException {
+				try(NavigationDTO nad = new NavigationDTO(con)) {
+					return (int) nad.readRssMainSize(filters);
 				}
 			}
 		});

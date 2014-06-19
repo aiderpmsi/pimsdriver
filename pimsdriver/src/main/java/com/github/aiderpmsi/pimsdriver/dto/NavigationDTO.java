@@ -512,7 +512,7 @@ public class NavigationDTO extends AutoCloseableDto<NavigationDTO.Navigation> {
 
 		// IN THIS QUERY, IT IS NOT POSSIBLE TO STORE THE QUERY (CAN CHANGE AT EVERY CALL)
 		StringBuilder query = new StringBuilder(
-				"SELECT smva.pmel_id, smva.pmel_position, smva.pmel_line, trim(smva.numcmd) || trim(smva.numghm) ghm, "
+				"SELECT smva.pmel_id, smva.pmel_position, smva.pmel_line, trim(smva.numrss) numrss, trim(smva.numcmd) || trim(smva.numghm) ghm, "
 				+ "pmgr.pmgr_racine || pmgr.pmgr_modalite || pmgr.pmgr_gravite || pmgr.pmgr_erreur ghmcorrige, "
 				+ "trim(smva.numlocalsejour) numlocalsejour, trim(smva.numrum) numrum, "
 				+ "trim(smva.numunitemedicale) numunitemedicale, cast_to_date(smva.dateentree, NULL) dateentree, "
@@ -557,22 +557,50 @@ public class NavigationDTO extends AutoCloseableDto<NavigationDTO.Navigation> {
 					rssMain.pmel_id = rs.getLong(1);
 					rssMain.pmel_position = rs.getLong(2);
 					rssMain.pmel_line = rs.getLong(3);
-					rssMain.ghm = rs.getString(4);
-					rssMain.ghmcorrige = rs.getString(5);
-					rssMain.numlocalsejour = rs.getString(6);
-					rssMain.numrum = rs.getString(7);
-					rssMain.numunitemedicale = rs.getString(8);
-					rssMain.dateentree = rs.getDate(9);
-					rssMain.datesortie = rs.getDate(10);
-					rssMain.nbseances = rs.getInt(11);
-					rssMain.dp = rs.getString(12);
-					rssMain.dr = rs.getString(13);
+					rssMain.numrss = rs.getString(4);
+					rssMain.ghm = rs.getString(5);
+					rssMain.ghmcorrige = rs.getString(6);
+					rssMain.numlocalsejour = rs.getString(7);
+					rssMain.numrum = rs.getString(8);
+					rssMain.numunitemedicale = rs.getString(9);
+					rssMain.dateentree = rs.getDate(10);
+					rssMain.datesortie = rs.getDate(11);
+					rssMain.nbseances = rs.getInt(12);
+					rssMain.dp = rs.getString(13);
+					rssMain.dr = rs.getString(14);
 
 				}
 				return rssmains;
 			}
 		}
 	}
+
+	public long readRssMainSize(List<Filter> filters) throws SQLException {
+		// IN THIS QUERY, IT IS NOT POSSIBLE TO STORE THE QUERY (CAN CHANGE AT EVERY CALL)
+		StringBuilder query = new StringBuilder(
+				"SELECT COUNT(*) FROM smva_rssmain_116_view");
+		
+		// PREPARES THE LIST OF ARGUMENTS FOR THIS QUERY
+		List<Object> queryArgs = new ArrayList<>();
+		// CREATES THE FILTERS, THE ORDERS AND FILLS THE ARGUMENTS
+		query.append(DBQueryBuilder.getWhereStringForFilters(filters, queryArgs));
+		
+		// CREATE THE DB STATEMENT
+		try (PreparedStatement ps = con.prepareStatement(query.toString())) {
+			for (int i = 0 ; i < queryArgs.size() ; i++) {
+				ps.setObject(i + 1, queryArgs.get(i));
+			}
+
+			// EXECUTE QUERY
+			try (ResultSet rs = ps.executeQuery()) {
+
+				// RESULT
+				rs.next();
+				return rs.getLong(1);
+			}
+		}
+	}
+	
 	
 	public String pmsiSource(long pmel_root, long pmel_position) throws SQLException {
 		// GETS THE PREPARED STATEMENT

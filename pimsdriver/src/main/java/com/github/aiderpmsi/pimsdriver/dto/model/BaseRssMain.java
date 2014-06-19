@@ -15,6 +15,8 @@ public class BaseRssMain {
 	
 	public Long pmel_line;
 	
+	public String numrss;
+	
 	public String numlocalsejour;
 	
 	public String numrum;
@@ -57,6 +59,14 @@ public class BaseRssMain {
 
 	public void setPmel_line(Long pmel_line) {
 		this.pmel_line = pmel_line;
+	}
+
+	public String getNumrss() {
+		return numrss;
+	}
+
+	public void setNumrss(String numrss) {
+		this.numrss = numrss;
 	}
 
 	public String getNumlocalsejour() {
