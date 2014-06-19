@@ -51,11 +51,21 @@ public class PmsiSelectedHandler implements Action.Handler {
 					UI.getCurrent().addWindow(wProcess);
 				} else if (action.equals(ACTION_SOURCE)) {
 					// SHOWS FACT DETAILS
-					final Window wProcess = new PmsiSourceWindow(pmel_root, pmel_position, numfacture);
+					final Window wProcess = new PmsiSourceWindow(pmel_root, pmel_position, type, numfacture);
 					UI.getCurrent().addWindow(wProcess);
 				}
 				break;
 			case sejours:
+				String numrum = (String) lzq.getContainerProperty(target, "numrum").getValue();
+				if (action.equals(ACTION_DETAILS)) {
+					// SHOWS FACT DETAILS
+					final Window wProcess = new PmsiDetailsWindow(pmel_root, pmel_position, type, numrum);
+					UI.getCurrent().addWindow(wProcess);
+				} else if (action.equals(ACTION_SOURCE)) {
+					// SHOWS FACT DETAILS
+					final Window wProcess = new PmsiSourceWindow(pmel_root, pmel_position, type, numrum);
+					UI.getCurrent().addWindow(wProcess);
+				}
 				break;
 			}
 		}

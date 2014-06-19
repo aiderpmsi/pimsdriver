@@ -90,6 +90,7 @@ public class PmsiContentPanel extends VerticalLayout {
 		switch (type) {
 		case sejours:
 			body.addComponent(createSejoursTable(type, model));
+			break;
 		case factures:
 			body.addComponent(createFactTable(type, model));
 			break;

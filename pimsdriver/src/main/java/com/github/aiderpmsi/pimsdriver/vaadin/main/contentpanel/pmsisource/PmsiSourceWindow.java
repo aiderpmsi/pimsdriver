@@ -2,6 +2,7 @@ package com.github.aiderpmsi.pimsdriver.vaadin.main.contentpanel.pmsisource;
 
 import com.github.aiderpmsi.pimsdriver.db.actions.ActionException;
 import com.github.aiderpmsi.pimsdriver.db.actions.NavigationActions;
+import com.github.aiderpmsi.pimsdriver.vaadin.main.NavSelectedEvent.Type;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.VerticalLayout;
@@ -12,9 +13,9 @@ public class PmsiSourceWindow extends Window {
 	/** Generated serial Id */
 	private static final long serialVersionUID = -7803472921198470202L;
 
-	public PmsiSourceWindow(Long pmel_root, Long pmel_position, String numfacture) {
+	public PmsiSourceWindow(Long pmel_root, Long pmel_position, Type type, String numpmsi) {
 		// TITLE
-		super("Facture numéro : " + numfacture);
+		super(type.getLabel() + " : " + numpmsi);
 
 		// SET VISUAL ASPECT
         setWidth("650px");
