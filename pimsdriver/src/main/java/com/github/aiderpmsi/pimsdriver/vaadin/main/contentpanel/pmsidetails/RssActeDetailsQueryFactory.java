@@ -74,7 +74,7 @@ public class RssActeDetailsQueryFactory implements QueryFactory {
 
 			@Override
 			public int size(List<Filter> Filters) throws ActionException {
-				return new NavigationActions().getRssDadSize(Filters);
+				return new NavigationActions().getRssActeSize(Filters);
 			}
 
 			@Override

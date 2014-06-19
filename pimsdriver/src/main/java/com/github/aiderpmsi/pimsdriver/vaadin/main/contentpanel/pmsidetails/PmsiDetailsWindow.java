@@ -54,6 +54,8 @@ public class PmsiDetailsWindow extends Window {
         case sejours:
         	Table das = getDA(pmel_root, pmel_position);
         	layout.addComponent(das);
+        	Table actes = getActe(pmel_root, pmel_position);
+        	layout.addComponent(actes);
         	Table dad = getDAD(pmel_root, pmel_position);
         	layout.addComponent(dad);
         	break;

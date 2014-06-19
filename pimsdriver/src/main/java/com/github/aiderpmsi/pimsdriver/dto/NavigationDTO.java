@@ -768,7 +768,7 @@ public class NavigationDTO extends AutoCloseableDto<NavigationDTO.Navigation> {
 		StringBuilder query = new StringBuilder(
 				"SELECT pmel_id, pmel_position, pmel_line, cast_to_date(daterealisation, NULL) daterealisation, "
 				+ "trim(codeccam) codeccam, trim(phase) phase, trim(activite) activite, cast_to_int(nbacte, NULL) nbacte "
-				+ "FROM sdda_rssdad_116_view");
+				+ "FROM sava_rssacte_116_view");
 		
 		// PREPARES THE LIST OF ARGUMENTS FOR THIS QUERY
 		List<Object> queryArgs = new ArrayList<>();
@@ -819,7 +819,7 @@ public class NavigationDTO extends AutoCloseableDto<NavigationDTO.Navigation> {
 	public long readRssActeSize(List<Filter> filters) throws SQLException {
 		// IN THIS QUERY, IT IS NOT POSSIBLE TO STORE THE QUERY (CAN CHANGE AT EVERY CALL)
 		StringBuilder query = new StringBuilder(
-				"SELECT COUNT(*) FROM sdda_rssdad_116_view");
+				"SELECT COUNT(*) FROM sava_rssacte_116_view");
 		
 		// PREPARES THE LIST OF ARGUMENTS FOR THIS QUERY
 		List<Object> queryArgs = new ArrayList<>();

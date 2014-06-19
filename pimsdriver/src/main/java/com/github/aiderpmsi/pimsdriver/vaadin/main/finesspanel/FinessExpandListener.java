@@ -142,7 +142,7 @@ public class FinessExpandListener implements Tree.ExpandListener {
 		
 		// CREATE THE QUERY ORDER BY
 		List<OrderBy> orderBys = new ArrayList<>(1);
-		orderBys.add(new OrderBy("plud_dateenvoi", true));
+		orderBys.add(new OrderBy("plud_dateenvoi", false));
 
 		// LOAD THE ITEMS
 		List<UploadedPmsi> ups = new NavigationActions().getUploadedPmsi(filters, orderBys, null, null);
