@@ -116,8 +116,8 @@ public class PmsiContentPanel extends VerticalLayout {
         		new LazyColumnType("dp", String.class, "DP", Align.CENTER),
         		new LazyColumnType("dr", String.class, "DR", Align.CENTER),
         		new LazyColumnType("nbseances", String.class, "Séances", Align.RIGHT),
-        		new LazyColumnType("formatteddateentree", String.class, "Prestations", Align.RIGHT),
-        		new LazyColumnType("formatteddatesortie", String.class, "Liquidation", Align.RIGHT)
+        		new LazyColumnType("formatteddateentree", String.class, "Entrée", Align.CENTER),
+        		new LazyColumnType("formatteddatesortie", String.class, "Sortie", Align.CENTER)
         };
 
         final Table table = new LazyTable(cols, Locale.FRANCE, datasContainer);
@@ -125,6 +125,7 @@ public class PmsiContentPanel extends VerticalLayout {
         table.setSelectable(true);
         table.setSizeFull();
         table.setCaption("Séjours");
+        table.addActionHandler(new PmsiSelectedHandler(type, datasContainer, model.recordid));
 
         return table;
 	}
@@ -156,7 +157,7 @@ public class PmsiContentPanel extends VerticalLayout {
         table.setSelectable(true);
         table.setSizeFull();
         table.setCaption("Factures");
-        table.addActionHandler(new PmsiSelectedHandler(type, datasContainer));
+        table.addActionHandler(new PmsiSelectedHandler(type, datasContainer, model.recordid));
 
         // EXECUTE AN ACTION
         ActionEncloser.execute(new ActionEncloser.ActionExecuter() {

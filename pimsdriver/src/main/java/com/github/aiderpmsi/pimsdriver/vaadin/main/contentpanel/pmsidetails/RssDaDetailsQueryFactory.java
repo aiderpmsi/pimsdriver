@@ -1,4 +1,4 @@
-package com.github.aiderpmsi.pimsdriver.vaadin.main.contentpanel;
+package com.github.aiderpmsi.pimsdriver.vaadin.main.contentpanel.pmsidetails;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -13,42 +13,34 @@ import com.github.aiderpmsi.pimsdriver.db.vaadin.query.BaseQuery;
 import com.github.aiderpmsi.pimsdriver.db.vaadin.query.BaseQuery.BaseQueryInit;
 import com.github.aiderpmsi.pimsdriver.db.vaadin.query.DBQueryMapping;
 import com.github.aiderpmsi.pimsdriver.db.vaadin.query.Entry;
-import com.github.aiderpmsi.pimsdriver.dto.model.BaseRssMain;
+import com.github.aiderpmsi.pimsdriver.dto.model.BaseRssDa;
 import com.vaadin.data.Container.Filter;
 import com.vaadin.data.util.filter.Compare;
 import com.vaadin.data.util.sqlcontainer.query.OrderBy;
 
-public class SejoursQueryFactory implements QueryFactory {
+public class RssDaDetailsQueryFactory implements QueryFactory {
 	
 	private Object[][] mappings = new Object[][] {
-			{"pmel_id", "smva.pmel_id"},
-			{"pmel_root", "smva.pmel_root"},
-			{"pmel_position", "smva.pmel_position"},
-			{"pmel_line", "smva.pmel_line"},
-			{"numrss", "trim(smva.numrss)"},
-			{"ghm", "trim(smva.numcmd) || trim(smva.numghm)"},
-			{"ghmcorrige", "pmgr.pmgr_racine || pmgr.pmgr_modalite || pmgr.pmgr_gravite || pmgr.pmgr_erreur"},
-			{"numlocalsejour", "trim(smva.numlocalsejour)"},
-			{"numrum", "trim(smva.numrum)"},
-			{"numunitemedicale", "trim(smva.numunitemedicale)"},
-			{"formatteddateentree", "cast_to_date(smva.dateentree, NULL)"},
-			{"formatteddatesortie", "cast_to_date(smva.datesortie, NULL)"},
-			{"nbseances", "cast_to_int(smva.nbseances, NULL)"},
-			{"dp", "trim(smva.dp)"},
-			{"dr", "trim(smva.dr)"}
+			{"pmel_id", "pmel_id"},
+			{"pmel_root", "pmel_root"},
+			{"pmel_parent", "pmel_parent"},
+			{"pmel_position", "pmel_position"},
+			{"pmel_line", "pmel_line"},
+			{"da", "trim(da)"}
 	};
 
-	private BaseQueryInit<BaseRssMain> bqi;
+	private BaseQueryInit<BaseRssDa> bqi;
 	
 	private DBQueryMapping mapping;
 	
-	public SejoursQueryFactory(final Long pmel_root) {
+	public RssDaDetailsQueryFactory(final Long pmel_root, final Long pmel_position) {
 		// CREATES THE QUERY INITIALIZER
-		bqi = new BaseQueryInit<BaseRssMain>() {
+		bqi = new BaseQueryInit<BaseRssDa>() {
 
 			@Override
 			public void initFilters(List<Filter> filters) {
 				filters.add(new Compare.Equal("pmel_root", pmel_root));
+				filters.add(new Compare.Equal("pmel_parent", pmel_position));
 			}
 
 			@Override
@@ -60,30 +52,30 @@ public class SejoursQueryFactory implements QueryFactory {
 			}
 
 			@Override
-			public BaseRssMain constructBean() {
-				return new BaseRssMain();
+			public BaseRssDa constructBean() {
+				return new BaseRssDa();
 			}
 
 			@Override
-			public List<BaseRssMain> loadBeans(List<Filter> filters,
+			public List<BaseRssDa> loadBeans(List<Filter> filters,
 					List<OrderBy> orderBys, int startIndex, int count)
 					throws ActionException {
-					return new NavigationActions().getRssMainList(filters, orderBys, startIndex, count);
+					return new NavigationActions().getRssDaList(filters, orderBys, startIndex, count);
 			}
 
 			@Override
 			public String loadBeansError(Exception e) {
-				return "Erreur de lecture de la liste des séjours";
+				return "Erreur de lecture de la liste des factures B";
 			}
 
 			@Override
 			public int size(List<Filter> Filters) throws ActionException {
-				return new NavigationActions().getRssMainSize(Filters);
+				return new NavigationActions().getRssDaSize(Filters);
 			}
 
 			@Override
 			public String sizeError(Exception e) {
-				return "Erreur de lecture de la liste des séjours";
+				return "Erreur de lecture de la liste des factures B";
 			}
 		};
 		

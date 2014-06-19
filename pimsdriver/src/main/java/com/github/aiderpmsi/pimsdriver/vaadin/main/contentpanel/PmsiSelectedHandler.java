@@ -22,9 +22,12 @@ public class PmsiSelectedHandler implements Action.Handler {
 	
 	private Type type;
 	
-	public PmsiSelectedHandler(Type type, LazyQueryContainer lzq) {
+	private Long pmel_root;
+	
+	public PmsiSelectedHandler(Type type, LazyQueryContainer lzq, Long pmel_root) {
 		this.lzq = lzq;
 		this.type = type;
+		this.pmel_root = pmel_root;
 	}
 	
 	public Action[] getActions(Object target, Object sender) {
@@ -37,8 +40,7 @@ public class PmsiSelectedHandler implements Action.Handler {
 	}
 	
 	public void handleAction(Action action, Object sender, Object target) {
-		// GETS THE ROOT ID AND POSITION ID
-		Long pmel_root = (Long) lzq.getContainerProperty(target, "pmel_root").getValue();
+		// GETS THE POSITION ID
 		Long pmel_position = (Long) lzq.getContainerProperty(target, "pmel_position").getValue();
 
 		if (target != null) {

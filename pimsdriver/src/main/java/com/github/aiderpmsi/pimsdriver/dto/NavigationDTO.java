@@ -12,6 +12,7 @@ import com.github.aiderpmsi.pimsdriver.db.vaadin.query.DBQueryBuilder;
 import com.github.aiderpmsi.pimsdriver.dto.model.BaseRsfA;
 import com.github.aiderpmsi.pimsdriver.dto.model.BaseRsfB;
 import com.github.aiderpmsi.pimsdriver.dto.model.BaseRsfC;
+import com.github.aiderpmsi.pimsdriver.dto.model.BaseRssDa;
 import com.github.aiderpmsi.pimsdriver.dto.model.BaseRssMain;
 import com.github.aiderpmsi.pimsdriver.dto.model.UploadedPmsi;
 import com.vaadin.data.Container.Filter;
@@ -568,7 +569,8 @@ public class NavigationDTO extends AutoCloseableDto<NavigationDTO.Navigation> {
 					rssMain.nbseances = rs.getInt(12);
 					rssMain.dp = rs.getString(13);
 					rssMain.dr = rs.getString(14);
-
+					
+					rssmains.add(rssMain);
 				}
 				return rssmains;
 			}
@@ -578,7 +580,10 @@ public class NavigationDTO extends AutoCloseableDto<NavigationDTO.Navigation> {
 	public long readRssMainSize(List<Filter> filters) throws SQLException {
 		// IN THIS QUERY, IT IS NOT POSSIBLE TO STORE THE QUERY (CAN CHANGE AT EVERY CALL)
 		StringBuilder query = new StringBuilder(
-				"SELECT COUNT(*) FROM smva_rssmain_116_view");
+				"SELECT COUNT(*) FROM smva_rssmain_116_view smva "
+						+ "JOIN pmgr_pmsigroups pmgr ON "
+						+ "smva.pmel_root = pmgr.pmel_root "
+						+ "AND smva.pmel_id = pmgr.pmel_id ");
 		
 		// PREPARES THE LIST OF ARGUMENTS FOR THIS QUERY
 		List<Object> queryArgs = new ArrayList<>();
@@ -601,6 +606,81 @@ public class NavigationDTO extends AutoCloseableDto<NavigationDTO.Navigation> {
 		}
 	}
 	
+	public List<BaseRssDa> readRssDaList (List<Filter> filters, List<OrderBy> orders,
+			Integer first, Integer rows) throws SQLException {
+
+		// IN THIS QUERY, IT IS NOT POSSIBLE TO STORE THE QUERY (CAN CHANGE AT EVERY CALL)
+		StringBuilder query = new StringBuilder(
+				"SELECT pmel_id, pmel_position, pmel_line, trim(da) "
+				+ "FROM sdva_rssda_116_view");
+		
+		// PREPARES THE LIST OF ARGUMENTS FOR THIS QUERY
+		List<Object> queryArgs = new ArrayList<>();
+		// CREATES THE FILTERS, THE ORDERS AND FILLS THE ARGUMENTS
+		query.append(DBQueryBuilder.getWhereStringForFilters(filters, queryArgs)).
+			append(DBQueryBuilder.getOrderStringForOrderBys(orders, queryArgs));
+		// OFFSET AND LIMIT
+		if (first != null)
+			query.append(" OFFSET ").append(first.toString()).append(" ");
+		if (rows != null && rows != 0)
+			query.append(" LIMIT ").append(rows.toString()).append(" ");
+		
+		// CREATES THE DB STATEMENT
+		try (PreparedStatement ps = con.prepareStatement(query.toString())) {
+
+			for (int i = 0 ; i < queryArgs.size() ; i++) {
+				ps.setObject(i + 1, queryArgs.get(i));
+			}
+
+			// EXECUTES THE QUERY
+			try (ResultSet rs = ps.executeQuery()) {
+		
+				// LIST OF ELEMENTS
+				List<BaseRssDa> rssdas = new ArrayList<>();
+			
+				// FILLS THE LIST OF ELEMENTS
+				while (rs.next()) {
+					// BEAN FOR THIS ITEM
+					BaseRssDa rssda = new BaseRssDa();
+
+					// FILLS THE BEAN
+					rssda.pmel_id = rs.getLong(1);
+					rssda.pmel_position = rs.getLong(2);
+					rssda.pmel_line = rs.getLong(3);
+					rssda.da = rs.getString(4);
+					
+					rssdas.add(rssda);
+				}
+				return rssdas;
+			}
+		}
+	}
+
+	public long readRssDaSize(List<Filter> filters) throws SQLException {
+		// IN THIS QUERY, IT IS NOT POSSIBLE TO STORE THE QUERY (CAN CHANGE AT EVERY CALL)
+		StringBuilder query = new StringBuilder(
+				"SELECT COUNT(*) FROM sdva_rssda_116_view");
+		
+		// PREPARES THE LIST OF ARGUMENTS FOR THIS QUERY
+		List<Object> queryArgs = new ArrayList<>();
+		// CREATES THE FILTERS, THE ORDERS AND FILLS THE ARGUMENTS
+		query.append(DBQueryBuilder.getWhereStringForFilters(filters, queryArgs));
+		
+		// CREATE THE DB STATEMENT
+		try (PreparedStatement ps = con.prepareStatement(query.toString())) {
+			for (int i = 0 ; i < queryArgs.size() ; i++) {
+				ps.setObject(i + 1, queryArgs.get(i));
+			}
+
+			// EXECUTE QUERY
+			try (ResultSet rs = ps.executeQuery()) {
+
+				// RESULT
+				rs.next();
+				return rs.getLong(1);
+			}
+		}
+	}
 	
 	public String pmsiSource(long pmel_root, long pmel_position) throws SQLException {
 		// GETS THE PREPARED STATEMENT

@@ -56,6 +56,29 @@ public class PmsiDetailsWindow extends Window {
         }
 	}
 
+	public Table getDA(final Long pmel_root, final Long pmel_position) {
+        // RSFB CONTAINER
+        LazyQueryContainer datasContainer = new LazyQueryContainer(
+        		new LazyQueryDefinition(false, 1000, "pmel_id"),
+        		new RssDaDetailsQueryFactory(pmel_root, pmel_position));
+
+        // COLUMNS DEFINITIONS
+        LazyColumnType[] cols = new LazyColumnType[] {
+        		new LazyColumnType("pmel_id", Long.class, null, null),
+        		new LazyColumnType("pmel_line", Long.class, "Ligne", Align.RIGHT),
+        		new LazyColumnType("da", String.class, "Diagnostic", Align.CENTER)
+        };
+
+        final Table table = new LazyTable(cols, Locale.FRANCE, datasContainer);
+
+        table.setSelectable(true);
+        table.setPageLength(4);
+        table.setWidth("100%");
+        table.setCaption("Diagnostics associés significatifs");
+        
+        return table;
+	}
+	
 	public Table getRsfBTable(final Long pmel_root, final Long pmel_position) {
         // RSFB CONTAINER
         LazyQueryContainer datasContainer = new LazyQueryContainer(
