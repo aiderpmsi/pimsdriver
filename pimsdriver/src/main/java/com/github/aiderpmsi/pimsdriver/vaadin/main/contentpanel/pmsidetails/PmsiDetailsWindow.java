@@ -52,8 +52,39 @@ public class PmsiDetailsWindow extends Window {
         	layout.addComponent(rsfC);
         	break;
         case sejours:
+        	Table das = getDA(pmel_root, pmel_position);
+        	layout.addComponent(das);
+        	Table dad = getDAD(pmel_root, pmel_position);
+        	layout.addComponent(dad);
         	break;
         }
+	}
+
+	public Table getActe(final Long pmel_root, final Long pmel_position) {
+        // RSFB CONTAINER
+        LazyQueryContainer datasContainer = new LazyQueryContainer(
+        		new LazyQueryDefinition(false, 1000, "pmel_id"),
+        		new RssActeDetailsQueryFactory(pmel_root, pmel_position));
+
+        // COLUMNS DEFINITIONS
+        LazyColumnType[] cols = new LazyColumnType[] {
+        		new LazyColumnType("pmel_id", Long.class, null, null),
+        		new LazyColumnType("pmel_line", Long.class, "Ligne", Align.RIGHT),
+        		new LazyColumnType("codeccam", String.class, "Acte", Align.CENTER),
+        		new LazyColumnType("formatteddaterealisation", String.class, "Date", Align.CENTER),
+        		new LazyColumnType("phase", String.class, "Phase", Align.CENTER),
+        		new LazyColumnType("activite", String.class, "Activité", Align.CENTER),
+        		new LazyColumnType("nbacte", String.class, "Nombre", Align.RIGHT)
+        };
+
+        final Table table = new LazyTable(cols, Locale.FRANCE, datasContainer);
+
+        table.setSelectable(true);
+        table.setPageLength(4);
+        table.setWidth("100%");
+        table.setCaption("Actes");
+        
+        return table;
 	}
 
 	public Table getDA(final Long pmel_root, final Long pmel_position) {
@@ -79,6 +110,29 @@ public class PmsiDetailsWindow extends Window {
         return table;
 	}
 	
+	public Table getDAD(final Long pmel_root, final Long pmel_position) {
+        // RSFB CONTAINER
+        LazyQueryContainer datasContainer = new LazyQueryContainer(
+        		new LazyQueryDefinition(false, 1000, "pmel_id"),
+        		new RssDadDetailsQueryFactory(pmel_root, pmel_position));
+
+        // COLUMNS DEFINITIONS
+        LazyColumnType[] cols = new LazyColumnType[] {
+        		new LazyColumnType("pmel_id", Long.class, null, null),
+        		new LazyColumnType("pmel_line", Long.class, "Ligne", Align.RIGHT),
+        		new LazyColumnType("dad", String.class, "Diagnostic", Align.CENTER)
+        };
+
+        final Table table = new LazyTable(cols, Locale.FRANCE, datasContainer);
+
+        table.setSelectable(true);
+        table.setPageLength(4);
+        table.setWidth("100%");
+        table.setCaption("Diagnostics associés documentaires");
+        
+        return table;
+	}
+
 	public Table getRsfBTable(final Long pmel_root, final Long pmel_position) {
         // RSFB CONTAINER
         LazyQueryContainer datasContainer = new LazyQueryContainer(

@@ -9,7 +9,9 @@ import com.github.aiderpmsi.pimsdriver.dto.UploadedPmsiDTO;
 import com.github.aiderpmsi.pimsdriver.dto.model.BaseRsfA;
 import com.github.aiderpmsi.pimsdriver.dto.model.BaseRsfB;
 import com.github.aiderpmsi.pimsdriver.dto.model.BaseRsfC;
+import com.github.aiderpmsi.pimsdriver.dto.model.BaseRssActe;
 import com.github.aiderpmsi.pimsdriver.dto.model.BaseRssDa;
+import com.github.aiderpmsi.pimsdriver.dto.model.BaseRssDad;
 import com.github.aiderpmsi.pimsdriver.dto.model.BaseRssMain;
 import com.github.aiderpmsi.pimsdriver.dto.model.UploadedPmsi;
 import com.vaadin.data.Container.Filter;
@@ -199,6 +201,60 @@ public class NavigationActions extends DbAction {
 			public Integer execute(Connection con) throws SQLException {
 				try(NavigationDTO nad = new NavigationDTO(con)) {
 					return (int) nad.readRssDaSize(filters);
+				}
+			}
+		});
+
+	}
+
+	public List<BaseRssDad> getRssDadList(final List<Filter> filters, final List<OrderBy> orders,
+			final Integer first, final Integer rows) throws ActionException {
+
+		return execute(new DbExecution<List<BaseRssDad>>() {
+			@Override
+			public List<BaseRssDad> execute(Connection con) throws SQLException {
+				try(NavigationDTO nad = new NavigationDTO(con)) {
+					return nad.readRssDadList(filters, orders, first, rows);
+				}
+			}
+		});
+
+	}
+
+	public int getRssDadSize(final List<Filter> filters) throws ActionException {
+
+		return execute(new DbExecution<Integer>() {
+			@Override
+			public Integer execute(Connection con) throws SQLException {
+				try(NavigationDTO nad = new NavigationDTO(con)) {
+					return (int) nad.readRssDadSize(filters);
+				}
+			}
+		});
+
+	}
+
+	public List<BaseRssActe> getRssActeList(final List<Filter> filters, final List<OrderBy> orders,
+			final Integer first, final Integer rows) throws ActionException {
+
+		return execute(new DbExecution<List<BaseRssActe>>() {
+			@Override
+			public List<BaseRssActe> execute(Connection con) throws SQLException {
+				try(NavigationDTO nad = new NavigationDTO(con)) {
+					return nad.readRssActeList(filters, orders, first, rows);
+				}
+			}
+		});
+
+	}
+
+	public int getRssActeSize(final List<Filter> filters) throws ActionException {
+
+		return execute(new DbExecution<Integer>() {
+			@Override
+			public Integer execute(Connection con) throws SQLException {
+				try(NavigationDTO nad = new NavigationDTO(con)) {
+					return (int) nad.readRssActeSize(filters);
 				}
 			}
 		});

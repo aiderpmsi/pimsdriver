@@ -12,7 +12,9 @@ import com.github.aiderpmsi.pimsdriver.db.vaadin.query.DBQueryBuilder;
 import com.github.aiderpmsi.pimsdriver.dto.model.BaseRsfA;
 import com.github.aiderpmsi.pimsdriver.dto.model.BaseRsfB;
 import com.github.aiderpmsi.pimsdriver.dto.model.BaseRsfC;
+import com.github.aiderpmsi.pimsdriver.dto.model.BaseRssActe;
 import com.github.aiderpmsi.pimsdriver.dto.model.BaseRssDa;
+import com.github.aiderpmsi.pimsdriver.dto.model.BaseRssDad;
 import com.github.aiderpmsi.pimsdriver.dto.model.BaseRssMain;
 import com.github.aiderpmsi.pimsdriver.dto.model.UploadedPmsi;
 import com.vaadin.data.Container.Filter;
@@ -660,6 +662,164 @@ public class NavigationDTO extends AutoCloseableDto<NavigationDTO.Navigation> {
 		// IN THIS QUERY, IT IS NOT POSSIBLE TO STORE THE QUERY (CAN CHANGE AT EVERY CALL)
 		StringBuilder query = new StringBuilder(
 				"SELECT COUNT(*) FROM sdva_rssda_116_view");
+		
+		// PREPARES THE LIST OF ARGUMENTS FOR THIS QUERY
+		List<Object> queryArgs = new ArrayList<>();
+		// CREATES THE FILTERS, THE ORDERS AND FILLS THE ARGUMENTS
+		query.append(DBQueryBuilder.getWhereStringForFilters(filters, queryArgs));
+		
+		// CREATE THE DB STATEMENT
+		try (PreparedStatement ps = con.prepareStatement(query.toString())) {
+			for (int i = 0 ; i < queryArgs.size() ; i++) {
+				ps.setObject(i + 1, queryArgs.get(i));
+			}
+
+			// EXECUTE QUERY
+			try (ResultSet rs = ps.executeQuery()) {
+
+				// RESULT
+				rs.next();
+				return rs.getLong(1);
+			}
+		}
+	}
+	
+	public List<BaseRssDad> readRssDadList (List<Filter> filters, List<OrderBy> orders,
+			Integer first, Integer rows) throws SQLException {
+
+		// IN THIS QUERY, IT IS NOT POSSIBLE TO STORE THE QUERY (CAN CHANGE AT EVERY CALL)
+		StringBuilder query = new StringBuilder(
+				"SELECT pmel_id, pmel_position, pmel_line, trim(dad) "
+				+ "FROM sdda_rssdad_116_view");
+		
+		// PREPARES THE LIST OF ARGUMENTS FOR THIS QUERY
+		List<Object> queryArgs = new ArrayList<>();
+		// CREATES THE FILTERS, THE ORDERS AND FILLS THE ARGUMENTS
+		query.append(DBQueryBuilder.getWhereStringForFilters(filters, queryArgs)).
+			append(DBQueryBuilder.getOrderStringForOrderBys(orders, queryArgs));
+		// OFFSET AND LIMIT
+		if (first != null)
+			query.append(" OFFSET ").append(first.toString()).append(" ");
+		if (rows != null && rows != 0)
+			query.append(" LIMIT ").append(rows.toString()).append(" ");
+		
+		// CREATES THE DB STATEMENT
+		try (PreparedStatement ps = con.prepareStatement(query.toString())) {
+
+			for (int i = 0 ; i < queryArgs.size() ; i++) {
+				ps.setObject(i + 1, queryArgs.get(i));
+			}
+
+			// EXECUTES THE QUERY
+			try (ResultSet rs = ps.executeQuery()) {
+		
+				// LIST OF ELEMENTS
+				List<BaseRssDad> rssdads = new ArrayList<>();
+			
+				// FILLS THE LIST OF ELEMENTS
+				while (rs.next()) {
+					// BEAN FOR THIS ITEM
+					BaseRssDad rssdad = new BaseRssDad();
+
+					// FILLS THE BEAN
+					rssdad.pmel_id = rs.getLong(1);
+					rssdad.pmel_position = rs.getLong(2);
+					rssdad.pmel_line = rs.getLong(3);
+					rssdad.dad = rs.getString(4);
+					
+					rssdads.add(rssdad);
+				}
+				return rssdads;
+			}
+		}
+	}
+
+	public long readRssDadSize(List<Filter> filters) throws SQLException {
+		// IN THIS QUERY, IT IS NOT POSSIBLE TO STORE THE QUERY (CAN CHANGE AT EVERY CALL)
+		StringBuilder query = new StringBuilder(
+				"SELECT COUNT(*) FROM sdda_rssdad_116_view");
+		
+		// PREPARES THE LIST OF ARGUMENTS FOR THIS QUERY
+		List<Object> queryArgs = new ArrayList<>();
+		// CREATES THE FILTERS, THE ORDERS AND FILLS THE ARGUMENTS
+		query.append(DBQueryBuilder.getWhereStringForFilters(filters, queryArgs));
+		
+		// CREATE THE DB STATEMENT
+		try (PreparedStatement ps = con.prepareStatement(query.toString())) {
+			for (int i = 0 ; i < queryArgs.size() ; i++) {
+				ps.setObject(i + 1, queryArgs.get(i));
+			}
+
+			// EXECUTE QUERY
+			try (ResultSet rs = ps.executeQuery()) {
+
+				// RESULT
+				rs.next();
+				return rs.getLong(1);
+			}
+		}
+	}
+
+	
+	public List<BaseRssActe> readRssActeList (List<Filter> filters, List<OrderBy> orders,
+			Integer first, Integer rows) throws SQLException {
+
+		// IN THIS QUERY, IT IS NOT POSSIBLE TO STORE THE QUERY (CAN CHANGE AT EVERY CALL)
+		StringBuilder query = new StringBuilder(
+				"SELECT pmel_id, pmel_position, pmel_line, cast_to_date(daterealisation, NULL) daterealisation, "
+				+ "trim(codeccam) codeccam, trim(phase) phase, trim(activite) activite, cast_to_int(nbacte, NULL) nbacte "
+				+ "FROM sdda_rssdad_116_view");
+		
+		// PREPARES THE LIST OF ARGUMENTS FOR THIS QUERY
+		List<Object> queryArgs = new ArrayList<>();
+		// CREATES THE FILTERS, THE ORDERS AND FILLS THE ARGUMENTS
+		query.append(DBQueryBuilder.getWhereStringForFilters(filters, queryArgs)).
+			append(DBQueryBuilder.getOrderStringForOrderBys(orders, queryArgs));
+		// OFFSET AND LIMIT
+		if (first != null)
+			query.append(" OFFSET ").append(first.toString()).append(" ");
+		if (rows != null && rows != 0)
+			query.append(" LIMIT ").append(rows.toString()).append(" ");
+		
+		// CREATES THE DB STATEMENT
+		try (PreparedStatement ps = con.prepareStatement(query.toString())) {
+
+			for (int i = 0 ; i < queryArgs.size() ; i++) {
+				ps.setObject(i + 1, queryArgs.get(i));
+			}
+
+			// EXECUTES THE QUERY
+			try (ResultSet rs = ps.executeQuery()) {
+		
+				// LIST OF ELEMENTS
+				List<BaseRssActe> rssactes = new ArrayList<>();
+			
+				// FILLS THE LIST OF ELEMENTS
+				while (rs.next()) {
+					// BEAN FOR THIS ITEM
+					BaseRssActe rssacte = new BaseRssActe();
+
+					// FILLS THE BEAN
+					rssacte.pmel_id = rs.getLong(1);
+					rssacte.pmel_position = rs.getLong(2);
+					rssacte.pmel_line = rs.getLong(3);
+					rssacte.daterealisation = rs.getDate(4);
+					rssacte.codeccam = rs.getString(5);
+					rssacte.phase = rs.getString(6);
+					rssacte.activite = rs.getString(7);
+					rssacte.nbacte = rs.getInt(8);
+					
+					rssactes.add(rssacte);
+				}
+				return rssactes;
+			}
+		}
+	}
+
+	public long readRssActeSize(List<Filter> filters) throws SQLException {
+		// IN THIS QUERY, IT IS NOT POSSIBLE TO STORE THE QUERY (CAN CHANGE AT EVERY CALL)
+		StringBuilder query = new StringBuilder(
+				"SELECT COUNT(*) FROM sdda_rssdad_116_view");
 		
 		// PREPARES THE LIST OF ARGUMENTS FOR THIS QUERY
 		List<Object> queryArgs = new ArrayList<>();
