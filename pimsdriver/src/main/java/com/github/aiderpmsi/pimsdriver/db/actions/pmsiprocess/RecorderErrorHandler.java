@@ -1,56 +1,35 @@
 package com.github.aiderpmsi.pimsdriver.db.actions.pmsiprocess;
 
+import java.io.IOException;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.xml.sax.ErrorHandler;
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
+import com.github.aiderpmsi.pims.parser.utils.Utils.ErrorHandler;
 
 public class RecorderErrorHandler implements ErrorHandler {
 
 	/**
-	 * List of recovered errors
+	 * List of encountered errors
 	 */
-	private List<SAXParseException> errors = new LinkedList<>();
-	
-	/**
-	 * List of warnings
-	 */
-	private List<SAXParseException> warnings = new LinkedList<>();
-	
-	private SAXParseException fatalError = null;
+	private List<Error> errors = new LinkedList<>();
 	
 	@Override
-	public void error(SAXParseException arg0) throws SAXException {
-		// RECOVERABLE ERROR, JUST SAVE
-		errors.add(arg0);
+	public void error(String msg, long line) throws IOException {
+		errors.add(new Error(msg, line));
 	}
-
-	@Override
-	public void fatalError(SAXParseException arg0) throws SAXException {
-		// UNRECOVERABLE ERROR, RETHROW
-		fatalError = arg0;
-		throw new SAXException(fatalError);
-	}
-
-	@Override
-	public void warning(SAXParseException arg0) throws SAXException {
-		// INFORMATION, JUST SAVE
-		warnings.add(arg0);
-	}
-
-	public List<SAXParseException> getErrors() {
+	
+	public Collection<Error> getErrors() {
 		return errors;
 	}
 
-	public List<SAXParseException> getWarnings() {
-		return warnings;
+	public class Error {
+		public String msg;
+		public long line;
+		public Error(String msg, long line) {
+			this.msg = msg;
+			this.line = line;
+		}
 	}
-
-	public SAXParseException getFatalError() {
-		return fatalError;
-	}
-
 	
 }

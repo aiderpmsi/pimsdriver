@@ -1,9 +1,11 @@
 package com.github.aiderpmsi.pimsdriver.db.actions.pmsiprocess;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 
-public class RsfDbLink extends DbLink {
+import com.github.aiderpmsi.pims.parser.linestypes.IPmsiLine;
+import com.github.aiderpmsi.pims.parser.linestypes.IPmsiLine.Element;
+
+public class RsfLineHandler extends PmsiLineHandler {
 
 	private boolean wasHeader = false;
 	
@@ -15,16 +17,21 @@ public class RsfDbLink extends DbLink {
 	
 	private Long currentParent = null;
 	
-	public RsfDbLink(Connection con, long pmel_root, long pmsiPosition) throws SQLException {
-		super(con, pmel_root, pmsiPosition);
+	private String finess = null;
+	
+	private String version = null;
+	
+	public RsfLineHandler(final long pmel_root, final long pmsiPosition) throws SQLException {
+		super(pmel_root, pmsiPosition);
 	}
+	
 	@Override
 	protected Long getParent() {
 		return currentParent;
 	}
 
 	@Override
-	protected void calculateParent(Entry entry) {
+	protected void calculateParent(IPmsiLine line) {
 		// IF LAST ELEMENT WAS RSFHEADER, USE ITS ID AS THE PARENT ID FOR EVERY ELEMENT
 		if (wasHeader)
 			rsfHeader = pmsiPosition - 1;
@@ -32,11 +39,18 @@ public class RsfDbLink extends DbLink {
 			rsfA = pmsiPosition - 1;
 			
 		// CHECKS IF THIS ELEMENT IS HEADER OR RSFA FOR NEXT ITERATION THROUGH CALCULATEPARENT
-		if (entry.pmel_type.equals("rsfheader")) {
+		if (line.getName().equals("rsfheader")) {
+			for (Element element : line.getElements()) {
+				if (element.getName().equals("finess")) {
+					finess = element.getElement().toString();
+					break;
+				}
+			}
+			version = line.getVersion();
 			wasHeader = true;
 			wasRsfA = false;
 			currentParent = null;
-		} else if (entry.pmel_type.equals("rsfa")) {
+		} else if (line.getName().equals("rsfa")) {
 			wasHeader = false;
 			wasRsfA = true;
 			currentParent = rsfHeader;
@@ -47,11 +61,15 @@ public class RsfDbLink extends DbLink {
 		}
 
 	}
-	
+
 	@Override
-	protected CharSequence getRootType() {
-		return rootType;
+	public String getFiness() {
+		return finess;
 	}
 
-	private static final String rootType = "rsf";
+	@Override
+	public String getVersion() {
+		return version;
+	}
+	
 }

@@ -1,13 +1,13 @@
 package com.github.aiderpmsi.pimsdriver.dto;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
+import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
+import java.nio.file.StandardOpenOption;
 import java.sql.Array;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -15,15 +15,14 @@ import java.sql.SQLException;
 
 import org.apache.commons.dbcp2.DelegatingConnection;
 import org.postgresql.PGConnection;
+import org.postgresql.copy.CopyManager;
 import org.postgresql.largeobject.LargeObjectManager;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
 
-import com.github.aiderpmsi.pims.parser.utils.Parser;
-import com.github.aiderpmsi.pims.parser.utils.ParserFactory;
-import com.github.aiderpmsi.pimsdriver.db.actions.pmsiprocess.PmsiContentHandlerHelper;
+import com.github.aiderpmsi.pims.parser.utils.SimpleParser;
+import com.github.aiderpmsi.pims.parser.utils.SimpleParserFactory;
+import com.github.aiderpmsi.pimsdriver.db.actions.pmsiprocess.PmsiLineHandler;
 import com.github.aiderpmsi.pimsdriver.db.actions.pmsiprocess.RecorderErrorHandler;
+import com.github.aiderpmsi.pimsdriver.db.actions.pmsiprocess.RecorderErrorHandler.Error;
 import com.github.aiderpmsi.pimsdriver.dto.StatementProvider.Entry;
 import com.github.aiderpmsi.pimsdriver.dto.model.UploadedPmsi.Status;
 
@@ -151,7 +150,7 @@ public class ProcessorDTO extends AutoCloseableDto<ProcessorDTO.Query> {
 		ps.execute();
 	}
 
-	public void processPmsi(String type, PmsiContentHandlerHelper ch, ParserFactory pf, Long oid) throws SQLException {
+	public void processPmsi(String type, PmsiLineHandler lh, SimpleParserFactory pf, Long oid) throws SQLException {
 		Connection innerCon;
 		if(con instanceof DelegatingConnection
 				&& (innerCon = ((DelegatingConnection<?>) con).getInnermostDelegateInternal()) instanceof PGConnection) {
@@ -163,34 +162,45 @@ public class ProcessorDTO extends AutoCloseableDto<ProcessorDTO.Query> {
 				// CREATE THE TEMP FILE WHICH WILL BE DELETED AFTER TRY BLOCK
 				tmpPath = Files.createTempFile("", "");
 
-				// COPY PMSI IN TEMP FILE
-				try (InputStream dbFile = new BufferedInputStream(lom.open(oid).getInputStream())) {
-					Files.copy(dbFile, tmpPath, StandardCopyOption.REPLACE_EXISTING);
+				// TRANSFORMS PMSI TO A READY TO IMPORT POSTGRESQL FILE
+				try (
+						Reader dbFile = new InputStreamReader(lom.open(oid).getInputStream(), Charset.forName("UTF-8"));
+						Writer fsFile = Files.newBufferedWriter(tmpPath, Charset.forName("UTF-8"), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+						) {
+					// SETS THE WRITER THE LINE HANDLER WRITES IN
+					lh.setWriter(fsFile);
+
+					// PARSE AND STORE PMSI
+					RecorderErrorHandler eh = new RecorderErrorHandler();
+					SimpleParser parser = pf.newParser(type, lh, eh);
+					parser.parse(dbFile);
+
+					// THROW ERROR IF AN ERROR HAPPENED
+					if (eh.getErrors().size() != 0) {
+						IOException e = null;
+						int i = 0;
+						for (Error ex : eh.getErrors()) {
+							if (i++ == 0)
+								e = new IOException(ex.msg + " at line " + ex.line);
+							else
+								e.addSuppressed(new IOException(ex.msg + " at line " + ex.line));
+						}
+						throw e;
+					}
+					
 				}
 			
-				// PARSE AND STORE PMSI
-				RecorderErrorHandler eh = new RecorderErrorHandler();
-				Parser parser = pf.newParser(type);
-				parser.setContentHandler(ch);
-				parser.setErrorHandler(eh);
-				try (Reader tmpFile = Files.newBufferedReader(tmpPath, Charset.forName("ISO-8859-1"))) {
-					parser.parse(new InputSource(tmpFile));
-				}
-				
-				// THROW ERROR IF AN ERROR HAPPENED
-				if (eh.getErrors().size() != 0) {
-					SAXParseException e = null;
-					int i = 0;
-					for (SAXParseException ex : eh.getErrors()) {
-						if (i++ == 0)
-							e = ex;
-						else
-							e.addSuppressed(ex);
-					}
-					throw e;
+				try (Reader fsFile = Files.newBufferedReader(tmpPath, Charset.forName("UTF-8"))) {
+					// BULK IMPORT TO PGSQL
+					String query = "COPY pmel_temp (pmel_root, pmel_position, pmel_parent, pmel_type, pmel_line, pmel_content) "
+							+ "FROM STDIN WITH DELIMITER '|'";
+
+					Connection conn = ((DelegatingConnection<?>) con).getInnermostDelegateInternal();
+					CopyManager cm = new CopyManager((org.postgresql.core.BaseConnection)conn);
+					cm.copyIn(query, fsFile);
 				}
 
-			} catch (IOException | SAXException e) {
+			} catch (IOException e) {
 				throw new SQLException(e);
 			} finally {
 				// BE SURE TO DELETE TEMP PATH

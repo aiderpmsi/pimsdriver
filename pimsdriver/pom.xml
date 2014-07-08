@@ -111,8 +111,8 @@
 				<version>3.0</version>
 				<configuration>
 					<fork>true</fork>
-					<source>7</source>
-					<target>7</target>
+					<source>8</source>
+					<target>8</target>
 					<showWarnings>true</showWarnings>
 					<showDeprecation>true</showDeprecation>
 					<compilerArguments>
