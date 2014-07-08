@@ -10,6 +10,7 @@ import java.nio.file.StandardOpenOption;
 import java.sql.SQLException;
 
 import com.github.aiderpmsi.pims.parser.linestypes.ConfiguredPmsiLine;
+import com.github.aiderpmsi.pims.parser.linestypes.EndOfFilePmsiLine;
 import com.github.aiderpmsi.pims.parser.linestypes.IPmsiLine;
 import com.github.aiderpmsi.pims.parser.linestypes.LineNumberPmsiLine;
 import com.github.aiderpmsi.pims.parser.utils.Utils.LineHandler;
@@ -33,60 +34,72 @@ public abstract class PmsiLineHandler implements LineHandler, AutoCloseable {
 	/** Temp file where we will store the results of the handling */
 	private final Path tmpFile;
 	
+	/** Writer associated with this file */
+	private final Writer writer;
+
+	/** Indicates if the writer is closed */
+	private boolean writerClosed;
+	
 	public PmsiLineHandler(final long pmel_root, final long pmsiPosition) throws IOException {
 		this.pmel_root = pmel_root;
 		this.pmsiPosition = pmsiPosition;
 		this.tmpFile = Files.createTempFile("", "");
+		writer = Files.newBufferedWriter(tmpFile, Charset.forName("UTF-8"),
+				StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
+		writerClosed = false;
 	}
 
 	@Override
 	public void handle(final IPmsiLine line) throws IOException {
-		try (final Writer writer = Files.newBufferedWriter(tmpFile, Charset.forName("UTF-8"),
-				StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE)) {
-			// IF WE ARE IN LINENUMBER, STORE THIS LINENUMBER
-			if (line instanceof LineNumberPmsiLine) {
-				final LineNumberPmsiLine pmsiLine = (LineNumberPmsiLine) line;
-				lineNumber = pmsiLine.getLine();
-			}
-			// IF WE ARE IN A CLASSIC LINE, WRITES THE CONTENT
-			else if (line instanceof ConfiguredPmsiLine) {
-				// SETS THE NEW PARENT FOR THIS LINE
-				calculateParent(line);
-				
-				// WRITES THE CONTENT
-				// 1 - ROOT
-				writer.append(Long.toString(pmel_root));
-				writer.append('|');
-	
-				// 2 - PMSI POSITION (UNIQUE IN EACH ROOT)
-				writer.append(Long.toString(pmsiPosition));
-				writer.append('|');
+		// IF WE ARE IN LINENUMBER, STORE THIS LINENUMBER
+		if (line instanceof LineNumberPmsiLine) {
+			final LineNumberPmsiLine pmsiLine = (LineNumberPmsiLine) line;
+			lineNumber = pmsiLine.getLine();
+		}
+		// IF WE ARE IN A CLASSIC LINE, WRITES THE CONTENT
+		else if (line instanceof ConfiguredPmsiLine) {
+			// SETS THE NEW PARENT FOR THIS LINE
+			calculateParent(line);
 			
-				// 3 - PARENT (NULL FOR HEADER)
-				final Long pmel_parent = getParent();
-				writer.append(pmel_parent == null ? "\\N" : Long.toString(pmel_parent));
-				writer.append('|');
-			
-				// 4 - KIND OF CONTENT
-				escape(line.getName(), writer);
-				writer.append('|');
-	
-				// 5 -WRITES LINE NUMBER
-				writer.append(lineNumber);
-				writer.append('|');
-			
-				// 6 - WRITES LINE
-				escape(line.getMatchedLine(), writer);
-	
-				// 7 - END LINE
-				writer.append("\r\n");
-	
-				pmsiPosition++;
-			}
+			// WRITES THE CONTENT
+			// 1 - ROOT
+			writer.append(Long.toString(pmel_root));
+			writer.append('|');
+
+			// 2 - PMSI POSITION (UNIQUE IN EACH ROOT)
+			writer.append(Long.toString(pmsiPosition));
+			writer.append('|');
+		
+			// 3 - PARENT (NULL FOR HEADER)
+			final Long pmel_parent = getParent();
+			writer.append(pmel_parent == null ? "\\N" : Long.toString(pmel_parent));
+			writer.append('|');
+		
+			// 4 - KIND OF CONTENT
+			escape(line.getName(), writer);
+			writer.append('|');
+
+			// 5 -WRITES LINE NUMBER
+			writer.append(lineNumber);
+			writer.append('|');
+		
+			// 6 - WRITES LINE
+			escape(line.getMatchedLine(), writer);
+
+			// 7 - END LINE
+			writer.append("\r\n");
+
+			pmsiPosition++;
+		} else if (line instanceof EndOfFilePmsiLine) {
+			// EOF, CLOSE WRITER
+			writer.close();
+			writerClosed = true;
 		}
 	}
 	
 	public <T> T applyOnFile(final Function<Reader, T> function) throws IOException, SQLException {
+		if (!writerClosed)
+			throw new IllegalArgumentException("Writer is open");
 		try (final Reader reader = Files.newBufferedReader(tmpFile, Charset.forName("UTF-8"))) {
 			return function.apply(reader);
 		}
@@ -94,7 +107,12 @@ public abstract class PmsiLineHandler implements LineHandler, AutoCloseable {
 	
 	@Override
 	public void close() throws IOException {
-		Files.delete(tmpFile);
+		try {
+			if (!writerClosed)
+				writer.close();
+		} finally {
+			Files.delete(tmpFile);
+		}
 	}
 
 	private void escape(final CharSequence sgt, final Writer writer) throws IOException {		

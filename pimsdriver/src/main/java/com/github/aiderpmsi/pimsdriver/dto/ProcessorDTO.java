@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.sql.Array;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -152,16 +150,17 @@ public class ProcessorDTO extends AutoCloseableDto<ProcessorDTO.Query> {
 	}
 
 	public void processPmsi(String type, Collection<LineHandler> lhs, SimpleParserFactory pf, Long oid) throws SQLException {
+		
 		Connection innerCon;
+
 		if(con instanceof DelegatingConnection
 				&& (innerCon = ((DelegatingConnection<?>) con).getInnermostDelegateInternal()) instanceof PGConnection) {
 			// GETS LARGE OBJECT API IF CONNECTION IS POSTGRESQL
 			LargeObjectManager lom = ((org.postgresql.PGConnection)innerCon).getLargeObjectAPI();
 			
-			Path tmpPath = null;
+			long time1 = System.currentTimeMillis();
+			
 			try {
-				// CREATE THE TEMP FILE WHICH WILL BE DELETED AFTER TRY BLOCK
-				tmpPath = Files.createTempFile("", "");
 
 				// TRANSFORMS PMSI TO A READY TO IMPORT POSTGRESQL FILE
 				try (Reader dbFile = new InputStreamReader(lom.open(oid).getInputStream(), Charset.forName("UTF-8"))) {
@@ -207,15 +206,11 @@ public class ProcessorDTO extends AutoCloseableDto<ProcessorDTO.Query> {
 
 			} catch (IOException e) {
 				throw new SQLException(e);
-			} finally {
-				// BE SURE TO DELETE TEMP PATH
-				if (tmpPath != null)
-					try {
-						Files.delete(tmpPath);
-					} catch (IOException e) {
-						throw new SQLException(e);
-					}
 			}
+
+			long time2 = System.currentTimeMillis();
+			System.out.println("Difference time : " + (time2 - time1));
+
 		} else {
 			throw new RuntimeException("This function needs a Delegated PGConnection");
 		}

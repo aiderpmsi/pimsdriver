@@ -35,9 +35,6 @@ import com.github.aiderpmsi.pimsdriver.db.actions.pmsiprocess.PmsiLineHandler.Fu
  */
 public class GroupHandler implements LineHandler, AutoCloseable {
 
-	/** Writer to write in */
-	private Writer writer = null;
-	
 	/** Rss (list of Rums) */
 	private final List<RssContent> fullRss = new ArrayList<>();
 	
@@ -56,9 +53,17 @@ public class GroupHandler implements LineHandler, AutoCloseable {
 	/** Temp file where we will store the results of the handling */
 	private final Path tmpFile;
 	
+	/** Writer associated with tmpFile */
+	private final Writer writer;
+	
+	/** Indicates if the writer is closed */
+	private boolean writerClosed;
+
 	public GroupHandler(Long startPmsiPosition) throws IOException {
 		this.pmsiPosition = startPmsiPosition;
 		this.tmpFile = Files.createTempFile("", "");
+		writer = Files.newBufferedWriter(tmpFile, Charset.forName("UTF-8"),
+				StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
 		// CREATES THE GROUPER
 		try {
 			GrouperFactory gf = new GrouperFactory();
@@ -86,7 +91,7 @@ public class GroupHandler implements LineHandler, AutoCloseable {
 				}
 	
 				// IF THIS RSS IS A NEW RSS, GROUP AND STORE 
-				if (newNumRss != null && newNumRss.equals(lastNumRss)) {
+				if (newNumRss != null && !newNumRss.equals(lastNumRss)) {
 					groupAndStore();
 					// REINIT FULL RSS
 					fullRss.clear();
@@ -160,17 +165,33 @@ public class GroupHandler implements LineHandler, AutoCloseable {
 			} else if (line instanceof LineNumberPmsiLine) {
 				
 			} else if (line instanceof EndOfFilePmsiLine) {
-				
+				// GROUP AND STORE REMAIN RSS
+				if (fullRss.size() != 0) {
+					groupAndStore();
+					// REINIT FULL RSS
+					fullRss.clear();
+					pmsiPositions.clear();
+				}
+				// EOF, CLOSE WRITER
+				writer.close();
+				writerClosed = true;
 			}
 		}
 	}
 
 	@Override
 	public void close() throws IOException {
-		Files.delete(tmpFile);
+		try {
+			if (!writerClosed)
+				writer.close();
+		} finally {
+			Files.delete(tmpFile);
+		}
 	}
 
 	public <T> T applyOnFile(final Function<Reader, T> function) throws IOException, SQLException {
+		if (!writerClosed)
+			throw new IllegalArgumentException("Writer is open");
 		try (final Reader reader = Files.newBufferedReader(tmpFile, Charset.forName("UTF-8"))) {
 			return function.apply(reader);
 		}
