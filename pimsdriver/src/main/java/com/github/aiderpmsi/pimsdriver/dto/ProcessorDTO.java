@@ -57,7 +57,7 @@ public class ProcessorDTO extends AutoCloseableDto<ProcessorDTO.Query> {
 				+ ") ON COMMIT DROP;";
 			} else if (this == SET_STATUS) {
 				return "UPDATE plud_pmsiupload SET plud_processed = ?::plud_status, plud_finess = ?, "
-						+ "plud_arguments = plud_arguments || hstore(?)";
+						+ "plud_arguments = plud_arguments || hstore(?) WHERE plud_id = ?";
 			} else if (entries.length == 1
 					&& entries[0] != null && entries[0].object != null && entries[0].object instanceof Long) {
 				switch(this) {
@@ -227,6 +227,7 @@ public class ProcessorDTO extends AutoCloseableDto<ProcessorDTO.Query> {
 		ps.setString(2, finess);
 		Array parametersArray = con.createArrayOf("text", parameters);
 		ps.setArray(3, parametersArray);
+		ps.setLong(4, recordid);
 		ps.execute();
 	}
 	

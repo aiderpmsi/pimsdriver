@@ -1,6 +1,6 @@
 package com.github.aiderpmsi.pimsdriver.db.actions.pmsiprocess;
 
-import java.sql.SQLException;
+import java.io.IOException;
 
 import com.github.aiderpmsi.pims.parser.linestypes.IPmsiLine;
 import com.github.aiderpmsi.pims.parser.linestypes.IPmsiLine.Element;
@@ -21,7 +21,7 @@ public class RssLineHandler extends PmsiLineHandler {
 	
 	private String version = null;
 	
-	public RssLineHandler(final long pmel_root, final long pmsiPosition) throws SQLException {
+	public RssLineHandler(final long pmel_root, final long pmsiPosition) throws IOException {
 		super(pmel_root, pmsiPosition);
 	}
 	
@@ -61,7 +61,7 @@ public class RssLineHandler extends PmsiLineHandler {
 		}
 
 	}
-
+	
 	@Override
 	public String getFiness() {
 		return finess;

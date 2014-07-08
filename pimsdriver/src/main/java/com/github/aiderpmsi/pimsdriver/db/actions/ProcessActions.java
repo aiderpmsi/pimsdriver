@@ -91,8 +91,9 @@ public class ProcessActions {
 					} else {
 						// IF WE HAVE AN ERROR, ROLLBACK TRANSACTION AND STORE THE REASON FOR THE FAILURE
 						con.rollback();
-					
-						dto.setStatus(element.recordid, Status.failed, element.finess, "error", e.getMessage() == null ? e.getClass().toString() : e.getMessage());
+
+						dto.setStatus(element.recordid, Status.failed,
+								element.finess, "error", e.getMessage() == null ? e.getClass().toString() : e.getMessage());
 
 						con.commit();
 						
