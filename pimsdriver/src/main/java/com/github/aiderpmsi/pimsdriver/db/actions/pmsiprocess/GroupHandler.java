@@ -7,11 +7,11 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
-import java.util.function.Function;
 
 import com.github.aiderpmsi.pims.grouper.model.RssActe;
 import com.github.aiderpmsi.pims.grouper.model.RssContent;
@@ -26,6 +26,7 @@ import com.github.aiderpmsi.pims.parser.linestypes.IPmsiLine.Element;
 import com.github.aiderpmsi.pims.parser.linestypes.LineNumberPmsiLine;
 import com.github.aiderpmsi.pims.parser.utils.Utils.LineHandler;
 import com.github.aiderpmsi.pims.treebrowser.TreeBrowserException;
+import com.github.aiderpmsi.pimsdriver.db.actions.pmsiprocess.PmsiLineHandler.Function;
 
 /**
  * Process makeing the calls to database while main process reads pmsi file
@@ -165,11 +166,11 @@ public class GroupHandler implements LineHandler, AutoCloseable {
 	}
 
 	@Override
-	public void close() throws Exception {
+	public void close() throws IOException {
 		Files.delete(tmpFile);
 	}
 
-	public <T> T applyOnFile(final Function<Reader, T> function) throws IOException {
+	public <T> T applyOnFile(final Function<Reader, T> function) throws IOException, SQLException {
 		try (final Reader reader = Files.newBufferedReader(tmpFile, Charset.forName("UTF-8"))) {
 			return function.apply(reader);
 		}

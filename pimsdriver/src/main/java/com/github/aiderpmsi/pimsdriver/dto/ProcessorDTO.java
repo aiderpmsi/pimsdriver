@@ -3,15 +3,14 @@ package com.github.aiderpmsi.pimsdriver.dto;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import java.sql.Array;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Collection;
 
 import org.apache.commons.dbcp2.DelegatingConnection;
 import org.postgresql.PGConnection;
@@ -20,9 +19,11 @@ import org.postgresql.largeobject.LargeObjectManager;
 
 import com.github.aiderpmsi.pims.parser.utils.SimpleParser;
 import com.github.aiderpmsi.pims.parser.utils.SimpleParserFactory;
+import com.github.aiderpmsi.pims.parser.utils.Utils.LineHandler;
+import com.github.aiderpmsi.pimsdriver.db.actions.pmsiprocess.GroupHandler;
 import com.github.aiderpmsi.pimsdriver.db.actions.pmsiprocess.PmsiLineHandler;
-import com.github.aiderpmsi.pimsdriver.db.actions.pmsiprocess.RecorderErrorHandler;
-import com.github.aiderpmsi.pimsdriver.db.actions.pmsiprocess.RecorderErrorHandler.Error;
+import com.github.aiderpmsi.pimsdriver.db.actions.pmsiprocess.SimpleErrorHandler;
+import com.github.aiderpmsi.pimsdriver.db.actions.pmsiprocess.SimpleErrorHandler.Error;
 import com.github.aiderpmsi.pimsdriver.dto.StatementProvider.Entry;
 import com.github.aiderpmsi.pimsdriver.dto.model.UploadedPmsi.Status;
 
@@ -150,7 +151,7 @@ public class ProcessorDTO extends AutoCloseableDto<ProcessorDTO.Query> {
 		ps.execute();
 	}
 
-	public void processPmsi(String type, PmsiLineHandler lh, SimpleParserFactory pf, Long oid) throws SQLException {
+	public void processPmsi(String type, Collection<LineHandler> lhs, SimpleParserFactory pf, Long oid) throws SQLException {
 		Connection innerCon;
 		if(con instanceof DelegatingConnection
 				&& (innerCon = ((DelegatingConnection<?>) con).getInnermostDelegateInternal()) instanceof PGConnection) {
@@ -163,16 +164,11 @@ public class ProcessorDTO extends AutoCloseableDto<ProcessorDTO.Query> {
 				tmpPath = Files.createTempFile("", "");
 
 				// TRANSFORMS PMSI TO A READY TO IMPORT POSTGRESQL FILE
-				try (
-						Reader dbFile = new InputStreamReader(lom.open(oid).getInputStream(), Charset.forName("UTF-8"));
-						Writer fsFile = Files.newBufferedWriter(tmpPath, Charset.forName("UTF-8"), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
-						) {
-					// SETS THE WRITER THE LINE HANDLER WRITES IN
-					lh.setWriter(fsFile);
+				try (Reader dbFile = new InputStreamReader(lom.open(oid).getInputStream(), Charset.forName("UTF-8"))) {
 
 					// PARSE AND STORE PMSI
-					RecorderErrorHandler eh = new RecorderErrorHandler();
-					SimpleParser parser = pf.newParser(type, lh, eh);
+					SimpleErrorHandler eh = new SimpleErrorHandler();
+					SimpleParser parser = pf.newParser(type, lhs, eh);
 					parser.parse(dbFile);
 
 					// THROW ERROR IF AN ERROR HAPPENED
@@ -190,14 +186,23 @@ public class ProcessorDTO extends AutoCloseableDto<ProcessorDTO.Query> {
 					
 				}
 			
-				try (Reader fsFile = Files.newBufferedReader(tmpPath, Charset.forName("UTF-8"))) {
-					// BULK IMPORT TO PGSQL
-					String query = "COPY pmel_temp (pmel_root, pmel_position, pmel_parent, pmel_type, pmel_line, pmel_content) "
-							+ "FROM STDIN WITH DELIMITER '|'";
+				// BULK IMPORT TO PGSQL
+				String pmsiQuery = "COPY pmel_temp (pmel_root, pmel_position, pmel_parent, pmel_type, pmel_line, pmel_content) "
+						+ "FROM STDIN WITH DELIMITER '|'";
+				String groupQuery = "COPY pmgr_temp (pmel_position, pmgr_racine, pmgr_modalite, pmgr_gravite, pmgr_erreur) "
+						+ "FROM STDIN WITH DELIMITER '|'";
 
-					Connection conn = ((DelegatingConnection<?>) con).getInnermostDelegateInternal();
-					CopyManager cm = new CopyManager((org.postgresql.core.BaseConnection)conn);
-					cm.copyIn(query, fsFile);
+				final Connection conn = ((DelegatingConnection<?>) con).getInnermostDelegateInternal();
+				final CopyManager cm = new CopyManager((org.postgresql.core.BaseConnection)conn);
+				
+				for (LineHandler lineHandler : lhs) {
+					if (lineHandler instanceof PmsiLineHandler) {
+						((PmsiLineHandler) lineHandler).applyOnFile(
+								(reader) -> cm.copyIn(pmsiQuery, reader));
+					} else if (lineHandler instanceof GroupHandler) {
+						((GroupHandler) lineHandler).applyOnFile(
+								(reader) -> cm.copyIn(groupQuery, reader));
+					}
 				}
 
 			} catch (IOException e) {

@@ -4,11 +4,13 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.github.aiderpmsi.pims.parser.utils.SimpleParserFactory;
 import com.github.aiderpmsi.pims.treebrowser.TreeBrowserException;
 import com.github.aiderpmsi.pimsdriver.db.DataSourceSingleton;
+import com.github.aiderpmsi.pimsdriver.db.actions.pmsiprocess.GroupHandler;
 import com.github.aiderpmsi.pimsdriver.db.actions.pmsiprocess.RsfLineHandler;
 import com.github.aiderpmsi.pimsdriver.db.actions.pmsiprocess.RssLineHandler;
 import com.github.aiderpmsi.pimsdriver.dto.ProcessorDTO;
@@ -37,28 +39,32 @@ public class ProcessActions {
 						SimpleParserFactory pf = new SimpleParserFactory();
 		
 						// COPY PMSI FILE TO PGSQL
-						final RsfLineHandler rsfLineHandler = new RsfLineHandler(element.recordid, pmsiPosition);
-						dto.processPmsi("rsfheader", rsfLineHandler, pf, element.rsfoid);
-
-						// RETRIEVE ELEMENTS FROM LINE HANDLER
-						pmsiPosition = rsfLineHandler.getPmsiPosition();
-						finess = rsfLineHandler.getFiness();
-						rsfVersion = rsfLineHandler.getVersion();
+						try (final RsfLineHandler rsfLineHandler = new RsfLineHandler(element.recordid, pmsiPosition)) {
+							dto.processPmsi("rsfheader", Arrays.asList(rsfLineHandler), pf, element.rsfoid);
+	
+							// RETRIEVE ELEMENTS FROM LINE HANDLER
+							pmsiPosition = rsfLineHandler.getPmsiPosition();
+							finess = rsfLineHandler.getFiness();
+							rsfVersion = rsfLineHandler.getVersion();
+						}
 						
 						// PROCESS RSS IF NEEDED
 						if (element.rssoid != null) {
 						
 							// COPY PMSI FILE TO PGSQL
-							final RssLineHandler rssLineHandler = new RssLineHandler(element.recordid, pmsiPosition);
-							dto.processPmsi("rssheader", rssLineHandler, pf, element.rssoid);
-						
-							// RETRIEVE ELEEMNTS FROM LINE HANDLER
-							pmsiPosition = rssLineHandler.getPmsiPosition();
-							rssVersion = rssLineHandler.getVersion();
-								
-							// CHECK THAT RSFFINESS MATCHES RSSFINESS
-							if (!finess.equals(rssLineHandler.getFiness())) {
-								throw new IOException("Finess dans RSF et RSS ne correspondent pas");
+							try (
+									final RssLineHandler rssLineHandler = new RssLineHandler(element.recordid, pmsiPosition);
+									final GroupHandler groupHandler = new GroupHandler(pmsiPosition);) {
+								dto.processPmsi("rssheader", Arrays.asList(rssLineHandler, groupHandler), pf, element.rssoid);
+							
+								// RETRIEVE ELEEMNTS FROM LINE HANDLER
+								pmsiPosition = rssLineHandler.getPmsiPosition();
+								rssVersion = rssLineHandler.getVersion();
+									
+								// CHECK THAT RSFFINESS MATCHES RSSFINESS
+								if (!finess.equals(rssLineHandler.getFiness())) {
+									throw new IOException("Finess dans RSF et RSS ne correspondent pas");
+								}
 							}
 						}
 

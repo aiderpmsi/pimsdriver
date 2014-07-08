@@ -7,7 +7,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.function.Function;
+import java.sql.SQLException;
 
 import com.github.aiderpmsi.pims.parser.linestypes.ConfiguredPmsiLine;
 import com.github.aiderpmsi.pims.parser.linestypes.IPmsiLine;
@@ -86,14 +86,14 @@ public abstract class PmsiLineHandler implements LineHandler, AutoCloseable {
 		}
 	}
 	
-	public <T> T applyOnFile(final Function<Reader, T> function) throws IOException {
+	public <T> T applyOnFile(final Function<Reader, T> function) throws IOException, SQLException {
 		try (final Reader reader = Files.newBufferedReader(tmpFile, Charset.forName("UTF-8"))) {
 			return function.apply(reader);
 		}
 	}
 	
 	@Override
-	public void close() throws Exception {
+	public void close() throws IOException {
 		Files.delete(tmpFile);
 	}
 
@@ -127,4 +127,8 @@ public abstract class PmsiLineHandler implements LineHandler, AutoCloseable {
 
 	private static final char[] escapeDelim = {'\\', '|'};
 
+	@FunctionalInterface
+	public interface Function<T, R> {
+		public R apply(T t) throws IOException, SQLException;
+	}
 }
