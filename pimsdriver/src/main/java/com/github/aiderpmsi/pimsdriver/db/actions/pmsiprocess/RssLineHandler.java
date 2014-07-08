@@ -40,10 +40,10 @@ public class RssLineHandler extends PmsiLineHandler {
 		
 		// CHECKS IF THIS ELEMENT IS HEADER OR MAIN FOR NEXT ITERATION THROUGH CALCULATEPARENT
 		if (line.getName().equals("rssheader")) {
-			for (Element element : line.getElements()) {
-				if (element.getName().equals("finess")) {
+			initsearch : for (Element element : line.getElements()) {
+				if (element.getName().equals("Finess")) {
 					finess = element.getElement().toString();
-					break;
+					break initsearch;
 				}
 			}
 			version = line.getVersion();

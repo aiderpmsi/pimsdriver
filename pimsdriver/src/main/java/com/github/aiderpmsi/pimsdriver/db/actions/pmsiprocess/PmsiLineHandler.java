@@ -67,12 +67,11 @@ public abstract class PmsiLineHandler implements LineHandler {
 			writer.append('|');
 
 			// 5 -WRITES LINE NUMBER
-			writer.append(line.toString());
+			writer.append(lineNumber);
 			writer.append('|');
 		
 			// 6 - WRITES LINE
 			escape(line.getMatchedLine(), writer);
-			writer.append('|');
 
 			// 7 - END LINE
 			writer.append("\r\n");

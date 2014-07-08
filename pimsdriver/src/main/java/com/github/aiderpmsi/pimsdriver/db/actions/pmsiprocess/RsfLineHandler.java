@@ -40,10 +40,10 @@ public class RsfLineHandler extends PmsiLineHandler {
 			
 		// CHECKS IF THIS ELEMENT IS HEADER OR RSFA FOR NEXT ITERATION THROUGH CALCULATEPARENT
 		if (line.getName().equals("rsfheader")) {
-			for (Element element : line.getElements()) {
-				if (element.getName().equals("finess")) {
+			startsearch : for (Element element : line.getElements()) {
+				if (element.getName().equals("Finess")) {
 					finess = element.getElement().toString();
-					break;
+					break startsearch;
 				}
 			}
 			version = line.getVersion();
