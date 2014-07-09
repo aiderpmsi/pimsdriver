@@ -3,6 +3,7 @@ package com.github.aiderpmsi.pimsdriver.vaadin.main;
 import com.github.aiderpmsi.pimsdriver.dto.model.UploadedPmsi;
 import com.vaadin.annotations.Theme;
 import com.vaadin.server.VaadinRequest;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Layout;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
@@ -12,52 +13,62 @@ public class RootWindow extends UI {
 
 	/** Generated Serial */
 	private static final long serialVersionUID = 3109715875916629911L;
-
-	/** Layout */
-	private Layout layout;
 	
-	private SplitPanel splitPanel;
+	@SuppressWarnings("serial")
+	private final Layout layout = new VerticalLayout() {{
+		addStyleName("pims-main-layout");
+	}};
+
+	@SuppressWarnings("serial")
+	private final Label header = new Label() {{
+		addStyleName("pims-main-header");
+	}};
+	
+	private final MenuBar menuBar = new MenuBar(this);
+
+	private final SplitPanel splitPanel = new SplitPanel(this);
+
+	private VaadinRequest vaadinRequest = null;
 	
 	@Override
-	protected void init(VaadinRequest request) {
-		setSizeFull();
-		layout = createLayout();
-		layout.setSizeFull();
-		setContent(layout);
-		
-		// ADDS EACH WIDGET INSIDE LAYOUT
-		Header header = new Header();
+	protected void init(final VaadinRequest request) {
 		layout.addComponent(header);
-		MenuBar menuBar = new MenuBar(this);
 		layout.addComponent(menuBar);
-		splitPanel = new SplitPanel(this);
 		layout.addComponent(splitPanel);
-		// SPLIT PANEL EXPANDS MAX If LAYOUT IS VERTICAL LAYOUT
-		if (layout instanceof VerticalLayout)
-			((VerticalLayout) layout).setExpandRatio(splitPanel, 1f);
+		setContent(layout);
 
-		// REGISTER A FINESS SELECTED LISTENER WHEN A FINESS CHANGES
-		addListener(new FinessSelectedListener(splitPanel.getContentPanel(), menuBar));
-		// REGISTER A NAV SELECTED LISTENER WHEN WE WANT TO NAVIGATE THROUGH FACTURES OR SEJOURS
-		addListener(new NavSelectedListener(splitPanel.getContentPanel()));
+		// SETS THE VADIN REQUEST
+		this.vaadinRequest = request;
+		
+	}
+		
+	public void setUploadSelected(final UploadedPmsi model, final UploadedPmsi.Status status) {
+		splitPanel.getContentPanel().setUpload(model, status);
+		menuBar.setUpload(model, status);
 	}
 	
-	private Layout createLayout() {
-		// CREATES THE LAYOUT
-		Layout thisLayout = new VerticalLayout();
-		thisLayout.addStyleName("pims-main-layout");
-		return thisLayout;
-	}		
-	
-	public void fireFinessSelected(UploadedPmsi model, UploadedPmsi.Status status) {
-		FinessSelectedEvent fse = new FinessSelectedEvent(this);
-		fse.setModel(model);
-		fse.setStatus(status);
-		fireEvent(fse);
+	public void setMenuNavigationSelected(final UploadedPmsi model, final MenuBar.MenuBarSelected type) {
+		splitPanel.getContentPanel().show(type, model);
 	}
-	
-	public void fireNavPmsiSelected(NavSelectedEvent.Type type, UploadedPmsi model) {
-		NavSelectedEvent nse = new NavSelectedEvent(type, model, this);
-		fireEvent(nse);
+
+	public Layout getLayout() {
+		return layout;
 	}
+
+	public Label getHeader() {
+		return header;
+	}
+
+	public MenuBar getMenuBar() {
+		return menuBar;
+	}
+
+	public SplitPanel getSplitPanel() {
+		return splitPanel;
+	}
+
+	public VaadinRequest getVaadinRequest() {
+		return vaadinRequest;
+	}
+
 }

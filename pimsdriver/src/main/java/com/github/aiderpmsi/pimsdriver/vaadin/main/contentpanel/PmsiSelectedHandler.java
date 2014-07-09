@@ -2,6 +2,7 @@ package com.github.aiderpmsi.pimsdriver.vaadin.main.contentpanel;
 
 import org.vaadin.addons.lazyquerycontainer.LazyQueryContainer;
 
+import com.github.aiderpmsi.pimsdriver.vaadin.main.MenuBar;
 import com.github.aiderpmsi.pimsdriver.vaadin.main.NavSelectedEvent.Type;
 import com.github.aiderpmsi.pimsdriver.vaadin.main.contentpanel.pmsidetails.PmsiDetailsWindow;
 import com.github.aiderpmsi.pimsdriver.vaadin.main.contentpanel.pmsisource.PmsiSourceWindow;
@@ -20,11 +21,11 @@ public class PmsiSelectedHandler implements Action.Handler {
 	
 	private LazyQueryContainer lzq;
 	
-	private Type type;
+	private MenuBar.MenuBarSelected type;
 	
 	private Long pmel_root;
 	
-	public PmsiSelectedHandler(Type type, LazyQueryContainer lzq, Long pmel_root) {
+	public PmsiSelectedHandler(MenuBar.MenuBarSelected type, LazyQueryContainer lzq, Long pmel_root) {
 		this.lzq = lzq;
 		this.type = type;
 		this.pmel_root = pmel_root;

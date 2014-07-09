@@ -9,6 +9,7 @@ import com.github.aiderpmsi.pimsdriver.db.actions.ActionException;
 import com.github.aiderpmsi.pimsdriver.db.actions.NavigationActions;
 import com.github.aiderpmsi.pimsdriver.dto.model.BaseRsfB;
 import com.github.aiderpmsi.pimsdriver.dto.model.BaseRsfC;
+import com.github.aiderpmsi.pimsdriver.vaadin.main.MenuBar;
 import com.github.aiderpmsi.pimsdriver.vaadin.main.NavSelectedEvent.Type;
 import com.github.aiderpmsi.pimsdriver.vaadin.utils.LazyColumnType;
 import com.github.aiderpmsi.pimsdriver.vaadin.utils.LazyTable;
@@ -23,7 +24,7 @@ public class PmsiDetailsWindow extends Window {
 	/** Generated serial Id */
 	private static final long serialVersionUID = -7803472921198470202L;
 
-	public PmsiDetailsWindow(final Long pmel_root, final Long pmel_position, final Type type, final String typeLabel) {
+	public PmsiDetailsWindow(final Long pmel_root, final Long pmel_position, final MenuBar.MenuBarSelected type, final String typeLabel) {
 		// TITLE
 		super(type.getLabel() + " : " + typeLabel);
 

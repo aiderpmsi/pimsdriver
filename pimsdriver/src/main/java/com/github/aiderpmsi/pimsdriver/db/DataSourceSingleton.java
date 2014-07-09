@@ -18,18 +18,12 @@ import org.flywaydb.core.api.FlywayException;
 
 public class DataSourceSingleton {
 
-	private final static String location = "localhost";
-
-	private final static String user = "pimsdriver";
-	
-	private final static String pwd = "pimsdriver";
-
 	private DataSource dataSource;
 	
 	private static DataSourceSingleton singleton = null;
 	
 	protected DataSourceSingleton() throws SQLException {
-		
+		Application
 		try {
 			Class.forName("org.postgresql.Driver");
 		} catch (ClassNotFoundException e) {

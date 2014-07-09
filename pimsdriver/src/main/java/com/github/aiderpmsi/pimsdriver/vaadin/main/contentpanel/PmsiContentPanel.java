@@ -12,7 +12,7 @@ import com.github.aiderpmsi.pimsdriver.db.actions.NavigationActions;
 import com.github.aiderpmsi.pimsdriver.dto.NavigationDTO;
 import com.github.aiderpmsi.pimsdriver.dto.model.BaseRsfA;
 import com.github.aiderpmsi.pimsdriver.dto.model.UploadedPmsi;
-import com.github.aiderpmsi.pimsdriver.vaadin.main.NavSelectedEvent.Type;
+import com.github.aiderpmsi.pimsdriver.vaadin.main.MenuBar;
 import com.github.aiderpmsi.pimsdriver.vaadin.utils.LazyColumnType;
 import com.github.aiderpmsi.pimsdriver.vaadin.utils.LazyTable;
 import com.github.aiderpmsi.pimsdriver.vaadin.utils.aop.ActionEncloser;
@@ -82,7 +82,7 @@ public class PmsiContentPanel extends VerticalLayout {
 		}
 	}
 	
-	public void show(Type type, UploadedPmsi model) {
+	public void show(MenuBar.MenuBarSelected type, UploadedPmsi model) {
 		// REMOVE ALL COMPONENTS OF BODY
 		body.removeAllComponents();
 
@@ -97,7 +97,7 @@ public class PmsiContentPanel extends VerticalLayout {
 		}
 	}
 	
-	private Table createSejoursTable(final Type type, final UploadedPmsi model) {
+	private Table createSejoursTable(final MenuBar.MenuBarSelected type, final UploadedPmsi model) {
         // RSS MAIN CONTAINER
         LazyQueryContainer datasContainer = new LazyQueryContainer(
         		new LazyQueryDefinition(false, 1000, "pmel_id"),
