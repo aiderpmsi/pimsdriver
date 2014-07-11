@@ -14,6 +14,7 @@ import org.postgresql.largeobject.LargeObjectManager;
 
 import com.github.aiderpmsi.pimsdriver.dto.model.UploadPmsi;
 import com.github.aiderpmsi.pimsdriver.dto.model.UploadedPmsi;
+import com.vaadin.server.VaadinRequest;
 
 public class UploadPmsiDTO extends AutoCloseableDto<UploadPmsiDTO.Query> {
 
@@ -36,35 +37,38 @@ public class UploadPmsiDTO extends AutoCloseableDto<UploadPmsiDTO.Query> {
 		}
 	};
 	
-	public UploadPmsiDTO(Connection con) {
-		super(con, UploadPmsiDTO.Query.class);
+	public UploadPmsiDTO(final Connection con, final VaadinRequest request) {
+		super(con, UploadPmsiDTO.Query.class, request);
 	}
 
-
-	public Long create(UploadPmsi model, InputStream rsf, InputStream rss) throws SQLException, IOException {
+	public Long create(UploadPmsi model, InputStream rsf, InputStream rss) throws SQLException {
 		
 		// USE THE LARGE OBJECT INTERFACE FOR FILES
 		@SuppressWarnings("unchecked")
-		Connection conn = ((DelegatingConnection<Connection>) con).getInnermostDelegateInternal();
-		LargeObjectManager lom = ((org.postgresql.PGConnection)conn).getLargeObjectAPI();
-			
-		// CREATES AND FILLS THE RSF LARGE OBJECT (IF IT EXISTS)
-		Long rsfoid = store(lom, rsf), rssoid = store(lom, rss); 
+		final Connection conn = ((DelegatingConnection<Connection>) getConnection()).getInnermostDelegateInternal();
+		final LargeObjectManager lom = ((org.postgresql.PGConnection)conn).getLargeObjectAPI();
 
-		// CREATES THE PREPARED STATEMENT
-		PreparedStatement ps = getPs(Query.INSERT_PLUD);
-
-		ps.setString(1, UploadedPmsi.Status.pending.toString());
-		ps.setString(2, model.finess);
-		ps.setInt(3, model.year);
-		ps.setInt(4, model.month);
-		ps.setObject(5, rsfoid, Types.BIGINT);
-		ps.setObject(6, rssoid, Types.BIGINT);
-			
-		// EXECUTE QUERY
-		try (ResultSet rs = ps.executeQuery()) {
-			rs.next();
-			return rs.getLong(1);
+		try {
+			// CREATES AND FILLS THE RSF LARGE OBJECT (IF IT EXISTS)
+			final Long rsfoid = store(lom, rsf), rssoid = store(lom, rss); 
+	
+			// CREATES THE PREPARED STATEMENT
+			final PreparedStatement ps = getPs(Query.INSERT_PLUD);
+	
+			ps.setString(1, UploadedPmsi.Status.pending.toString());
+			ps.setString(2, model.finess);
+			ps.setInt(3, model.year);
+			ps.setInt(4, model.month);
+			ps.setObject(5, rsfoid, Types.BIGINT);
+			ps.setObject(6, rssoid, Types.BIGINT);
+				
+			// EXECUTE QUERY
+			try (final ResultSet rs = ps.executeQuery()) {
+				rs.next();
+				return rs.getLong(1);
+			}
+		} catch (IOException e) {
+			throw new SQLException(e);
 		}
 	}
 

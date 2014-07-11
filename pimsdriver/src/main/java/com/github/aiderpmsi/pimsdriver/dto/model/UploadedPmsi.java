@@ -41,7 +41,7 @@ public class UploadedPmsi extends UploadPmsi {
 	
 	/** Status of this upload */
 	@XmlElement
-	public Status processed;
+	public Status status;
 	
 	/** ID of the RSF OID */
 	public Long rsfoid;
@@ -69,12 +69,12 @@ public class UploadedPmsi extends UploadPmsi {
 		this.dateenvoi = dateenvoi;
 	}
 
-	public Status getProcessed() {
-		return processed;
+	public Status getStatus() {
+		return status;
 	}
 
-	public void setProcessed(Status processed) {
-		this.processed = processed;
+	public void setStatus(Status status) {
+		this.status = status;
 	}
 
 	public Long getRsfoid() {

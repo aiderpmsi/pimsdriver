@@ -6,55 +6,38 @@ import java.util.List;
 
 import com.github.aiderpmsi.pimsdriver.db.DataSourceSingleton;
 import com.github.aiderpmsi.pimsdriver.dto.CleanupDTO;
+import com.vaadin.server.VaadinRequest;
 
-public class CleanupActions {
+public class CleanupActions extends DbAction {
 	
+	public CleanupActions(final VaadinRequest request) {
+		super(request);
+	}
+
 	public List<Long> getToCleanup() throws ActionException {
 
-		try (Connection con = DataSourceSingleton.getInstance().getConnection();
-			CleanupDTO cu = new CleanupDTO(con);) {
-			
-			// CONTINUE WHILE SELECTION HAS NOT SUCCEDED BECAUSE OF SERIALIZATION EXCEPTIONS
-			for (;;) {
-				try {
-					List<Long> cleanup = cu.readList();
-					// SELECTION HAS SUCCEDDED
-					con.commit();
-					return cleanup;
-				} catch (SQLException e) {
-					if (!e.getSQLState().equals("40001")) {
-						con.rollback();
-						throw e;
-					}
-				}
-			}
-		} catch (SQLException e) {
+		try (
+				final Connection con = DataSourceSingleton.getConnection(getRequest());
+				final CleanupDTO cu = new CleanupDTO(con);) {
+
+			return execute( (connection) -> cu.readList());
+
+		} catch (final SQLException e) {
 			throw new ActionException(e);
 		}
 	}
 
-	public void cleanup(Long cleanupId) throws ActionException {
+	public Boolean cleanup(final Long cleanupId) throws ActionException {
 
-		try (Connection con = DataSourceSingleton.getInstance().getConnection();
-			CleanupDTO cu = new CleanupDTO(con);) {
+		try (
+				final Connection con = DataSourceSingleton.getConnection(getRequest());
+				final CleanupDTO cu = new CleanupDTO(con);) {
 			
-			// CONTINUE WHILE SELECTION HAS NOT SUCCEDED BECAUSE OF SERIALIZATION EXCEPTIONS
-			for (;;) {
-				try {
-					cu.delete(cleanupId);
-					// SELECTION HAS SUCCEDDED
-					con.commit();
-					// GO OUT
-					return;
-				} catch (SQLException e) {
-					if (!e.getSQLState().equals("40001")) {
-						con.rollback();
-						throw e;
-					}
-				}
-			}
-		} catch (SQLException e) {
+			return execute( (connection) -> cu.delete(cleanupId));
+
+		} catch (final SQLException e) {
 			throw new ActionException(e);
 		}
 	}
+	
 }

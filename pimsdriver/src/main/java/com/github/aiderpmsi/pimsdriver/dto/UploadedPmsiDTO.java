@@ -16,6 +16,7 @@ import com.github.aiderpmsi.pimsdriver.dto.StatementProvider.Entry;
 import com.github.aiderpmsi.pimsdriver.dto.model.UploadedPmsi;
 import com.vaadin.data.Container.Filter;
 import com.vaadin.data.util.sqlcontainer.query.OrderBy;
+import com.vaadin.server.VaadinRequest;
 
 public class UploadedPmsiDTO extends AutoCloseableDto<UploadedPmsiDTO.Query> {
 
@@ -43,15 +44,15 @@ public class UploadedPmsiDTO extends AutoCloseableDto<UploadedPmsiDTO.Query> {
 		
 	};
 
-	public UploadedPmsiDTO(Connection con) {
-		super(con, UploadedPmsiDTO.Query.class);
+	public UploadedPmsiDTO(Connection con, VaadinRequest request) {
+		super(con, UploadedPmsiDTO.Query.class, request);
 	}
 
-	public void delete(UploadedPmsi model) throws SQLException {
+	public Boolean delete(UploadedPmsi model) throws SQLException {
 
 		// USE THE LARGE OBJECT INTERFACE FOR FILES
 		@SuppressWarnings("unchecked")
-		Connection conn = ((DelegatingConnection<Connection>) con).getInnermostDelegateInternal();
+		Connection conn = ((DelegatingConnection<Connection>) getConnection()).getInnermostDelegateInternal();
 		LargeObjectManager lom = ((org.postgresql.PGConnection)conn).getLargeObjectAPI();
 
 		// DELETE LARGE OBJECT IDS
@@ -62,7 +63,7 @@ public class UploadedPmsiDTO extends AutoCloseableDto<UploadedPmsiDTO.Query> {
 		}
 		
 		// DELETE ELEMENTS FROM PMSI ELEMENTS IF STATUS IS SUCESSED
-		if (model.processed == UploadedPmsi.Status.successed) {
+		if (model.getStatus() == UploadedPmsi.Status.successed) {
 			// GET PS
 			Entry<Long> id = new Entry<>();
 			id.object = model.recordid;
@@ -80,6 +81,8 @@ public class UploadedPmsiDTO extends AutoCloseableDto<UploadedPmsiDTO.Query> {
 		ps.setLong(2, model.recordid);
 
 		ps.execute();
+		
+		return true;
 	}
 
 	public List<UploadedPmsi> readList (List<Filter> filters, List<OrderBy> orders,
@@ -103,7 +106,7 @@ public class UploadedPmsiDTO extends AutoCloseableDto<UploadedPmsiDTO.Query> {
 			query.append(" LIMIT ").append(rows.toString()).append(" ");
 		
 		// CREATES THE DB STATEMENT
-		try (PreparedStatement ps = con.prepareStatement(query.toString())) {
+		try (PreparedStatement ps = getConnection().prepareStatement(query.toString())) {
 
 			for (int i = 0 ; i < queryArgs.size() ; i++) {
 				ps.setObject(i + 1, queryArgs.get(i));
@@ -122,7 +125,7 @@ public class UploadedPmsiDTO extends AutoCloseableDto<UploadedPmsiDTO.Query> {
 
 					// FILLS THE BEAN
 					element.recordid = rs.getLong(1);
-					element.processed = UploadedPmsi.Status.valueOf(rs.getString(2));
+					element.status = UploadedPmsi.Status.valueOf(rs.getString(2));
 					element.finess = rs.getString(3);
 					element.year = rs.getInt(4);
 					element.month = rs.getInt(5);
@@ -157,7 +160,7 @@ public class UploadedPmsiDTO extends AutoCloseableDto<UploadedPmsiDTO.Query> {
 		query.append(DBQueryBuilder.getWhereStringForFilters(filters, queryArgs));
 		
 		// CREATE THE DB STATEMENT
-		try (PreparedStatement ps = con.prepareStatement(query.toString())) {
+		try (PreparedStatement ps = getConnection().prepareStatement(query.toString())) {
 			for (int i = 0 ; i < queryArgs.size() ; i++) {
 				ps.setObject(i + 1, queryArgs.get(i));
 			}

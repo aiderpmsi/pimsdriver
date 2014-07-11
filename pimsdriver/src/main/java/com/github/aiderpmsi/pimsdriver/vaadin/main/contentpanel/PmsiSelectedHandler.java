@@ -3,7 +3,6 @@ package com.github.aiderpmsi.pimsdriver.vaadin.main.contentpanel;
 import org.vaadin.addons.lazyquerycontainer.LazyQueryContainer;
 
 import com.github.aiderpmsi.pimsdriver.vaadin.main.MenuBar;
-import com.github.aiderpmsi.pimsdriver.vaadin.main.NavSelectedEvent.Type;
 import com.github.aiderpmsi.pimsdriver.vaadin.main.contentpanel.pmsidetails.PmsiDetailsWindow;
 import com.github.aiderpmsi.pimsdriver.vaadin.main.contentpanel.pmsisource.PmsiSourceWindow;
 import com.vaadin.event.Action;
@@ -19,20 +18,20 @@ public class PmsiSelectedHandler implements Action.Handler {
 	static final Action[] ACTIONS = new Action[] { ACTION_DETAILS, ACTION_SOURCE };
 	static final Action[] NO_ACTION = new Action[] {};
 	
-	private LazyQueryContainer lzq;
+	private final LazyQueryContainer lzq;
 	
-	private MenuBar.MenuBarSelected type;
+	private final MenuBar.MenuBarSelected type;
 	
-	private Long pmel_root;
+	private final Long pmel_root;
 	
-	public PmsiSelectedHandler(MenuBar.MenuBarSelected type, LazyQueryContainer lzq, Long pmel_root) {
+	public PmsiSelectedHandler(final MenuBar.MenuBarSelected type, final LazyQueryContainer lzq, final Long pmel_root) {
 		this.lzq = lzq;
 		this.type = type;
 		this.pmel_root = pmel_root;
 	}
-	
-	public Action[] getActions(Object target, Object sender) {
 
+	@Override
+	public Action[] getActions(Object target, Object sender) {
 		if (target != null) {
 			return ACTIONS;
 		} else {
@@ -40,6 +39,7 @@ public class PmsiSelectedHandler implements Action.Handler {
 		}
 	}
 	
+	@Override
 	public void handleAction(Action action, Object sender, Object target) {
 		// GETS THE POSITION ID
 		Long pmel_position = (Long) lzq.getContainerProperty(target, "pmel_position").getValue();
@@ -54,8 +54,7 @@ public class PmsiSelectedHandler implements Action.Handler {
 					UI.getCurrent().addWindow(wProcess);
 				} else if (action.equals(ACTION_SOURCE)) {
 					// SHOWS FACT DETAILS
-					final Window wProcess = new PmsiSourceWindow(pmel_root, pmel_position, type, numfacture);
-					UI.getCurrent().addWindow(wProcess);
+					UI.getCurrent().addWindow(new PmsiSourceWindow(pmel_root, pmel_position, type, numfacture));
 				}
 				break;
 			case sejours:

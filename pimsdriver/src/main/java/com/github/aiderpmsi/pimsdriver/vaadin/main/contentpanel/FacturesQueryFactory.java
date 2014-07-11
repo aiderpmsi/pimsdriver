@@ -20,7 +20,7 @@ import com.vaadin.data.util.sqlcontainer.query.OrderBy;
 
 public class FacturesQueryFactory implements QueryFactory {
 	
-	private Object[][] mappings = new Object[][] {
+	private final Object[][] mappings = new Object[][] {
 			{"pmel_id", "pmel_id"},
 			{"pmel_root", "pmel_root"},
 			{"pmel_position", "pmel_position"},

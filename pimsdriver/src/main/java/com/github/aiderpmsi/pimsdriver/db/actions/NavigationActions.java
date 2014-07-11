@@ -16,8 +16,13 @@ import com.github.aiderpmsi.pimsdriver.dto.model.BaseRssMain;
 import com.github.aiderpmsi.pimsdriver.dto.model.UploadedPmsi;
 import com.vaadin.data.Container.Filter;
 import com.vaadin.data.util.sqlcontainer.query.OrderBy;
+import com.vaadin.server.VaadinRequest;
 
 public class NavigationActions extends DbAction {
+
+	public NavigationActions(VaadinRequest request) {
+		super(request);
+	}
 
 	public List<UploadedPmsi> getUploadedPmsi(final List<Filter> filters, final List<OrderBy> orders,
 			final Integer first, final Integer rows) throws ActionException {
@@ -25,7 +30,7 @@ public class NavigationActions extends DbAction {
 		return execute(new DbExecution<List<UploadedPmsi>>() {
 			@Override
 			public List<UploadedPmsi> execute(Connection con) throws SQLException {
-				try(UploadedPmsiDTO upd = new UploadedPmsiDTO(con)) {
+				try(UploadedPmsiDTO upd = new UploadedPmsiDTO(con, getRequest())) {
 					return upd.readList(filters, orders, first, rows);
 				}
 			}
@@ -266,7 +271,7 @@ public class NavigationActions extends DbAction {
 		return execute(new DbExecution<Integer>() {
 			@Override
 			public Integer execute(Connection con) throws SQLException {
-				try(UploadedPmsiDTO upd = new UploadedPmsiDTO(con)) {
+				try(UploadedPmsiDTO upd = new UploadedPmsiDTO(con, getRequest())) {
 					return (int) upd.listSize(filters);
 				}
 			}

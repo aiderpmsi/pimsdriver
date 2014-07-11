@@ -62,7 +62,7 @@ public class CleanupDTO extends AutoCloseableDto<CleanupDTO.Cleanup>{
 
 	}
 
-	public void delete(Long cleanupId) throws SQLException {
+	public Boolean delete(Long cleanupId) throws SQLException {
 		// CREATES THE CLEANUPID ENTRY
 		Entry<Long> cleanupEntry = new StatementProvider.Entry<>();
 		cleanupEntry.object = cleanupId;
@@ -73,6 +73,6 @@ public class CleanupDTO extends AutoCloseableDto<CleanupDTO.Cleanup>{
 		ps.setLong(1, cleanupId);
 		
 		// EXECUTE IT
-		ps.execute();
+		return ps.execute();
 	}	
 }

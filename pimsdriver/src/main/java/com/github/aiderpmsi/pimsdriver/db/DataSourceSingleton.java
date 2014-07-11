@@ -2,8 +2,11 @@ package com.github.aiderpmsi.pimsdriver.db;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.Properties;
 
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.sql.DataSource;
 
 import org.apache.commons.dbcp2.ConnectionFactory;
@@ -16,30 +19,47 @@ import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.FlywayException;
 
+import com.vaadin.server.VaadinRequest;
+
 public class DataSourceSingleton {
 
-	private DataSource dataSource;
-	
-	private static DataSourceSingleton singleton = null;
-	
-	protected DataSourceSingleton() throws SQLException {
-		Application
+	private static final HashMap<String, DataSource> dataSources = new HashMap<>();
+		
+	public static Connection getConnection(final VaadinRequest request) throws SQLException {
+		// GET CONNECTION INFORMATIONS FROM CONTEXT
+		String url = null;
+		try {
+			final InitialContext context = new InitialContext();
+			Object urlContext = context.lookup("com.github.aiderpmsi.pimsdriver.jdbcurl");
+			url = (String) urlContext;
+		} catch (NamingException e) {
+			throw new SQLException(e);
+		}
+		
+		DataSource dataSource = null;
+		if ((dataSource = dataSources.get(url)) == null) {
+			dataSource = initDataSource("", "", "");
+			dataSources.put(url, dataSource);
+		}
+		
+		final Connection con = dataSource.getConnection();
+		// FORCE AUTO COMMIT TO FALSE
+		con.setAutoCommit(false);
+		// SETS TRANSACTION ISOLATION
+		con.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
+		return con;
+	}
+
+	private static DataSource initDataSource(final String url, final String user, final String pwd) throws SQLException {
 		try {
 			Class.forName("org.postgresql.Driver");
 		} catch (ClassNotFoundException e) {
 			throw new SQLException(e);
 		}
 
-		// BUILD THE PGSQL DSN
-		StringBuilder dsn = new StringBuilder();
-		dsn.append("jdbc:postgresql://").
-		append(location).append(":").
-		append("5432").append("/").
-		append("pimsdriver");
-		  
 		// CONNECTION PROPERTIES (LOOK AT http://commons.apache.org/proper/commons-dbcp/configuration.html)
-		Properties props = new Properties();
-		props.setProperty("url", dsn.toString());
+		final Properties props = new Properties();
+		props.setProperty("url", url);
 		props.setProperty("user", user);
 		props.setProperty("password", pwd);
 		props.setProperty("driverClassName", "org.postgresql.Driver");
@@ -50,25 +70,25 @@ public class DataSourceSingleton {
 		props.setProperty("accessToUnderlyingConnectionAllowed", "true");
 
 		// THE POOL WILL USE IT TO CREATE CONNECTIONS
-		ConnectionFactory connectionFactory =
-				new DriverManagerConnectionFactory(dsn.toString(), props);
+		final ConnectionFactory connectionFactory =
+				new DriverManagerConnectionFactory(url, props);
 		
 		// WRAPS THE REAL CONNECTIONS FROM CONNECTIONFACTORY WITH THE POOLING FUNCTIONALITY
-		PoolableConnectionFactory poolableConnectionFactory =
+		final PoolableConnectionFactory poolableConnectionFactory =
 				new PoolableConnectionFactory(connectionFactory, null); 
 		
 		 // WRAPS THE ACTUAL POOL OF CONNECTIONS INTO A GENERIC POOL OBJECT
-		 ObjectPool<PoolableConnection> connectionPool =
-				 new GenericObjectPool<>(poolableConnectionFactory);
+		final ObjectPool<PoolableConnection> connectionPool =
+				new GenericObjectPool<>(poolableConnectionFactory);
 
 		 // SETS THE OBJECT POOL AS WRAPPER TO PORTABLECONNECTIONFACTORY
 		 poolableConnectionFactory.setPool(connectionPool);
 
 		 // CREATE THE DATASOURCE
-		 dataSource = new PoolingDataSource<>(connectionPool);
-		 		 
+		 final DataSource dataSource = new PoolingDataSource<>(connectionPool);
+
 		 // NOW CREATE THE DATABASE IF NEEDED
-		 Flyway flyway = new Flyway();
+		 final Flyway flyway = new Flyway();
 		 flyway.setDataSource(dataSource);
 
 		 try {
@@ -77,22 +97,8 @@ public class DataSourceSingleton {
 			 e.printStackTrace();
 			 throw new SQLException(e);
 		 }
-	}
-	
-	public synchronized Connection getConnection() throws SQLException {
-		Connection con = dataSource.getConnection();
-		// FORCE AUTO COMMIT TO FALSE
-		con.setAutoCommit(false);
-		// SETS TRANSACTION ISOLATION
-		con.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
-		return con;
-	}
-	
-	public static synchronized DataSourceSingleton getInstance() throws SQLException {
-		if (singleton == null) {
-			singleton = new DataSourceSingleton();
-		}
-		return singleton;
+		 
+		 return dataSource;
 	}
 		
 }

@@ -17,6 +17,8 @@ import com.github.aiderpmsi.pimsdriver.vaadin.utils.LazyColumnType;
 import com.github.aiderpmsi.pimsdriver.vaadin.utils.LazyTable;
 import com.github.aiderpmsi.pimsdriver.vaadin.utils.aop.ActionEncloser;
 import com.github.aiderpmsi.pimsdriver.vaadin.utils.aop.ActionEncloser.ActionExecuter;
+import com.github.aiderpmsi.pimsdriver.vaadin.utils.aop.ActionHandlerEncloser;
+import com.vaadin.event.Action;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
@@ -31,54 +33,41 @@ public class PmsiContentPanel extends VerticalLayout {
 	private static final long serialVersionUID = 9173237483341882407L;
 
 	/** header layout */
-	private Layout header = null;
+	private final VerticalLayout header = new VerticalLayout();
 	
 	/** body layout */
-	private Layout body = null;
+	private VerticalLayout body = new VerticalLayout();
 	
 	public PmsiContentPanel() {
 		super();
 		addStyleName("pims-contentpanel");
-		
-		// CREATE A DEFAULT LAYOUT FOR BODY
-		body = new VerticalLayout();
-
-		// CREATE A DEFAULT LAYOUT FOR HEADER
-		header = new VerticalLayout();
 	
 		// SETS LAYOUT HIERARCHY
 		addComponent(header);
 		addComponent(body);
 	}
 	
-	public void setUpload(final UploadedPmsi model, UploadedPmsi.Status status) {
+	public void setUpload(final UploadedPmsi model) {
 		// FIRST, CLEANUP BODY AND HEADER
 		body.removeAllComponents();
 		header.removeAllComponents();
 
 		// IF STATUS IS NOT NULL AND SUCCESSED, ADD HEADER CONTENT
-		if (model != null && status != null && status == UploadedPmsi.Status.successed)  {
-			ActionEncloser.execute(new ActionExecuter() {
-				@Override
-				public void action() throws ActionException {
-					// GETS THE SUMMARY OF RSF AND RSS
-					NavigationActions.Overview overview = new NavigationActions().getOverview(model);
-					
-					// CREATES THE CONFIG TABLE
-					Object[][] headers = new Object[][] {
-							{"RSF", overview.rsf},
-							{overview.rss == null ? "Absence de RSS" : "RSS",
-									overview.rss == null ? new ArrayList<NavigationDTO.PmsiOverviewEntry>() : overview.rss}
-					};
-					
-					// USE THIS CONFIG TABLE TO FILL THE HEADER
-					fillContentHeader(headers);
-				}
-				@Override
-				public String msgError(ActionException e) {
-					return "Erreur lors de la récupération des éléments des rsf et rss ";
-				}
-			});
+		if (model != null && model.getStatus() != null && model.getStatus() == UploadedPmsi.Status.successed)  {
+			ActionEncloser<Boolean, NavigationActions> action = new ActionEncloser<>(
+					(exception) -> "Erreur lors de la récupération des éléments des rsf et rss ", 
+					() -> {
+						final NavigationActions.Overview overview = new NavigationActions().getOverview(model);
+						// CREATES THE CONFIG TABLE
+						final Object[][] headers = new Object[][] {
+								{"RSF", overview.rsf},
+								{overview.rss == null ? "Absence de RSS" : "RSS",
+										overview.rss == null ? new ArrayList<NavigationDTO.PmsiOverviewEntry>() : overview.rss}
+						};
+						// USE THIS CONFIG TABLE TO FILL THE HEADER
+						fillContentHeader(headers);
+					});
+			action.execute();
 		}
 	}
 	
@@ -130,7 +119,7 @@ public class PmsiContentPanel extends VerticalLayout {
         return table;
 	}
 
-	private Table createFactTable(final Type type, final UploadedPmsi model) {
+	private Table createFactTable(final MenuBar.MenuBarSelected type, final UploadedPmsi model) {
         // RSFA CONTAINER
         LazyQueryContainer datasContainer = new LazyQueryContainer(
         		new LazyQueryDefinition(false, 1000, "pmel_id"),
@@ -209,5 +198,17 @@ public class PmsiContentPanel extends VerticalLayout {
 		return layout;
 	}
 
+	public class RightClickActions implements ActionHandlerEncloser.Actions {
+		@Override
+		public Action[] getActions() {
+			return ACTIONS;
+		}
+		@Override
+		public Action[] getNoActions() {
+			return new Action[0];
+		}
+	}
 	
+	static final Action[] ACTIONS = new Action[] {new Action("détails"), new Action("source")};
+
 }
