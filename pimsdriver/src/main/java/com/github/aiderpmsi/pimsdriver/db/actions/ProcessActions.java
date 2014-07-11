@@ -16,13 +16,18 @@ import com.github.aiderpmsi.pimsdriver.db.actions.pmsiprocess.RssLineHandler;
 import com.github.aiderpmsi.pimsdriver.dto.ProcessorDTO;
 import com.github.aiderpmsi.pimsdriver.dto.model.UploadedPmsi;
 import com.github.aiderpmsi.pimsdriver.dto.model.UploadedPmsi.Status;
+import com.vaadin.server.VaadinRequest;
 
-public class ProcessActions {
+public class ProcessActions extends DbAction {
 	
+	public ProcessActions(VaadinRequest request) {
+		super(request);
+	}
+
 	public boolean processPmsi(UploadedPmsi element) throws ActionException {
 
 		// GETS THE DB CONNECTION
-		try (Connection con = DataSourceSingleton.getInstance().getConnection()) {
+		try (Connection con = DataSourceSingleton.getConnection(getRequest())) {
 
 			// DTO
 			try (ProcessorDTO dto = new ProcessorDTO(con)) {

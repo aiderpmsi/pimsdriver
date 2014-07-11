@@ -1,7 +1,5 @@
 package com.github.aiderpmsi.pimsdriver.db.actions;
 
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.List;
 
 import com.github.aiderpmsi.pimsdriver.dto.NavigationDTO;
@@ -20,288 +18,162 @@ import com.vaadin.server.VaadinRequest;
 
 public class NavigationActions extends DbAction {
 
-	public NavigationActions(VaadinRequest request) {
+	public NavigationActions(final VaadinRequest request) {
 		super(request);
 	}
 
 	public List<UploadedPmsi> getUploadedPmsi(final List<Filter> filters, final List<OrderBy> orders,
 			final Integer first, final Integer rows) throws ActionException {
 
-		return execute(new DbExecution<List<UploadedPmsi>>() {
-			@Override
-			public List<UploadedPmsi> execute(Connection con) throws SQLException {
-				try(UploadedPmsiDTO upd = new UploadedPmsiDTO(con, getRequest())) {
-					return upd.readList(filters, orders, first, rows);
-				}
-			}
-		});
-		
+		return execute(UploadedPmsiDTO.class,
+				(dto) -> dto.readList(filters, orders, first, rows));
+	
 	}
 		
 	public List<BaseRsfA> getFactures(final List<Filter> filters, final List<OrderBy> orders,
 			final Integer first, final Integer rows) throws ActionException {
 
-		return execute(new DbExecution<List<BaseRsfA>>() {
-			@Override
-			public List<BaseRsfA> execute(Connection con) throws SQLException {
-				try(NavigationDTO nad = new NavigationDTO(con)) {
-					return nad.readRsfAList(filters, orders, first, rows);
-				}
-			}
-		});
+		return execute(NavigationDTO.class,
+				(dto) -> dto.readRsfAList(filters, orders, first, rows));
 
 	}
 
 	public int getFacturesSize(final List<Filter> filters) throws ActionException {
 
-		return execute(new DbExecution<Integer>() {
-			@Override
-			public Integer execute(Connection con) throws SQLException {
-				try(NavigationDTO nad = new NavigationDTO(con)) {
-					return (int) nad.readRsfASize(filters);
-				}
-			}
-		});
+		return execute(NavigationDTO.class,
+				(dto) -> (int) dto.readRsfASize(filters));
 
 	}
 
 	public BaseRsfA GetFacturesSummary (final Long pmel_root) throws ActionException {
 
-		return execute(new DbExecution<BaseRsfA>() {
-			@Override
-			public BaseRsfA execute(Connection con) throws SQLException {
-				try(NavigationDTO nad = new NavigationDTO(con)) {
-					return nad.readRsfASummary(pmel_root);
-				}
-			}
-		});
-
+		return execute(NavigationDTO.class,
+				(dto) -> dto.readRsfASummary(pmel_root));
+		
 	}
 
 	public BaseRsfB GetFacturesBSummary (final Long pmel_root, final Long pmel_position) throws ActionException {
 
-		return execute(new DbExecution<BaseRsfB>() {
-			@Override
-			public BaseRsfB execute(Connection con) throws SQLException {
-				try(NavigationDTO nad = new NavigationDTO(con)) {
-					return nad.readRsfBSummary(pmel_root, pmel_position);
-				}
-			}
-		});
+		return execute(NavigationDTO.class,
+				(dto) -> dto.readRsfBSummary(pmel_root, pmel_position));
 
 	}
 
 	public BaseRsfC GetFacturesCSummary (final Long pmel_root, final Long pmel_position) throws ActionException {
 		
-		return execute(new DbExecution<BaseRsfC>() {
-			@Override
-			public BaseRsfC execute(Connection con) throws SQLException {
-				try(NavigationDTO nad = new NavigationDTO(con)) {
-					return nad.readRsfCSummary(pmel_root, pmel_position);
-				}
-			}
-		});
+		return execute(NavigationDTO.class,
+				(dto) -> dto.readRsfCSummary(pmel_root, pmel_position));
 
 	}
 
 	public List<BaseRsfB> getFacturesB(final List<Filter> filters, final List<OrderBy> orders,
 			final Integer first, final Integer rows) throws ActionException {
 
-		return execute(new DbExecution<List<BaseRsfB>>() {
-			@Override
-			public List<BaseRsfB> execute(Connection con) throws SQLException {
-				try(NavigationDTO nad = new NavigationDTO(con)) {
-					return nad.readRsfBList(filters, orders, first, rows);
-				}
-			}
-		});
+		return execute(NavigationDTO.class,
+				(dto) -> dto.readRsfBList(filters, orders, first, rows));
 
 	}
 
 	public int getFacturesBSize(final List<Filter> filters) throws ActionException {
 
-		return execute(new DbExecution<Integer>() {
-			@Override
-			public Integer execute(Connection con) throws SQLException {
-				try(NavigationDTO nad = new NavigationDTO(con)) {
-					return (int) nad.readRsfBSize(filters);
-				}
-			}
-		});
+		return execute(NavigationDTO.class,
+				(dto) -> (int) dto.readRsfBSize(filters));
 
 	}
 
 	public List<BaseRsfC> getFacturesC(final List<Filter> filters, final List<OrderBy> orders,
 			final Integer first, final Integer rows) throws ActionException {
 
-		return execute(new DbExecution<List<BaseRsfC>>() {
-			@Override
-			public List<BaseRsfC> execute(Connection con) throws SQLException {
-				try(NavigationDTO nad = new NavigationDTO(con)) {
-					return nad.readRsfCList(filters, orders, first, rows);
-				}
-			}
-		});
+		return execute(NavigationDTO.class,
+				(dto) -> dto.readRsfCList(filters, orders, first, rows));
 
 	}
 
 	public int getFacturesCSize(final List<Filter> filters) throws ActionException {
 
-		return execute(new DbExecution<Integer>() {
-			@Override
-			public Integer execute(Connection con) throws SQLException {
-				try(NavigationDTO nad = new NavigationDTO(con)) {
-					return (int) nad.readRsfCSize(filters);
-				}
-			}
-		});
+		return execute(NavigationDTO.class,
+				(dto) -> (int) dto.readRsfCSize(filters));
 
 	}
 
 	public List<BaseRssMain> getRssMainList(final List<Filter> filters, final List<OrderBy> orders,
 			final Integer first, final Integer rows) throws ActionException {
 
-		return execute(new DbExecution<List<BaseRssMain>>() {
-			@Override
-			public List<BaseRssMain> execute(Connection con) throws SQLException {
-				try(NavigationDTO nad = new NavigationDTO(con)) {
-					return nad.readRssMainList(filters, orders, first, rows);
-				}
-			}
-		});
+		return execute(NavigationDTO.class,
+				(dto) -> dto.readRssMainList(filters, orders, first, rows));
 
 	}
 
 	public int getRssMainSize(final List<Filter> filters) throws ActionException {
 
-		return execute(new DbExecution<Integer>() {
-			@Override
-			public Integer execute(Connection con) throws SQLException {
-				try(NavigationDTO nad = new NavigationDTO(con)) {
-					return (int) nad.readRssMainSize(filters);
-				}
-			}
-		});
+		return execute(NavigationDTO.class,
+				(dto) -> (int) dto.readRssMainSize(filters));
 
 	}
 
 	public List<BaseRssDa> getRssDaList(final List<Filter> filters, final List<OrderBy> orders,
 			final Integer first, final Integer rows) throws ActionException {
 
-		return execute(new DbExecution<List<BaseRssDa>>() {
-			@Override
-			public List<BaseRssDa> execute(Connection con) throws SQLException {
-				try(NavigationDTO nad = new NavigationDTO(con)) {
-					return nad.readRssDaList(filters, orders, first, rows);
-				}
-			}
-		});
+		return execute(NavigationDTO.class,
+				(dto) -> dto.readRssDaList(filters, orders, first, rows));
 
 	}
 
 	public int getRssDaSize(final List<Filter> filters) throws ActionException {
 
-		return execute(new DbExecution<Integer>() {
-			@Override
-			public Integer execute(Connection con) throws SQLException {
-				try(NavigationDTO nad = new NavigationDTO(con)) {
-					return (int) nad.readRssDaSize(filters);
-				}
-			}
-		});
+		return execute(NavigationDTO.class,
+				(dto) -> (int) dto.readRssDaSize(filters));
 
 	}
 
 	public List<BaseRssDad> getRssDadList(final List<Filter> filters, final List<OrderBy> orders,
 			final Integer first, final Integer rows) throws ActionException {
 
-		return execute(new DbExecution<List<BaseRssDad>>() {
-			@Override
-			public List<BaseRssDad> execute(Connection con) throws SQLException {
-				try(NavigationDTO nad = new NavigationDTO(con)) {
-					return nad.readRssDadList(filters, orders, first, rows);
-				}
-			}
-		});
+		return execute(NavigationDTO.class,
+				(dto) -> dto.readRssDadList(filters, orders, first, rows));
 
 	}
 
 	public int getRssDadSize(final List<Filter> filters) throws ActionException {
 
-		return execute(new DbExecution<Integer>() {
-			@Override
-			public Integer execute(Connection con) throws SQLException {
-				try(NavigationDTO nad = new NavigationDTO(con)) {
-					return (int) nad.readRssDadSize(filters);
-				}
-			}
-		});
+		return execute(NavigationDTO.class,
+				(dto) -> (int) dto.readRssDadSize(filters));
 
 	}
 
 	public List<BaseRssActe> getRssActeList(final List<Filter> filters, final List<OrderBy> orders,
 			final Integer first, final Integer rows) throws ActionException {
 
-		return execute(new DbExecution<List<BaseRssActe>>() {
-			@Override
-			public List<BaseRssActe> execute(Connection con) throws SQLException {
-				try(NavigationDTO nad = new NavigationDTO(con)) {
-					return nad.readRssActeList(filters, orders, first, rows);
-				}
-			}
-		});
+		return execute(NavigationDTO.class,
+				(dto) -> dto.readRssActeList(filters, orders, first, rows));
 
 	}
 
 	public int getRssActeSize(final List<Filter> filters) throws ActionException {
 
-		return execute(new DbExecution<Integer>() {
-			@Override
-			public Integer execute(Connection con) throws SQLException {
-				try(NavigationDTO nad = new NavigationDTO(con)) {
-					return (int) nad.readRssActeSize(filters);
-				}
-			}
-		});
+		return execute(NavigationDTO.class,
+				(dto) -> (int) dto.readRssActeSize(filters));
 
 	}
 
 	public Integer getUploadedPmsiSize(final List<Filter> filters) throws ActionException {
 
-		return execute(new DbExecution<Integer>() {
-			@Override
-			public Integer execute(Connection con) throws SQLException {
-				try(UploadedPmsiDTO upd = new UploadedPmsiDTO(con, getRequest())) {
-					return (int) upd.listSize(filters);
-				}
-			}
-		});
+		return execute(UploadedPmsiDTO.class,
+				(dto) -> (int) dto.listSize(filters));
 
 	}
 	
 	public List<String> getDistinctFinesses(final UploadedPmsi.Status status) throws ActionException {
 
-		return execute(new DbExecution<List<String>>() {
-			@Override
-			public List<String> execute(Connection con) throws SQLException {
-				try(NavigationDTO nad = new NavigationDTO(con)) {
-					return nad.readFinessList(status);
-				}
-			}
-		});
+		return execute(NavigationDTO.class,
+				(dto) -> dto.readFinessList(status));
 
 	}
 
 	public List<NavigationDTO.YM> getYM(final UploadedPmsi.Status status, final String finess) throws ActionException {
 
-		return execute(new DbExecution<List<NavigationDTO.YM>>() {
-			@Override
-			public List<NavigationDTO.YM> execute(Connection con) throws SQLException {
-				try(NavigationDTO nad = new NavigationDTO(con)) {
-					return nad.readYMList(status, finess);
-				}
-			}
-		});
+		return execute(NavigationDTO.class,
+				(dto) -> dto.readYMList(status, finess));
 
 	}
 
@@ -311,37 +183,24 @@ public class NavigationActions extends DbAction {
 	}
 	
 	public Overview getOverview(final UploadedPmsi model) throws ActionException {
-
-		return execute(new DbExecution<Overview>() {
-			@Override
-			public Overview execute(Connection con) throws SQLException {
-				try(NavigationDTO nad = new NavigationDTO(con)) {
-					Overview overview = new Overview();
-					
-					overview.rsf = (model.rsfoid == null ? null :
-						nad.readPmsiOverview(model, "rsfheader"));
-
-					overview.rss = (model.rssoid == null ? null :
-						nad.readPmsiOverview(model, "rssheader"));
-
-					return overview;
-				}
-			}
-		});
+		
+		final Overview overview = new Overview();
+		if (model.rsfoid != null) {
+			overview.rsf = execute(NavigationDTO.class,
+				(dto) -> dto.readPmsiOverview(model, "rsfheader"));
+		}
+		if (model.rssoid != null) {
+			overview.rsf = execute(NavigationDTO.class,
+					(dto) -> dto.readPmsiOverview(model, "rssheader"));
+		}
+		return overview;
 
 	}
 	
 	public String getPmsiSource(final long pmel_root, final long pmel_position) throws ActionException {
 
-		return execute(new DbExecution<String>() {
-			@Override
-			public String execute(Connection con) throws SQLException {
-				try(NavigationDTO nad = new NavigationDTO(con)) {
-					return nad.pmsiSource(pmel_root, pmel_position);
-					
-				}
-			}
-		});
+		return execute(NavigationDTO.class,
+				(dto) -> dto.pmsiSource(pmel_root, pmel_position));
 
 	}
 
