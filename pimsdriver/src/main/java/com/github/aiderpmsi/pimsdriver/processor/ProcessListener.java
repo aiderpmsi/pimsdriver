@@ -12,18 +12,16 @@ import javax.ws.rs.ext.Provider;
 import org.glassfish.jersey.server.spi.Container;
 import org.glassfish.jersey.server.spi.ContainerLifecycleListener;
 
+import com.github.aiderpmsi.pimsdriver.db.DataSourceSingleton;
+
 @Provider
 public class ProcessListener implements ContainerLifecycleListener {
 
 	static final Logger log = Logger.getLogger(ProcessListener.class.toString());
 	
-	Future<Boolean> threadResult = null;
-	
 	@Override
 	public void onStartup(Container container) {
-		// INITIALIZE RUNNING PROCESSOR
-		ExecutorService execute = Executors.newSingleThreadExecutor();
-		threadResult = execute.submit(new ProcessTask());
+		// LET BET EACH DATASOURCE BE INITIALIZED WHEN FIRST CALL TO IT WILL BE DONE
 	}
 
 	@Override
@@ -35,13 +33,7 @@ public class ProcessListener implements ContainerLifecycleListener {
 
 	@Override
 	public void onShutdown(Container container) {
-		threadResult.cancel(true);
-		try {
-			threadResult.get();
-		} catch (InterruptedException | ExecutionException | CancellationException e) {
-			log.warning(e.getMessage());
-		} finally {
-			// DO NOTHING
-		}
+		// STOPS EACH PROCESS FOR EACH DATASOURCE
+		DataSourceSingleton.clean();
 	}
 }

@@ -12,11 +12,13 @@ import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.annotation.security.PermitAll;
+import javax.servlet.ServletContext;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 
@@ -46,7 +48,8 @@ public class Report {
     @Path("/report/{id}/factures.pdf")
     @Produces({"application/pdf"})
 	public Response getFactures(
-			@PathParam("id") final Long id) {
+			@PathParam("id") final Long id,
+			@Context ServletContext context) {
 		
 		StreamingOutput stream = new StreamingOutput() {
 	
@@ -55,7 +58,7 @@ public class Report {
 			
 				try (
 						OutputStream bos = new BufferedOutputStream(os);
-						Connection con = DataSourceSingleton.getInstance().getConnection();) {
+						Connection con = DataSourceSingleton.getConnection(context);) {
 
 					JasperReport report = reportFromResourceName("fact_main.jrxml");
 
@@ -80,7 +83,8 @@ public class Report {
     @Path("/report/{id}/sejours.pdf")
     @Produces({"application/pdf"})
 	public Response getSejours(
-			@PathParam("id") final Long id) {
+			@PathParam("id") final Long id,
+			@Context ServletContext context) {
 		
 		StreamingOutput stream = new StreamingOutput() {
 	
@@ -89,7 +93,7 @@ public class Report {
 			
 				try (
 						OutputStream bos = new BufferedOutputStream(os);
-						Connection con = DataSourceSingleton.getInstance().getConnection();) {
+						Connection con = DataSourceSingleton.getConnection(context);) {
 
 					JasperReport report = reportFromResourceName("sejour_main.jrxml");
 

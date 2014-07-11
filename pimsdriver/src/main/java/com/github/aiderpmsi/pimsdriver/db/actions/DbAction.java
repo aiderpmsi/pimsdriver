@@ -5,22 +5,23 @@ import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+import javax.servlet.ServletContext;
+
 import com.github.aiderpmsi.pimsdriver.db.DataSourceSingleton;
 import com.github.aiderpmsi.pimsdriver.dto.AutoCloseableDto;
-import com.vaadin.server.VaadinRequest;
 
 public abstract class DbAction {
 
 	private final int MAXRETRYS = 1000;
 	
-	private final VaadinRequest request;
+	private final ServletContext context;
 	
-	public DbAction(final VaadinRequest request) {
-		this.request = request;
+	public DbAction(final ServletContext context) {
+		this.context = context;
 	}
 
-	public VaadinRequest getRequest() {
-		return request;
+	public ServletContext getServletContext() {
+		return context;
 	}
 
 	@FunctionalInterface
@@ -32,7 +33,7 @@ public abstract class DbAction {
 		try {
 			final Constructor<S> constructor = dtoClass.getConstructor(Connection.class);
 			try (
-					final Connection con = DataSourceSingleton.getConnection(getRequest());
+					final Connection con = DataSourceSingleton.getConnection(getServletContext());
 					final S dto = constructor.newInstance(con);) {
 	
 				// CONTINUE WHILE SELECTION HAS NOT SUCCEDED BECAUSE OF SERIALIZATION EXCEPTIONS

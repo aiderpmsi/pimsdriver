@@ -8,6 +8,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.ServletContext;
+
 import com.github.aiderpmsi.pimsdriver.db.vaadin.query.DBQueryBuilder;
 import com.github.aiderpmsi.pimsdriver.dto.model.BaseRsfA;
 import com.github.aiderpmsi.pimsdriver.dto.model.BaseRsfB;
@@ -97,8 +99,8 @@ public class NavigationDTO extends AutoCloseableDto<NavigationDTO.Navigation> {
 	
 	};
 
-	public NavigationDTO(Connection con) {
-		super(con, NavigationDTO.Navigation.class);
+	public NavigationDTO(final Connection con, final ServletContext context) {
+		super(con, NavigationDTO.Navigation.class, context);
 	}
 
 	public List<String> readFinessList(UploadedPmsi.Status status) throws SQLException {
@@ -191,7 +193,7 @@ public class NavigationDTO extends AutoCloseableDto<NavigationDTO.Navigation> {
 			query.append(" LIMIT ").append(rows.toString()).append(" ");
 		
 		// CREATES THE DB STATEMENT
-		try (PreparedStatement ps = con.prepareStatement(query.toString())) {
+		try (PreparedStatement ps = getConnection().prepareStatement(query.toString())) {
 
 			for (int i = 0 ; i < queryArgs.size() ; i++) {
 				ps.setObject(i + 1, queryArgs.get(i));
@@ -276,7 +278,7 @@ public class NavigationDTO extends AutoCloseableDto<NavigationDTO.Navigation> {
 		query.append(DBQueryBuilder.getWhereStringForFilters(filters, queryArgs));
 		
 		// CREATE THE DB STATEMENT
-		try (PreparedStatement ps = con.prepareStatement(query.toString())) {
+		try (PreparedStatement ps = getConnection().prepareStatement(query.toString())) {
 			for (int i = 0 ; i < queryArgs.size() ; i++) {
 				ps.setObject(i + 1, queryArgs.get(i));
 			}
@@ -313,7 +315,7 @@ public class NavigationDTO extends AutoCloseableDto<NavigationDTO.Navigation> {
 			query.append(" LIMIT ").append(rows.toString()).append(" ");
 		
 		// CREATES THE DB STATEMENT
-		try (PreparedStatement ps = con.prepareStatement(query.toString())) {
+		try (PreparedStatement ps = getConnection().prepareStatement(query.toString())) {
 
 			for (int i = 0 ; i < queryArgs.size() ; i++) {
 				ps.setObject(i + 1, queryArgs.get(i));
@@ -387,7 +389,7 @@ public class NavigationDTO extends AutoCloseableDto<NavigationDTO.Navigation> {
 		query.append(DBQueryBuilder.getWhereStringForFilters(filters, queryArgs));
 		
 		// CREATE THE DB STATEMENT
-		try (PreparedStatement ps = con.prepareStatement(query.toString())) {
+		try (PreparedStatement ps = getConnection().prepareStatement(query.toString())) {
 			for (int i = 0 ; i < queryArgs.size() ; i++) {
 				ps.setObject(i + 1, queryArgs.get(i));
 			}
@@ -423,7 +425,7 @@ public class NavigationDTO extends AutoCloseableDto<NavigationDTO.Navigation> {
 			query.append(" LIMIT ").append(rows.toString()).append(" ");
 		
 		// CREATES THE DB STATEMENT
-		try (PreparedStatement ps = con.prepareStatement(query.toString())) {
+		try (PreparedStatement ps = getConnection().prepareStatement(query.toString())) {
 
 			for (int i = 0 ; i < queryArgs.size() ; i++) {
 				ps.setObject(i + 1, queryArgs.get(i));
@@ -495,7 +497,7 @@ public class NavigationDTO extends AutoCloseableDto<NavigationDTO.Navigation> {
 		query.append(DBQueryBuilder.getWhereStringForFilters(filters, queryArgs));
 		
 		// CREATE THE DB STATEMENT
-		try (PreparedStatement ps = con.prepareStatement(query.toString())) {
+		try (PreparedStatement ps = getConnection().prepareStatement(query.toString())) {
 			for (int i = 0 ; i < queryArgs.size() ; i++) {
 				ps.setObject(i + 1, queryArgs.get(i));
 			}
@@ -539,7 +541,7 @@ public class NavigationDTO extends AutoCloseableDto<NavigationDTO.Navigation> {
 			query.append(" LIMIT ").append(rows.toString()).append(" ");
 		
 		// CREATES THE DB STATEMENT
-		try (PreparedStatement ps = con.prepareStatement(query.toString())) {
+		try (PreparedStatement ps = getConnection().prepareStatement(query.toString())) {
 
 			for (int i = 0 ; i < queryArgs.size() ; i++) {
 				ps.setObject(i + 1, queryArgs.get(i));
@@ -593,7 +595,7 @@ public class NavigationDTO extends AutoCloseableDto<NavigationDTO.Navigation> {
 		query.append(DBQueryBuilder.getWhereStringForFilters(filters, queryArgs));
 		
 		// CREATE THE DB STATEMENT
-		try (PreparedStatement ps = con.prepareStatement(query.toString())) {
+		try (PreparedStatement ps = getConnection().prepareStatement(query.toString())) {
 			for (int i = 0 ; i < queryArgs.size() ; i++) {
 				ps.setObject(i + 1, queryArgs.get(i));
 			}
@@ -628,7 +630,7 @@ public class NavigationDTO extends AutoCloseableDto<NavigationDTO.Navigation> {
 			query.append(" LIMIT ").append(rows.toString()).append(" ");
 		
 		// CREATES THE DB STATEMENT
-		try (PreparedStatement ps = con.prepareStatement(query.toString())) {
+		try (PreparedStatement ps = getConnection().prepareStatement(query.toString())) {
 
 			for (int i = 0 ; i < queryArgs.size() ; i++) {
 				ps.setObject(i + 1, queryArgs.get(i));
@@ -669,7 +671,7 @@ public class NavigationDTO extends AutoCloseableDto<NavigationDTO.Navigation> {
 		query.append(DBQueryBuilder.getWhereStringForFilters(filters, queryArgs));
 		
 		// CREATE THE DB STATEMENT
-		try (PreparedStatement ps = con.prepareStatement(query.toString())) {
+		try (PreparedStatement ps = getConnection().prepareStatement(query.toString())) {
 			for (int i = 0 ; i < queryArgs.size() ; i++) {
 				ps.setObject(i + 1, queryArgs.get(i));
 			}
@@ -704,7 +706,7 @@ public class NavigationDTO extends AutoCloseableDto<NavigationDTO.Navigation> {
 			query.append(" LIMIT ").append(rows.toString()).append(" ");
 		
 		// CREATES THE DB STATEMENT
-		try (PreparedStatement ps = con.prepareStatement(query.toString())) {
+		try (PreparedStatement ps = getConnection().prepareStatement(query.toString())) {
 
 			for (int i = 0 ; i < queryArgs.size() ; i++) {
 				ps.setObject(i + 1, queryArgs.get(i));
@@ -745,7 +747,7 @@ public class NavigationDTO extends AutoCloseableDto<NavigationDTO.Navigation> {
 		query.append(DBQueryBuilder.getWhereStringForFilters(filters, queryArgs));
 		
 		// CREATE THE DB STATEMENT
-		try (PreparedStatement ps = con.prepareStatement(query.toString())) {
+		try (PreparedStatement ps = getConnection().prepareStatement(query.toString())) {
 			for (int i = 0 ; i < queryArgs.size() ; i++) {
 				ps.setObject(i + 1, queryArgs.get(i));
 			}
@@ -782,7 +784,7 @@ public class NavigationDTO extends AutoCloseableDto<NavigationDTO.Navigation> {
 			query.append(" LIMIT ").append(rows.toString()).append(" ");
 		
 		// CREATES THE DB STATEMENT
-		try (PreparedStatement ps = con.prepareStatement(query.toString())) {
+		try (PreparedStatement ps = getConnection().prepareStatement(query.toString())) {
 
 			for (int i = 0 ; i < queryArgs.size() ; i++) {
 				ps.setObject(i + 1, queryArgs.get(i));
@@ -827,7 +829,7 @@ public class NavigationDTO extends AutoCloseableDto<NavigationDTO.Navigation> {
 		query.append(DBQueryBuilder.getWhereStringForFilters(filters, queryArgs));
 		
 		// CREATE THE DB STATEMENT
-		try (PreparedStatement ps = con.prepareStatement(query.toString())) {
+		try (PreparedStatement ps = getConnection().prepareStatement(query.toString())) {
 			for (int i = 0 ; i < queryArgs.size() ; i++) {
 				ps.setObject(i + 1, queryArgs.get(i));
 			}

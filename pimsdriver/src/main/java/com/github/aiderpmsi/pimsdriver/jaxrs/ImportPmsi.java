@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.util.Set;
 
 import javax.annotation.security.PermitAll;
+import javax.servlet.ServletContext;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
@@ -41,7 +42,8 @@ public class ImportPmsi {
 			@FormDataParam("rsf") FormDataContentDisposition rsfInformations,
     		@FormDataParam("rss") InputStream rss,
 			@FormDataParam("rss") FormDataContentDisposition rssInformations,
-			@Context UriInfo uriInfo) throws IOException {
+			@Context UriInfo uriInfo,
+			@Context ServletContext servletContext) throws IOException {
 		
 		// CREATES THE MODEL
 		UploadPmsi model = new UploadPmsi();
@@ -72,7 +74,7 @@ public class ImportPmsi {
 		}
 		// THE FORM IS OK AND WE HAVE AT LEAST ONE RSF, IMPORT THE DATAS
 		else {
-			IOActions ioa = new IOActions();
+			IOActions ioa = new IOActions(servletContext);
 			Response resp;
 			try {
 				ioa.uploadPmsi(model, rsf, rss);

@@ -26,18 +26,18 @@ public class BaseQuery<R> implements Query {
 		public String sizeError(Exception e);
 	}
 	
-	private List<Filter> sqlFilters;
+	private final List<Filter> sqlFilters;
 	
-	private List<OrderBy> sqlOrderBys;
+	private final List<OrderBy> sqlOrderBys;
 		
-	private BaseQueryInit<R> bqi;
+	private final BaseQueryInit<R> bqi;
 	
-	public BaseQuery(BaseQueryInit<R> queryInit, DBQueryMapping mapping, QueryDefinition qd) {
+	public BaseQuery(final BaseQueryInit<R> queryInit, final DBQueryMapping mapping, final QueryDefinition qd) {
 		
 		this.bqi = queryInit;
 		
 		// MAPS THE NAME OF THE VAADIN FILTERS TO SQL FILTER
-		DBFilterMapper fm = new DBFilterMapper(mapping);
+		final DBFilterMapper fm = new DBFilterMapper(mapping);
 
 		// INIT FILTERS
 		queryInit.initFilters(qd.getFilters());
@@ -45,9 +45,9 @@ public class BaseQuery<R> implements Query {
 		sqlFilters = fm.mapFilters(qd.getFilters());
 		
 		// CREATES THE ORDERS LIST
-		LinkedList<Entry<Object, Boolean>> vaadinOrderBys = new LinkedList<>();
+		final LinkedList<Entry<Object, Boolean>> vaadinOrderBys = new LinkedList<>();
 		for (int i = 0 ; i < qd.getSortPropertyIds().length ; i++) {
-			Entry<Object, Boolean> entry = new Entry<>(
+			final Entry<Object, Boolean> entry = new Entry<>(
 					qd.getSortPropertyIds()[i],
 					qd.getSortPropertyAscendingStates().length < i ? true :
 						qd.getSortPropertyAscendingStates()[i]);
@@ -73,22 +73,14 @@ public class BaseQuery<R> implements Query {
 	@Override
 	public List<Item> loadItems(final int startIndex, final int count) {
 		// CREATES LIST OF ITEMS
-		List<Item> items = new ArrayList<>(count);
+		final List<Item> items = new ArrayList<>(count);
 		
-		List<R> beans = ActionEncloser.executer(new ActionEncloser.ActionReturner<List<R>>() {
-			@Override
-			public List<R> action() throws ActionException {
-				return bqi.loadBeans(sqlFilters, sqlOrderBys, startIndex, count);
-			}
-			@Override
-			public String msgError(ActionException e) {
-				return bqi.loadBeansError(e);
-			}
-		});
-		
+		final List<R> beans = ActionEncloser.execute( (exception) -> bqi.loadBeansError(exception),
+				() -> bqi.loadBeans(sqlFilters, sqlOrderBys, startIndex, count));
+
 		if (beans != null) {
 			// FILS THE LIST OF ITEMS FROM THE BEANS
-			for (R bean : beans) {
+			for (final R bean : beans) {
 				items.add(new BeanItem<R>(bean));
 			}
 		}
@@ -104,21 +96,13 @@ public class BaseQuery<R> implements Query {
 	@Override
 	public int size() {
 		// SIZE
-		Integer size = ActionEncloser.executer(new ActionEncloser.ActionReturner<Integer>() {
-			@Override
-			public Integer action() throws ActionException {
-				return bqi.size(sqlFilters);
-			}
-			@Override
-			public String msgError(ActionException e) {
-				return bqi.sizeError(e);
-			}
-		});
+		final Integer size = ActionEncloser.execute( (exception) -> bqi.sizeError(exception),
+				() -> bqi.size(sqlFilters));
 
 		if (size == null)
-			size = 0;
-		
-		return size;
+			return 0;
+		else
+			return size;
 	}
 
 }

@@ -7,6 +7,8 @@ import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.servlet.ServletContext;
+
 import com.github.aiderpmsi.pimsdriver.dto.StatementProvider.Entry;
 
 public class CleanupDTO extends AutoCloseableDto<CleanupDTO.Cleanup>{
@@ -31,7 +33,7 @@ public class CleanupDTO extends AutoCloseableDto<CleanupDTO.Cleanup>{
 				else
 					throw new SQLException("getStatement for DELETE element needs not null Long entry");
 			}
-			
+
 			// SHOULD NEVER TOUCH THIS POINT
 			throw new RuntimeException("This code should never been reached");
 		}
@@ -42,8 +44,8 @@ public class CleanupDTO extends AutoCloseableDto<CleanupDTO.Cleanup>{
 		public long number;
 	}
 	
-	public CleanupDTO(Connection con) {
-		super(con, CleanupDTO.Cleanup.class);
+	public CleanupDTO(final Connection con, final ServletContext context) {
+		super(con, CleanupDTO.Cleanup.class, context);
 	}
 
 	public List<Long> readList() throws SQLException {

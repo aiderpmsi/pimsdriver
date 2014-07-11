@@ -48,7 +48,9 @@ public class FinessExpandListener implements Tree.ExpandListener {
 		final Integer month = (Integer) hc.getContainerProperty(event.getItemId(), "month").getValue();
 		
 		// IF WE EXPAND A ROOT NODE
-		ActionEncloser.execute(new ActionEncloser.ActionExecuter() {
+		ActionEncloser.execute(
+				
+				new ActionEncloser.ActionExecuter() {
 			@Override
 			public void action() throws ActionException {
 				switch (depth) {

@@ -2,13 +2,15 @@ package com.github.aiderpmsi.pimsdriver.processor;
 
 import java.util.concurrent.Callable;
 
+import javax.servlet.ServletContext;
+
 import com.github.aiderpmsi.pimsdriver.db.actions.CleanupActions;
 
 public class CleanupImpl implements Callable<Boolean> {
 
-	private Long pludId;
+	private final Long pludId;
 	
-	public CleanupImpl(Long pludId) {
+	public CleanupImpl(final Long pludId, ServletContext context) {
 		this.pludId = pludId;
 	}
 

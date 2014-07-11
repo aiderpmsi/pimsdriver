@@ -10,6 +10,8 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Collection;
 
+import javax.servlet.ServletContext;
+
 import org.apache.commons.dbcp2.DelegatingConnection;
 import org.postgresql.PGConnection;
 import org.postgresql.copy.CopyManager;
@@ -113,8 +115,8 @@ public class ProcessorDTO extends AutoCloseableDto<ProcessorDTO.Query> {
 		
 	}
 	
-	public ProcessorDTO(Connection con) {
-		super(con, ProcessorDTO.Query.class);
+	public ProcessorDTO(final Connection con, final ServletContext context) {
+		super(con, ProcessorDTO.Query.class, context);
 	}
 
 	public void createTempTables() throws SQLException {
@@ -153,8 +155,8 @@ public class ProcessorDTO extends AutoCloseableDto<ProcessorDTO.Query> {
 		
 		Connection innerCon;
 
-		if(con instanceof DelegatingConnection
-				&& (innerCon = ((DelegatingConnection<?>) con).getInnermostDelegateInternal()) instanceof PGConnection) {
+		if(getConnection() instanceof DelegatingConnection
+				&& (innerCon = ((DelegatingConnection<?>) getConnection()).getInnermostDelegateInternal()) instanceof PGConnection) {
 			// GETS LARGE OBJECT API IF CONNECTION IS POSTGRESQL
 			LargeObjectManager lom = ((org.postgresql.PGConnection)innerCon).getLargeObjectAPI();
 			
@@ -191,7 +193,7 @@ public class ProcessorDTO extends AutoCloseableDto<ProcessorDTO.Query> {
 				String groupQuery = "COPY pmgr_temp (pmel_position, pmgr_racine, pmgr_modalite, pmgr_gravite, pmgr_erreur) "
 						+ "FROM STDIN WITH DELIMITER '|'";
 
-				final Connection conn = ((DelegatingConnection<?>) con).getInnermostDelegateInternal();
+				final Connection conn = ((DelegatingConnection<?>) getConnection()).getInnermostDelegateInternal();
 				final CopyManager cm = new CopyManager((org.postgresql.core.BaseConnection)conn);
 				
 				for (LineHandler lineHandler : lhs) {
@@ -225,7 +227,7 @@ public class ProcessorDTO extends AutoCloseableDto<ProcessorDTO.Query> {
 		PreparedStatement ps = getPs(Query.SET_STATUS);
 		ps.setString(1, successed.toString());
 		ps.setString(2, finess);
-		Array parametersArray = con.createArrayOf("text", parameters);
+		Array parametersArray = getConnection().createArrayOf("text", parameters);
 		ps.setArray(3, parametersArray);
 		ps.setLong(4, recordid);
 		ps.execute();

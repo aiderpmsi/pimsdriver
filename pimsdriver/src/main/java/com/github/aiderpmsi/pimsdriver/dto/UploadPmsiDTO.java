@@ -8,13 +8,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 
+import javax.servlet.ServletContext;
+
 import org.apache.commons.dbcp2.DelegatingConnection;
 import org.postgresql.largeobject.LargeObject;
 import org.postgresql.largeobject.LargeObjectManager;
 
 import com.github.aiderpmsi.pimsdriver.dto.model.UploadPmsi;
 import com.github.aiderpmsi.pimsdriver.dto.model.UploadedPmsi;
-import com.vaadin.server.VaadinRequest;
 
 public class UploadPmsiDTO extends AutoCloseableDto<UploadPmsiDTO.Query> {
 
@@ -37,8 +38,8 @@ public class UploadPmsiDTO extends AutoCloseableDto<UploadPmsiDTO.Query> {
 		}
 	};
 	
-	public UploadPmsiDTO(final Connection con, final VaadinRequest request) {
-		super(con, UploadPmsiDTO.Query.class, request);
+	public UploadPmsiDTO(final Connection con, final ServletContext context) {
+		super(con, UploadPmsiDTO.Query.class, context);
 	}
 
 	public Long create(UploadPmsi model, InputStream rsf, InputStream rss) throws SQLException {

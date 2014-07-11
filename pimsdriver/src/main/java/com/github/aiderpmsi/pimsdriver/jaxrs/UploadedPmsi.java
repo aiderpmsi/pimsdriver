@@ -5,11 +5,13 @@ import java.util.HashMap;
 import java.util.List;
 
 import javax.annotation.security.PermitAll;
+import javax.servlet.ServletContext;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -41,7 +43,8 @@ public class UploadedPmsi {
 			@DefaultValue("0") @QueryParam("first") Integer first,
 			@DefaultValue("20") @QueryParam("rows") Integer rows,
 			@QueryParam("orderelts") List<String> orderelts,
-			@QueryParam("order") List<Boolean> order) {
+			@QueryParam("order") List<Boolean> order,
+			@Context ServletContext context) {
 
 		// CREATE FILTERS AND ORDERS
 		List<Filter> filters = new ArrayList<>(1);
@@ -55,7 +58,7 @@ public class UploadedPmsi {
 			}
 		}
 
-		NavigationActions na = new NavigationActions();
+		NavigationActions na = new NavigationActions(context);
 		try {
 			List<com.github.aiderpmsi.pimsdriver.dto.model.UploadedPmsi> pued =
 					na.getUploadedPmsi(filters, orders, first, rows);

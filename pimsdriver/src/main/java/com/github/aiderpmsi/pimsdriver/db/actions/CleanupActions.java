@@ -1,43 +1,25 @@
 package com.github.aiderpmsi.pimsdriver.db.actions;
 
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.List;
 
-import com.github.aiderpmsi.pimsdriver.db.DataSourceSingleton;
+import javax.servlet.ServletContext;
+
 import com.github.aiderpmsi.pimsdriver.dto.CleanupDTO;
-import com.vaadin.server.VaadinRequest;
 
 public class CleanupActions extends DbAction {
 	
-	public CleanupActions(final VaadinRequest request) {
-		super(request);
+	public CleanupActions(final ServletContext context) {
+		super(context);
 	}
 
 	public List<Long> getToCleanup() throws ActionException {
-
-		try (
-				final Connection con = DataSourceSingleton.getConnection(getRequest());
-				final CleanupDTO cu = new CleanupDTO(con);) {
-
-			return execute( (connection) -> cu.readList());
-
-		} catch (final SQLException e) {
-			throw new ActionException(e);
-		}
+		return execute(CleanupDTO.class,
+				(dto) -> dto.readList());
 	}
 
 	public Boolean cleanup(final Long cleanupId) throws ActionException {
-
-		try (
-				final Connection con = DataSourceSingleton.getConnection(getRequest());
-				final CleanupDTO cu = new CleanupDTO(con);) {
-			
-			return execute( (connection) -> cu.delete(cleanupId));
-
-		} catch (final SQLException e) {
-			throw new ActionException(e);
-		}
+		return execute(CleanupDTO.class,
+				(dto) -> dto.delete(cleanupId));
 	}
 	
 }

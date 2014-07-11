@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.servlet.ServletContext;
+
 import org.apache.commons.dbcp2.DelegatingConnection;
 import org.postgresql.largeobject.LargeObjectManager;
 
@@ -16,7 +18,6 @@ import com.github.aiderpmsi.pimsdriver.dto.StatementProvider.Entry;
 import com.github.aiderpmsi.pimsdriver.dto.model.UploadedPmsi;
 import com.vaadin.data.Container.Filter;
 import com.vaadin.data.util.sqlcontainer.query.OrderBy;
-import com.vaadin.server.VaadinRequest;
 
 public class UploadedPmsiDTO extends AutoCloseableDto<UploadedPmsiDTO.Query> {
 
@@ -44,8 +45,8 @@ public class UploadedPmsiDTO extends AutoCloseableDto<UploadedPmsiDTO.Query> {
 		
 	};
 
-	public UploadedPmsiDTO(Connection con, VaadinRequest request) {
-		super(con, UploadedPmsiDTO.Query.class, request);
+	public UploadedPmsiDTO(final Connection con, final ServletContext context) {
+		super(con, UploadedPmsiDTO.Query.class, context);
 	}
 
 	public Boolean delete(UploadedPmsi model) throws SQLException {

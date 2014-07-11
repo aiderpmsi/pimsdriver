@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.servlet.ServletContext;
+
 import com.github.aiderpmsi.pims.parser.utils.SimpleParserFactory;
 import com.github.aiderpmsi.pims.treebrowser.TreeBrowserException;
 import com.github.aiderpmsi.pimsdriver.db.DataSourceSingleton;
@@ -16,21 +18,20 @@ import com.github.aiderpmsi.pimsdriver.db.actions.pmsiprocess.RssLineHandler;
 import com.github.aiderpmsi.pimsdriver.dto.ProcessorDTO;
 import com.github.aiderpmsi.pimsdriver.dto.model.UploadedPmsi;
 import com.github.aiderpmsi.pimsdriver.dto.model.UploadedPmsi.Status;
-import com.vaadin.server.VaadinRequest;
 
 public class ProcessActions extends DbAction {
 	
-	public ProcessActions(VaadinRequest request) {
-		super(request);
+	public ProcessActions(final ServletContext context) {
+		super(context);
 	}
 
 	public boolean processPmsi(UploadedPmsi element) throws ActionException {
 
 		// GETS THE DB CONNECTION
-		try (Connection con = DataSourceSingleton.getConnection(getRequest())) {
+		try (Connection con = DataSourceSingleton.getConnection(getServletContext())) {
 
 			// DTO
-			try (ProcessorDTO dto = new ProcessorDTO(con)) {
+			try (ProcessorDTO dto = new ProcessorDTO(con, getServletContext())) {
 
 				try {
 					// CREATES THE TEMP TABLES

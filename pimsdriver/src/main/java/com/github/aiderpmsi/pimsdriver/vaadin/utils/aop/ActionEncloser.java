@@ -5,26 +5,12 @@ import java.util.function.Function;
 import com.github.aiderpmsi.pimsdriver.db.actions.ActionException;
 import com.vaadin.ui.Notification;
 
-public class ActionEncloser<R, S> {
+public class ActionEncloser<R> {
 
-	private final Function<ActionException, String> errorMsgSupplier;
-	
-	private final Executer<R, S> actionSupplier;
-	
-	private final S actionsProvider;
-	
-	public ActionEncloser(
-			final S actionsProvider,
-			final Function<ActionException, String> errorMsgSupplier,
-			final Executer<R, S> actionSupplier) {
-		this.actionsProvider = actionsProvider;
-		this.errorMsgSupplier = errorMsgSupplier;
-		this.actionSupplier = actionSupplier;
-	}
-	
-	public R execute() {
+	public static <R> R execute(final Function<ActionException, String> errorMsgSupplier,
+			final Executer<R> actionSupplier) {
 		try {
-			return actionSupplier.execute(actionsProvider);
+			return actionSupplier.execute();
 		} catch (ActionException e) {
 			Notification.show(errorMsgSupplier.apply(e), Notification.Type.WARNING_MESSAGE);
 		}
@@ -32,7 +18,7 @@ public class ActionEncloser<R, S> {
 	}
 
 	@FunctionalInterface
-	public interface Executer<R, S> {
-		public R execute(S actionsProvider) throws ActionException;
+	public interface Executer<R> {
+		public R execute() throws ActionException;
 	}
 }

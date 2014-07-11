@@ -4,9 +4,14 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Properties;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
+import javax.servlet.ServletContext;
 import javax.sql.DataSource;
 
 import org.apache.commons.dbcp2.ConnectionFactory;
@@ -18,19 +23,20 @@ import org.apache.commons.pool2.ObjectPool;
 import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.FlywayException;
+import org.glassfish.jersey.server.spi.Container;
 
-import com.vaadin.server.VaadinRequest;
+import com.github.aiderpmsi.pimsdriver.processor.ProcessTask;
 
 public class DataSourceSingleton {
 
 	private static final HashMap<String, DataSource> dataSources = new HashMap<>();
-		
-	public static Connection getConnection(final VaadinRequest request) throws SQLException {
+
+	public static synchronized Connection getConnection(final ServletContext context) throws SQLException {
 		// GET CONNECTION INFORMATIONS FROM CONTEXT
 		String url = null;
 		try {
-			final InitialContext context = new InitialContext();
-			Object urlContext = context.lookup("com.github.aiderpmsi.pimsdriver.jdbcurl");
+			final InitialContext jndiContext = new InitialContext();
+			Object urlContext = jndiContext.lookup("com.github.aiderpmsi.pimsdriver.jdbcurl");
 			url = (String) urlContext;
 		} catch (NamingException e) {
 			throw new SQLException(e);
@@ -38,8 +44,11 @@ public class DataSourceSingleton {
 		
 		DataSource dataSource = null;
 		if ((dataSource = dataSources.get(url)) == null) {
+			// DATASOURCE DID NOT EXIST, WE HAVE TO INIT IT
 			dataSource = initDataSource("", "", "");
 			dataSources.put(url, dataSource);
+			// INIT CLEANERS AND PROCESSORS
+			
 		}
 		
 		final Connection con = dataSource.getConnection();
@@ -100,5 +109,34 @@ public class DataSourceSingleton {
 		 
 		 return dataSource;
 	}
+	
+	private void initDaemons(final ServletContext context) throws SQLException {
+		ExecutorService execute = Executors.newSingleThreadExecutor();
+		threadResult = execute.submit(new ProcessTask());
+	}
+
+	@Override
+	public void onReload(Container container) {
+		// STOP AND START
+		onShutdown(container);
+		onStartup(container);
+	}
+
+	@Override
+	public void onShutdown(Container container) {
+		threadResult.cancel(true);
+		try {
+			threadResult.get();
+		} catch (InterruptedException | ExecutionException | CancellationException e) {
+			log.warning(e.getMessage());
+		} finally {
+			// DO NOTHING
+		}
+
+	}
+
+	public static void clean() {
+		// STOPS EACH FUTURE AND CLEANS HASMAPS
 		
+	}
 }

@@ -2,6 +2,8 @@ package com.github.aiderpmsi.pimsdriver.db.actions;
 
 import java.util.List;
 
+import javax.servlet.ServletContext;
+
 import com.github.aiderpmsi.pimsdriver.dto.NavigationDTO;
 import com.github.aiderpmsi.pimsdriver.dto.UploadedPmsiDTO;
 import com.github.aiderpmsi.pimsdriver.dto.model.BaseRsfA;
@@ -14,12 +16,11 @@ import com.github.aiderpmsi.pimsdriver.dto.model.BaseRssMain;
 import com.github.aiderpmsi.pimsdriver.dto.model.UploadedPmsi;
 import com.vaadin.data.Container.Filter;
 import com.vaadin.data.util.sqlcontainer.query.OrderBy;
-import com.vaadin.server.VaadinRequest;
 
 public class NavigationActions extends DbAction {
 
-	public NavigationActions(final VaadinRequest request) {
-		super(request);
+	public NavigationActions(final ServletContext context) {
+		super(context);
 	}
 
 	public List<UploadedPmsi> getUploadedPmsi(final List<Filter> filters, final List<OrderBy> orders,

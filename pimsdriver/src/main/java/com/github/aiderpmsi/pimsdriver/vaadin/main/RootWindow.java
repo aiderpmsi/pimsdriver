@@ -1,8 +1,11 @@
 package com.github.aiderpmsi.pimsdriver.vaadin.main;
 
+import javax.servlet.ServletContext;
+
 import com.github.aiderpmsi.pimsdriver.dto.model.UploadedPmsi;
 import com.vaadin.annotations.Theme;
 import com.vaadin.server.VaadinRequest;
+import com.vaadin.server.VaadinServlet;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Layout;
 import com.vaadin.ui.UI;
@@ -28,7 +31,7 @@ public class RootWindow extends UI {
 
 	private final SplitPanel splitPanel = new SplitPanel(this);
 
-	private VaadinRequest vaadinRequest = null;
+	private final ServletContext servletContext = VaadinServlet.getCurrent().getServletContext();
 	
 	@Override
 	protected void init(final VaadinRequest request) {
@@ -36,10 +39,6 @@ public class RootWindow extends UI {
 		layout.addComponent(menuBar);
 		layout.addComponent(splitPanel);
 		setContent(layout);
-
-		// SETS THE VADIN REQUEST
-		this.vaadinRequest = request;
-		
 	}
 		
 	public void setUploadSelected(final UploadedPmsi model, final UploadedPmsi.Status status) {
@@ -67,8 +66,8 @@ public class RootWindow extends UI {
 		return splitPanel;
 	}
 
-	public VaadinRequest getVaadinRequest() {
-		return vaadinRequest;
+	public ServletContext getServletContext() {
+		return servletContext;
 	}
 
 }
