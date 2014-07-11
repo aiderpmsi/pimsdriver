@@ -1,10 +1,5 @@
 package com.github.aiderpmsi.pimsdriver.processor;
 
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.logging.Logger;
 
 import javax.ws.rs.ext.Provider;
@@ -17,7 +12,8 @@ import com.github.aiderpmsi.pimsdriver.db.DataSourceSingleton;
 @Provider
 public class ProcessListener implements ContainerLifecycleListener {
 
-	static final Logger log = Logger.getLogger(ProcessListener.class.toString());
+	@SuppressWarnings("unused")
+	private static final Logger log = Logger.getLogger(ProcessListener.class.toString());
 	
 	@Override
 	public void onStartup(Container container) {

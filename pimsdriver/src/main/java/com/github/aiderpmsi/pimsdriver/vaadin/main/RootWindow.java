@@ -41,9 +41,9 @@ public class RootWindow extends UI {
 		setContent(layout);
 	}
 		
-	public void setUploadSelected(final UploadedPmsi model, final UploadedPmsi.Status status) {
-		splitPanel.getContentPanel().setUpload(model, status);
-		menuBar.setUpload(model, status);
+	public void setUploadSelected(final UploadedPmsi model) {
+		splitPanel.getContentPanel().setUpload(model);
+		menuBar.setUpload(model);
 	}
 	
 	public void setMenuNavigationSelected(final UploadedPmsi model, final MenuBar.MenuBarSelected type) {

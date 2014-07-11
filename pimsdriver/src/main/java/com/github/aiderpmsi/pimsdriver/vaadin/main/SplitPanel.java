@@ -11,7 +11,7 @@ public class SplitPanel extends HorizontalSplitPanel{
 
 	private final RootWindow parent;
 
-	private final PmsiContentPanel contentPanel = new PmsiContentPanel();
+	private final PmsiContentPanel contentPanel = new PmsiContentPanel(this);
 	
 	private final FinessComponent finessPanel = new FinessComponent(this);
 		

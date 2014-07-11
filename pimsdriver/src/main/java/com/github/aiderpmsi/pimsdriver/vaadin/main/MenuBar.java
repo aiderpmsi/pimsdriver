@@ -52,13 +52,13 @@ public class MenuBar extends com.vaadin.ui.MenuBar {
 		navigations.setVisible(false);
 	}
 
-	public void setUpload(final UploadedPmsi model, final Status status) {
+	public void setUpload(final UploadedPmsi model) {
 		// FIRST, CLEANUP NAVIGATION AND REPORTS MENU ITEMS
 		navigations.removeChildren();
 		rapports.removeChildren();
 		
 		// IF NEW MODEL, CREATE THE LINKS
-		if (model != null && status == Status.successed) {
+		if (model != null && model.getStatus() != null && model.getStatus() == Status.successed) {
 			navigations.addItem("Factures", null,
 					(selectedItem) -> parent.setMenuNavigationSelected(model, MenuBarSelected.factures));
 			navigations.addItem("Séjours", null,

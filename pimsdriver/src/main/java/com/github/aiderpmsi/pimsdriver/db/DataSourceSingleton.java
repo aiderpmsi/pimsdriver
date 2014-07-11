@@ -3,11 +3,14 @@ package com.github.aiderpmsi.pimsdriver.db;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.logging.Logger;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -23,13 +26,15 @@ import org.apache.commons.pool2.ObjectPool;
 import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.FlywayException;
-import org.glassfish.jersey.server.spi.Container;
-
 import com.github.aiderpmsi.pimsdriver.processor.ProcessTask;
 
 public class DataSourceSingleton {
 
 	private static final HashMap<String, DataSource> dataSources = new HashMap<>();
+
+	private static final HashMap<String, Future<Boolean>> futures = new HashMap<>();
+	
+	private static final Logger log = Logger.getLogger(DataSourceSingleton.class.toString());
 
 	public static synchronized Connection getConnection(final ServletContext context) throws SQLException {
 		// GET CONNECTION INFORMATIONS FROM CONTEXT
@@ -45,10 +50,10 @@ public class DataSourceSingleton {
 		DataSource dataSource = null;
 		if ((dataSource = dataSources.get(url)) == null) {
 			// DATASOURCE DID NOT EXIST, WE HAVE TO INIT IT
-			dataSource = initDataSource("", "", "");
+			dataSource = initDataSource("TODO", "", "");
 			dataSources.put(url, dataSource);
 			// INIT CLEANERS AND PROCESSORS
-			
+			futures.put("TODO", Executors.newSingleThreadExecutor().submit(new ProcessTask(context)));			
 		}
 		
 		final Connection con = dataSource.getConnection();
@@ -110,33 +115,20 @@ public class DataSourceSingleton {
 		 return dataSource;
 	}
 	
-	private void initDaemons(final ServletContext context) throws SQLException {
-		ExecutorService execute = Executors.newSingleThreadExecutor();
-		threadResult = execute.submit(new ProcessTask());
-	}
-
-	@Override
-	public void onReload(Container container) {
-		// STOP AND START
-		onShutdown(container);
-		onStartup(container);
-	}
-
-	@Override
-	public void onShutdown(Container container) {
-		threadResult.cancel(true);
-		try {
-			threadResult.get();
-		} catch (InterruptedException | ExecutionException | CancellationException e) {
-			log.warning(e.getMessage());
-		} finally {
-			// DO NOTHING
-		}
-
-	}
-
 	public static void clean() {
 		// STOPS EACH FUTURE AND CLEANS HASMAPS
-		
+		Iterator<Entry<String, Future<Boolean>>> futuresIt = futures.entrySet().iterator();
+		while (futuresIt.hasNext()) {
+			final Entry<String, Future<Boolean>> futureEntry = futuresIt.next();
+			try {
+				futureEntry.getValue().cancel(true);
+				futureEntry.getValue().get();
+			} catch (InterruptedException | ExecutionException | CancellationException e) {
+				log.warning(e.getMessage());
+			}
+			futuresIt.remove();
+			// REMOVE THE DATABASE ENTRY TOO
+			dataSources.remove(futureEntry.getKey());
+		}
 	}
 }

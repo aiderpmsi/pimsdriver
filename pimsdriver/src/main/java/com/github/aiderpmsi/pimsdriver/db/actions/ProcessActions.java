@@ -25,7 +25,7 @@ public class ProcessActions extends DbAction {
 		super(context);
 	}
 
-	public boolean processPmsi(UploadedPmsi element) throws ActionException {
+	public Boolean processPmsi(UploadedPmsi element) throws ActionException {
 
 		// GETS THE DB CONNECTION
 		try (Connection con = DataSourceSingleton.getConnection(getServletContext())) {

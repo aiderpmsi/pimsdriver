@@ -7,16 +7,15 @@ import java.util.Locale;
 import org.vaadin.addons.lazyquerycontainer.LazyQueryContainer;
 import org.vaadin.addons.lazyquerycontainer.LazyQueryDefinition;
 
-import com.github.aiderpmsi.pimsdriver.db.actions.ActionException;
 import com.github.aiderpmsi.pimsdriver.db.actions.NavigationActions;
 import com.github.aiderpmsi.pimsdriver.dto.NavigationDTO;
 import com.github.aiderpmsi.pimsdriver.dto.model.BaseRsfA;
 import com.github.aiderpmsi.pimsdriver.dto.model.UploadedPmsi;
 import com.github.aiderpmsi.pimsdriver.vaadin.main.MenuBar;
+import com.github.aiderpmsi.pimsdriver.vaadin.main.SplitPanel;
 import com.github.aiderpmsi.pimsdriver.vaadin.utils.LazyColumnType;
 import com.github.aiderpmsi.pimsdriver.vaadin.utils.LazyTable;
 import com.github.aiderpmsi.pimsdriver.vaadin.utils.aop.ActionEncloser;
-import com.github.aiderpmsi.pimsdriver.vaadin.utils.aop.ActionEncloser.ActionExecuter;
 import com.github.aiderpmsi.pimsdriver.vaadin.utils.aop.ActionHandlerEncloser;
 import com.vaadin.event.Action;
 import com.vaadin.ui.CssLayout;
@@ -36,15 +35,20 @@ public class PmsiContentPanel extends VerticalLayout {
 	private final VerticalLayout header = new VerticalLayout();
 	
 	/** body layout */
-	private VerticalLayout body = new VerticalLayout();
+	private final VerticalLayout body = new VerticalLayout();
 	
-	public PmsiContentPanel() {
+	private final SplitPanel parent;
+	
+	public PmsiContentPanel(SplitPanel splitPanel) {
 		super();
 		addStyleName("pims-contentpanel");
 	
 		// SETS LAYOUT HIERARCHY
 		addComponent(header);
 		addComponent(body);
+		
+		// SETS PARENT
+		parent = splitPanel;
 	}
 	
 	public void setUpload(final UploadedPmsi model) {
@@ -54,20 +58,18 @@ public class PmsiContentPanel extends VerticalLayout {
 
 		// IF STATUS IS NOT NULL AND SUCCESSED, ADD HEADER CONTENT
 		if (model != null && model.getStatus() != null && model.getStatus() == UploadedPmsi.Status.successed)  {
-			ActionEncloser<Boolean, NavigationActions> action = new ActionEncloser<>(
+			final NavigationActions.Overview overview = ActionEncloser.execute(
 					(exception) -> "Erreur lors de la récupération des éléments des rsf et rss ", 
-					() -> {
-						final NavigationActions.Overview overview = new NavigationActions().getOverview(model);
-						// CREATES THE CONFIG TABLE
-						final Object[][] headers = new Object[][] {
-								{"RSF", overview.rsf},
-								{overview.rss == null ? "Absence de RSS" : "RSS",
-										overview.rss == null ? new ArrayList<NavigationDTO.PmsiOverviewEntry>() : overview.rss}
-						};
-						// USE THIS CONFIG TABLE TO FILL THE HEADER
-						fillContentHeader(headers);
-					});
-			action.execute();
+					() -> new NavigationActions(getParent().getParent().getServletContext()).getOverview(model));
+			
+			// CREATES THE CONFIG TABLE
+			final Object[][] headers = new Object[][] {
+					{"RSF", overview.rsf},
+					{overview.rss == null ? "Absence de RSS" : "RSS",
+							overview.rss == null ? new ArrayList<NavigationDTO.PmsiOverviewEntry>() : overview.rss}
+			};
+			
+			fillContentHeader(headers);
 		}
 	}
 	
@@ -123,7 +125,7 @@ public class PmsiContentPanel extends VerticalLayout {
         // RSFA CONTAINER
         LazyQueryContainer datasContainer = new LazyQueryContainer(
         		new LazyQueryDefinition(false, 1000, "pmel_id"),
-        		new FacturesQueryFactory(model.recordid));
+        		new FacturesQueryFactory(model.recordid, getParent().getParent().getServletContext()));
 
         // COLUMNS DEFINITIONS
         LazyColumnType[] cols = new LazyColumnType[] {
@@ -148,20 +150,13 @@ public class PmsiContentPanel extends VerticalLayout {
         table.setCaption("Factures");
         table.addActionHandler(new PmsiSelectedHandler(type, datasContainer, model.recordid));
 
-        // EXECUTE AN ACTION
-        ActionEncloser.execute(new ActionEncloser.ActionExecuter() {
-			@Override
-			public void action() throws ActionException {
-		        BaseRsfA summary = new NavigationActions().GetFacturesSummary(model.recordid);
-		        table.setFooterVisible(true);
-		        table.setColumnFooter("formattedtotalfacturehonoraire", summary.getFormattedtotalfacturehonoraire());
-		        table.setColumnFooter("formattedtotalfactureph", summary.getFormattedtotalfactureph());
-			}
-			@Override
-			public String msgError(ActionException e) {
-				return "Erreur de lecture du résumé des factures";
-			}
-		});
+        // FILLS THE SUMMARY
+        BaseRsfA summary = ActionEncloser.execute((exception) -> "Erreur de lecture du résumé des factures",
+        		() -> new NavigationActions(getParent().getParent().getServletContext()).GetFacturesSummary(model.recordid));
+        
+        table.setFooterVisible(true);
+        table.setColumnFooter("formattedtotalfacturehonoraire", summary.getFormattedtotalfacturehonoraire());
+        table.setColumnFooter("formattedtotalfactureph", summary.getFormattedtotalfactureph());
         
         return table;
 	}
@@ -198,6 +193,10 @@ public class PmsiContentPanel extends VerticalLayout {
 		return layout;
 	}
 
+	public SplitPanel getParent() {
+		return parent;
+	}
+	
 	public class RightClickActions implements ActionHandlerEncloser.Actions {
 		@Override
 		public Action[] getActions() {
