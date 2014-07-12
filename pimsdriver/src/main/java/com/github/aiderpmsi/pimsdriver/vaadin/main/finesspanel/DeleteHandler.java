@@ -1,5 +1,7 @@
 package com.github.aiderpmsi.pimsdriver.vaadin.main.finesspanel;
 
+import javax.servlet.ServletContext;
+
 import com.github.aiderpmsi.pimsdriver.db.actions.ActionException;
 import com.github.aiderpmsi.pimsdriver.db.actions.IOActions;
 import com.github.aiderpmsi.pimsdriver.dto.model.UploadedPmsi;
@@ -15,16 +17,16 @@ public class DeleteHandler implements Action.Handler {
 	static final Action[] ACTIONS = new Action[] { ACTION_DELETE };
 	static final Action[] NO_ACTION = new Action[] {};
 	
-	private HierarchicalContainer hc;
+	private final HierarchicalContainer hc;
 	
-	private FinessComponent fp;
+	private final FinessComponent fp;
 	
-	@SuppressWarnings("unused")
-	private DeleteHandler() {}
+	private final ServletContext context;
 	
-	public DeleteHandler(HierarchicalContainer hc, FinessComponent fp) {
+	public DeleteHandler(final HierarchicalContainer hc, final FinessComponent fp, final ServletContext context) {
 		this.hc = hc;
 		this.fp = fp;
+		this.context = context;
 	}
 	
 	public Action[] getActions(Object target, Object sender) {
@@ -46,7 +48,7 @@ public class DeleteHandler implements Action.Handler {
 				// GETS THE ASSOCIATED MODEL
 				UploadedPmsi model = (UploadedPmsi) hc.getContainerProperty(target, "model").getValue();
 				// DELETES THE UPLOAD
-				IOActions ioActions = new IOActions();
+				IOActions ioActions = new IOActions(context);
 				try {
 					ioActions.deletePmsi(model);
 					// REMOVE THE ITEM

@@ -13,6 +13,8 @@ import com.github.aiderpmsi.pimsdriver.dto.model.BaseRsfA;
 import com.github.aiderpmsi.pimsdriver.dto.model.UploadedPmsi;
 import com.github.aiderpmsi.pimsdriver.vaadin.main.MenuBar;
 import com.github.aiderpmsi.pimsdriver.vaadin.main.SplitPanel;
+import com.github.aiderpmsi.pimsdriver.vaadin.main.contentpanel.pmsidetails.PmsiDetailsWindow;
+import com.github.aiderpmsi.pimsdriver.vaadin.main.contentpanel.pmsisource.PmsiSourceWindow;
 import com.github.aiderpmsi.pimsdriver.vaadin.utils.LazyColumnType;
 import com.github.aiderpmsi.pimsdriver.vaadin.utils.LazyTable;
 import com.github.aiderpmsi.pimsdriver.vaadin.utils.aop.ActionEncloser;
@@ -24,6 +26,7 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Layout;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.Table.Align;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
 public class PmsiContentPanel extends VerticalLayout {
@@ -90,12 +93,12 @@ public class PmsiContentPanel extends VerticalLayout {
 	
 	private Table createSejoursTable(final MenuBar.MenuBarSelected type, final UploadedPmsi model) {
         // RSS MAIN CONTAINER
-        LazyQueryContainer datasContainer = new LazyQueryContainer(
+        final LazyQueryContainer datasContainer = new LazyQueryContainer(
         		new LazyQueryDefinition(false, 1000, "pmel_id"),
-        		new SejoursQueryFactory(model.recordid));
+        		new SejoursQueryFactory(model.recordid, getParent().getParent().getServletContext()));
 		
         // COLUMNS DEFINITIONS
-        LazyColumnType[] cols = new LazyColumnType[] {
+        final LazyColumnType[] cols = new LazyColumnType[] {
         		new LazyColumnType("pmel_id", Long.class, null, null),
         		new LazyColumnType("pmel_line", Long.class, "Ligne", Align.RIGHT),
         		new LazyColumnType("numrss", String.class, "Rss", Align.LEFT),
@@ -116,19 +119,18 @@ public class PmsiContentPanel extends VerticalLayout {
         table.setSelectable(true);
         table.setSizeFull();
         table.setCaption("Séjours");
-        table.addActionHandler(new PmsiSelectedHandler(type, datasContainer, model.recordid));
 
         return table;
 	}
 
 	private Table createFactTable(final MenuBar.MenuBarSelected type, final UploadedPmsi model) {
         // RSFA CONTAINER
-        LazyQueryContainer datasContainer = new LazyQueryContainer(
+        final LazyQueryContainer datasContainer = new LazyQueryContainer(
         		new LazyQueryDefinition(false, 1000, "pmel_id"),
         		new FacturesQueryFactory(model.recordid, getParent().getParent().getServletContext()));
 
         // COLUMNS DEFINITIONS
-        LazyColumnType[] cols = new LazyColumnType[] {
+        final LazyColumnType[] cols = new LazyColumnType[] {
         		new LazyColumnType("pmel_id", Long.class, null, null),
         		new LazyColumnType("pmel_line", Long.class, "Ligne", Align.RIGHT),
         		new LazyColumnType("numfacture", String.class, "Facture", Align.LEFT),
@@ -148,42 +150,53 @@ public class PmsiContentPanel extends VerticalLayout {
         table.setSelectable(true);
         table.setSizeFull();
         table.setCaption("Factures");
-        table.addActionHandler(new PmsiSelectedHandler(type, datasContainer, model.recordid));
 
         // FILLS THE SUMMARY
-        BaseRsfA summary = ActionEncloser.execute((exception) -> "Erreur de lecture du résumé des factures",
+        final BaseRsfA summary = ActionEncloser.execute((exception) -> "Erreur de lecture du résumé des factures",
         		() -> new NavigationActions(getParent().getParent().getServletContext()).GetFacturesSummary(model.recordid));
         
         table.setFooterVisible(true);
         table.setColumnFooter("formattedtotalfacturehonoraire", summary.getFormattedtotalfacturehonoraire());
         table.setColumnFooter("formattedtotalfactureph", summary.getFormattedtotalfactureph());
         
+        table.addActionHandler(
+        		new ActionHandlerEncloser(ACTIONS[0], (action, sender, target) -> {
+        			final Long pmel_position = (Long) datasContainer.getContainerProperty(target, "pmel_position").getValue();
+    				String numfacture = (String) datasContainer.getContainerProperty(target, "numfacture").getValue();
+        			UI.getCurrent().addWindow(new PmsiDetailsWindow(model.recordid, pmel_position, type, numfacture, getParent().getParent().getServletContext()));
+        		}));
+        table.addActionHandler(
+        		new ActionHandlerEncloser(ACTIONS[1], (action, sender, target) -> {
+        			final Long pmel_position = (Long) datasContainer.getContainerProperty(target, "pmel_position").getValue();
+    				String numfacture = (String) datasContainer.getContainerProperty(target, "numfacture").getValue();
+        			UI.getCurrent().addWindow(new PmsiSourceWindow(model.recordid, pmel_position, type, numfacture, getParent().getParent().getServletContext()));
+        		}));
         return table;
 	}
 	
 	private void fillContentHeader(Object[][] configs) {
 
-		for (Object[] config : configs) {
+		for (final Object[] config : configs) {
 			@SuppressWarnings("unchecked")
-			Layout layout = createContentHeader((String) config[0], (List<NavigationDTO.PmsiOverviewEntry>) config[1]);
+			final Layout layout = createContentHeader((String) config[0], (List<NavigationDTO.PmsiOverviewEntry>) config[1]);
 			header.addComponent(layout);
 		}
 
 	}
 	
 	private Layout createContentHeader(String header, List<NavigationDTO.PmsiOverviewEntry> entries) {
-		HorizontalLayout layout = new HorizontalLayout();
+		final HorizontalLayout layout = new HorizontalLayout();
 		layout.addStyleName("pims-contentpanel-header-layout");
 
 		// TITLE
-		Label title = new Label(header);
+		final Label title = new Label(header);
 		title.addStyleName("pims-contentpanel-header-label");
 		layout.addComponent(title);
 		
 		// CONTENT
-		CssLayout contentLayout = new CssLayout();
+		final CssLayout contentLayout = new CssLayout();
 		contentLayout.addStyleName("pims-contentpanel-header-content-layout");
-		for (NavigationDTO.PmsiOverviewEntry entry : entries) {
+		for (final NavigationDTO.PmsiOverviewEntry entry : entries) {
 			Label label = new Label(entry.lineName + " : " + Long.toString(entry.number));
 			label.setSizeUndefined();
 			label.addStyleName("pims-contentpanel-header-content-label");
@@ -196,18 +209,7 @@ public class PmsiContentPanel extends VerticalLayout {
 	public SplitPanel getParent() {
 		return parent;
 	}
-	
-	public class RightClickActions implements ActionHandlerEncloser.Actions {
-		@Override
-		public Action[] getActions() {
-			return ACTIONS;
-		}
-		@Override
-		public Action[] getNoActions() {
-			return new Action[0];
-		}
-	}
-	
-	static final Action[] ACTIONS = new Action[] {new Action("détails"), new Action("source")};
+
+	private static final Action[] ACTIONS = new Action[] {new Action("détails"), new Action("source")};
 
 }

@@ -3,6 +3,8 @@ package com.github.aiderpmsi.pimsdriver.vaadin.pending;
 import java.util.Date;
 import java.util.Locale;
 
+import javax.servlet.ServletContext;
+
 import org.vaadin.addons.lazyquerycontainer.LazyQueryContainer;
 import org.vaadin.addons.lazyquerycontainer.LazyQueryDefinition;
 
@@ -14,11 +16,11 @@ public class PendingPmsiWindow extends Window {
 
 	/** Generated serial Id */
 	private static final long serialVersionUID = -7803472921198470202L;
-
-	public PendingPmsiWindow() {
+	
+	public PendingPmsiWindow(final ServletContext context) {
 		// TITLE
 		super("Fichiers pmsi en cours de traitement");
-		
+				
 		// SET VISUAL ASPECT
         setWidth("650px");
         setHeight("80%");
@@ -38,7 +40,7 @@ public class PendingPmsiWindow extends Window {
         processtable.setLocale(Locale.FRANCE);
         LazyQueryContainer lqc = new LazyQueryContainer(
         		new LazyQueryDefinition(false, 1000, "recordid"),
-        		new PmsiPendingQueryFactory());
+        		new PmsiPendingQueryFactory(context));
         lqc.addContainerProperty("finess", String.class, "", true, true);
         lqc.addContainerProperty("year", Integer.class, null, true, true);
         lqc.addContainerProperty("month", Integer.class, null, true, true);

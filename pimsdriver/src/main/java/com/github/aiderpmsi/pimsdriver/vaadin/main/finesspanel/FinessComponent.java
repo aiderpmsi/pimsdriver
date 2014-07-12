@@ -45,7 +45,7 @@ public class FinessComponent extends Tree {
 		setImmediate(true); // MODIFICATIONS SHOULD BE SHOWED IMMEDIATELY
 		
 		// ADDS THE LISTENERS
-		ExpandListener el = new FinessExpandListener(hierarchicalContainer, this);
+		ExpandListener el = new FinessExpandListener(hierarchicalContainer, this, getParent().getParent().getServletContext());
 		CollapseListener cl = new FinessCollapseListener(hierarchicalContainer);
 		ItemClickListener icl = new ItemClickListener(parent.getParent(), hierarchicalContainer);
 
@@ -54,7 +54,7 @@ public class FinessComponent extends Tree {
 		addItemClickListener(icl);
 
 		// ADD THE ACTION HANDLERS
-		addActionHandler(new DeleteHandler(hierarchicalContainer, this));
+		addActionHandler(new DeleteHandler(hierarchicalContainer, this, getParent().getParent().getServletContext()));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -101,7 +101,7 @@ public class FinessComponent extends Tree {
 		}
 	}
 
-	 public class FinessContainerModel {
+	public static class FinessContainerModel {
 		private String caption = "";
 		private String finess = null;
 		private Integer depth = null;

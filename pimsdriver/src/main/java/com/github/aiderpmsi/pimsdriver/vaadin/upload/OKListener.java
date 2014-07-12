@@ -1,5 +1,7 @@
 package com.github.aiderpmsi.pimsdriver.vaadin.upload;
 
+import javax.servlet.ServletContext;
+
 import com.github.aiderpmsi.pimsdriver.db.actions.ActionException;
 import com.github.aiderpmsi.pimsdriver.db.actions.IOActions;
 import com.github.aiderpmsi.pimsdriver.dto.model.UploadPmsi;
@@ -20,13 +22,17 @@ public class OKListener implements Button.ClickListener {
 	private Window uploadWindow;
 	private FileUploader rsf, rss;
 	
+	private final ServletContext context;
+	
 	public OKListener(BeanFieldGroup<UploadPmsi> binder,
 			Window uploadWindow, FileUploader rsf,
-			FileUploader rss) {
+			FileUploader rss,
+			final ServletContext context) {
 		this.binder = binder;
 		this.uploadWindow = uploadWindow;
 		this.rsf = rsf;
 		this.rss = rss;
+		this.context = context;
 	}
 	
 	@Override
@@ -39,7 +45,7 @@ public class OKListener implements Button.ClickListener {
 			UploadPmsi model = binder.getItemDataSource().getBean();
 			
 			try {
-				(new IOActions()).uploadPmsi(model, rsf.getFile(), rss.getFile());
+				(new IOActions(context)).uploadPmsi(model, rsf.getFile(), rss.getFile());
 			} catch (ActionException e) {
 				throw new CommitException(e);
 			}

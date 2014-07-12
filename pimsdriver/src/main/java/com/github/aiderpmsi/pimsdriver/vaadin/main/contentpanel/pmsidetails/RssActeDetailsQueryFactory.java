@@ -3,6 +3,8 @@ package com.github.aiderpmsi.pimsdriver.vaadin.main.contentpanel.pmsidetails;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.servlet.ServletContext;
+
 import org.vaadin.addons.lazyquerycontainer.Query;
 import org.vaadin.addons.lazyquerycontainer.QueryDefinition;
 import org.vaadin.addons.lazyquerycontainer.QueryFactory;
@@ -20,7 +22,7 @@ import com.vaadin.data.util.sqlcontainer.query.OrderBy;
 
 public class RssActeDetailsQueryFactory implements QueryFactory {
 	
-	private Object[][] mappings = new Object[][] {
+	private final Object[][] mappings = new Object[][] {
 			{"pmel_id", "pmel_id"},
 			{"pmel_root", "pmel_root"},
 			{"pmel_parent", "pmel_parent"},
@@ -33,24 +35,24 @@ public class RssActeDetailsQueryFactory implements QueryFactory {
 			{"nbacte", "cast_to_int(nbacte, NULL)"}
 	};
 
-	private BaseQueryInit<BaseRssActe> bqi;
+	private final BaseQueryInit<BaseRssActe> bqi;
 	
-	private DBQueryMapping mapping;
+	private final DBQueryMapping mapping;
 	
-	public RssActeDetailsQueryFactory(final Long pmel_root, final Long pmel_position) {
+	public RssActeDetailsQueryFactory(final Long pmel_root, final Long pmel_position, final ServletContext context) {
 		// CREATES THE QUERY INITIALIZER
 		bqi = new BaseQueryInit<BaseRssActe>() {
 
 			@Override
-			public void initFilters(List<Filter> filters) {
+			public void initFilters(final List<Filter> filters) {
 				filters.add(new Compare.Equal("pmel_root", pmel_root));
 				filters.add(new Compare.Equal("pmel_parent", pmel_position));
 			}
 
 			@Override
-			public void initOrders(LinkedList<Entry<Object, Boolean>> orderbys) {
+			public void initOrders(final LinkedList<Entry<Object, Boolean>> orderbys) {
 				if (orderbys.size() == 0) {
-					Entry<Object, Boolean> entry = new Entry<>((Object)"pmel_position", true);
+					final Entry<Object, Boolean> entry = new Entry<>((Object)"pmel_position", true);
 					orderbys.add(entry);
 				}
 			}
@@ -61,24 +63,24 @@ public class RssActeDetailsQueryFactory implements QueryFactory {
 			}
 
 			@Override
-			public List<BaseRssActe> loadBeans(List<Filter> filters,
-					List<OrderBy> orderBys, int startIndex, int count)
+			public List<BaseRssActe> loadBeans(final List<Filter> filters,
+					final List<OrderBy> orderBys, final int startIndex, final int count)
 					throws ActionException {
-					return new NavigationActions().getRssActeList(filters, orderBys, startIndex, count);
+					return new NavigationActions(context).getRssActeList(filters, orderBys, startIndex, count);
 			}
 
 			@Override
-			public String loadBeansError(Exception e) {
+			public String loadBeansError(final Exception e) {
 				return "Erreur de lecture de la liste des actes";
 			}
 
 			@Override
-			public int size(List<Filter> Filters) throws ActionException {
-				return new NavigationActions().getRssActeSize(Filters);
+			public int size(final List<Filter> Filters) throws ActionException {
+				return new NavigationActions(context).getRssActeSize(Filters);
 			}
 
 			@Override
-			public String sizeError(Exception e) {
+			public String sizeError(final Exception e) {
 				return "Erreur de lecture de la liste des actes";
 			}
 		};
@@ -88,7 +90,7 @@ public class RssActeDetailsQueryFactory implements QueryFactory {
 	}
 	
 	@Override
-	public Query constructQuery(QueryDefinition qd) {
+	public Query constructQuery(final QueryDefinition qd) {
 		return new BaseQuery<>(bqi, mapping, qd);
 	}
 

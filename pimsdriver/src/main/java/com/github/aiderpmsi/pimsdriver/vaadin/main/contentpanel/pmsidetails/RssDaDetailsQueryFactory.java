@@ -3,6 +3,8 @@ package com.github.aiderpmsi.pimsdriver.vaadin.main.contentpanel.pmsidetails;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.servlet.ServletContext;
+
 import org.vaadin.addons.lazyquerycontainer.Query;
 import org.vaadin.addons.lazyquerycontainer.QueryDefinition;
 import org.vaadin.addons.lazyquerycontainer.QueryFactory;
@@ -20,7 +22,7 @@ import com.vaadin.data.util.sqlcontainer.query.OrderBy;
 
 public class RssDaDetailsQueryFactory implements QueryFactory {
 	
-	private Object[][] mappings = new Object[][] {
+	private final Object[][] mappings = new Object[][] {
 			{"pmel_id", "pmel_id"},
 			{"pmel_root", "pmel_root"},
 			{"pmel_parent", "pmel_parent"},
@@ -29,24 +31,24 @@ public class RssDaDetailsQueryFactory implements QueryFactory {
 			{"da", "trim(da)"}
 	};
 
-	private BaseQueryInit<BaseRssDa> bqi;
+	private final BaseQueryInit<BaseRssDa> bqi;
 	
-	private DBQueryMapping mapping;
+	private final DBQueryMapping mapping;
 	
-	public RssDaDetailsQueryFactory(final Long pmel_root, final Long pmel_position) {
+	public RssDaDetailsQueryFactory(final Long pmel_root, final Long pmel_position, final ServletContext context) {
 		// CREATES THE QUERY INITIALIZER
 		bqi = new BaseQueryInit<BaseRssDa>() {
 
 			@Override
-			public void initFilters(List<Filter> filters) {
+			public void initFilters(final List<Filter> filters) {
 				filters.add(new Compare.Equal("pmel_root", pmel_root));
 				filters.add(new Compare.Equal("pmel_parent", pmel_position));
 			}
 
 			@Override
-			public void initOrders(LinkedList<Entry<Object, Boolean>> orderbys) {
+			public void initOrders(final LinkedList<Entry<Object, Boolean>> orderbys) {
 				if (orderbys.size() == 0) {
-					Entry<Object, Boolean> entry = new Entry<>((Object)"pmel_position", true);
+					final Entry<Object, Boolean> entry = new Entry<>((Object)"pmel_position", true);
 					orderbys.add(entry);
 				}
 			}
@@ -57,24 +59,24 @@ public class RssDaDetailsQueryFactory implements QueryFactory {
 			}
 
 			@Override
-			public List<BaseRssDa> loadBeans(List<Filter> filters,
-					List<OrderBy> orderBys, int startIndex, int count)
+			public List<BaseRssDa> loadBeans(final List<Filter> filters,
+					final List<OrderBy> orderBys, final int startIndex, final int count)
 					throws ActionException {
-					return new NavigationActions().getRssDaList(filters, orderBys, startIndex, count);
+					return new NavigationActions(context).getRssDaList(filters, orderBys, startIndex, count);
 			}
 
 			@Override
-			public String loadBeansError(Exception e) {
+			public String loadBeansError(final Exception e) {
 				return "Erreur de lecture de la liste des factures B";
 			}
 
 			@Override
-			public int size(List<Filter> Filters) throws ActionException {
-				return new NavigationActions().getRssDaSize(Filters);
+			public int size(final List<Filter> Filters) throws ActionException {
+				return new NavigationActions(context).getRssDaSize(Filters);
 			}
 
 			@Override
-			public String sizeError(Exception e) {
+			public String sizeError(final Exception e) {
 				return "Erreur de lecture de la liste des factures B";
 			}
 		};
@@ -84,7 +86,7 @@ public class RssDaDetailsQueryFactory implements QueryFactory {
 	}
 	
 	@Override
-	public Query constructQuery(QueryDefinition qd) {
+	public Query constructQuery(final QueryDefinition qd) {
 		return new BaseQuery<>(bqi, mapping, qd);
 	}
 

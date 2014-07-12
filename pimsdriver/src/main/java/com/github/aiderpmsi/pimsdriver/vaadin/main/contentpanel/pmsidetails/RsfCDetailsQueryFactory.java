@@ -3,6 +3,8 @@ package com.github.aiderpmsi.pimsdriver.vaadin.main.contentpanel.pmsidetails;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.servlet.ServletContext;
+
 import org.vaadin.addons.lazyquerycontainer.Query;
 import org.vaadin.addons.lazyquerycontainer.QueryDefinition;
 import org.vaadin.addons.lazyquerycontainer.QueryFactory;
@@ -20,7 +22,7 @@ import com.vaadin.data.util.sqlcontainer.query.OrderBy;
 
 public class RsfCDetailsQueryFactory implements QueryFactory {
 	
-	private Object[][] mappings = new Object[][] {
+	private final Object[][] mappings = new Object[][] {
 			{"pmel_id", "pmel_id"},
 			{"pmel_root", "pmel_root"},
 			{"pmel_parent", "pmel_parent"},
@@ -32,11 +34,11 @@ public class RsfCDetailsQueryFactory implements QueryFactory {
 			{"formattedmontanttotalhonoraire", "cast_to_int(montanttotalhonoraire, NULL)"}
 	};
 
-	private BaseQueryInit<BaseRsfC> bqi;
+	private final BaseQueryInit<BaseRsfC> bqi;
 	
-	private DBQueryMapping mapping;
+	private final DBQueryMapping mapping;
 	
-	public RsfCDetailsQueryFactory(final Long pmel_root, final Long pmel_position) {
+	public RsfCDetailsQueryFactory(final Long pmel_root, final Long pmel_position, final ServletContext context) {
 		// CREATES THE QUERY INITIALIZER
 		bqi = new BaseQueryInit<BaseRsfC>() {
 
@@ -49,7 +51,7 @@ public class RsfCDetailsQueryFactory implements QueryFactory {
 			@Override
 			public void initOrders(LinkedList<Entry<Object, Boolean>> orderbys) {
 				if (orderbys.size() == 0) {
-					Entry<Object, Boolean> entry = new Entry<>((Object)"pmel_position", true);
+					final Entry<Object, Boolean> entry = new Entry<>((Object)"pmel_position", true);
 					orderbys.add(entry);
 				}
 			}
@@ -63,7 +65,7 @@ public class RsfCDetailsQueryFactory implements QueryFactory {
 			public List<BaseRsfC> loadBeans(List<Filter> filters,
 					List<OrderBy> orderBys, int startIndex, int count)
 					throws ActionException {
-					return new NavigationActions().getFacturesC(filters, orderBys, startIndex, count);
+					return new NavigationActions(context).getFacturesC(filters, orderBys, startIndex, count);
 			}
 
 			@Override
@@ -73,7 +75,7 @@ public class RsfCDetailsQueryFactory implements QueryFactory {
 
 			@Override
 			public int size(List<Filter> Filters) throws ActionException {
-				return new NavigationActions().getFacturesCSize(Filters);
+				return new NavigationActions(context).getFacturesCSize(Filters);
 			}
 
 			@Override
@@ -87,7 +89,7 @@ public class RsfCDetailsQueryFactory implements QueryFactory {
 	}
 	
 	@Override
-	public Query constructQuery(QueryDefinition qd) {
+	public Query constructQuery(final QueryDefinition qd) {
 		return new BaseQuery<>(bqi, mapping, qd);
 	}
 

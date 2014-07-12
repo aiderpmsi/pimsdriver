@@ -3,10 +3,11 @@ package com.github.aiderpmsi.pimsdriver.vaadin.main.contentpanel.pmsidetails;
 import java.util.ArrayList;
 import java.util.Locale;
 
+import javax.servlet.ServletContext;
+
 import org.vaadin.addons.lazyquerycontainer.LazyQueryContainer;
 import org.vaadin.addons.lazyquerycontainer.LazyQueryDefinition;
 
-import com.github.aiderpmsi.pimsdriver.db.actions.ActionException;
 import com.github.aiderpmsi.pimsdriver.db.actions.NavigationActions;
 import com.github.aiderpmsi.pimsdriver.dto.model.BaseRsfB;
 import com.github.aiderpmsi.pimsdriver.dto.model.BaseRsfC;
@@ -26,10 +27,18 @@ public class PmsiDetailsWindow extends Window {
 
 	private final ArrayList<Table> tables;
 	
-	public PmsiDetailsWindow(final Long pmel_root, final Long pmel_position, final MenuBar.MenuBarSelected type, final String typeLabel) {
+	private final ServletContext context;
+	
+	public PmsiDetailsWindow(final Long pmel_root,
+			final Long pmel_position,
+			final MenuBar.MenuBarSelected type,
+			final String typeLabel,
+			final ServletContext context) {
 		// TITLE
 		super(type.getLabel() + " : " + typeLabel);
 
+		this.context = context;
+		
 		// SET VISUAL ASPECT
         setWidth("650px");
         setHeight("80%");
@@ -63,11 +72,11 @@ public class PmsiDetailsWindow extends Window {
         }
 	}
 
-	public static Table getActe(final Long pmel_root, final Long pmel_position) {
+	public Table getActe(final Long pmel_root, final Long pmel_position) {
         // RSFB CONTAINER
 		final LazyQueryContainer datasContainer = new LazyQueryContainer(
 				new LazyQueryDefinition(false, 1000, "pmel_id"),
-				new RssActeDetailsQueryFactory(pmel_root, pmel_position));
+				new RssActeDetailsQueryFactory(pmel_root, pmel_position, context));
 
         // COLUMNS DEFINITIONS
 		final LazyColumnType[] cols = new LazyColumnType[] {
@@ -90,11 +99,11 @@ public class PmsiDetailsWindow extends Window {
         return table;
 	}
 
-	public static Table getDA(final Long pmel_root, final Long pmel_position) {
+	public Table getDA(final Long pmel_root, final Long pmel_position) {
         // RSFB CONTAINER
 		final LazyQueryContainer datasContainer = new LazyQueryContainer(
         		new LazyQueryDefinition(false, 1000, "pmel_id"),
-        		new RssDaDetailsQueryFactory(pmel_root, pmel_position));
+        		new RssDaDetailsQueryFactory(pmel_root, pmel_position, context));
 
         // COLUMNS DEFINITIONS
 		final LazyColumnType[] cols = new LazyColumnType[] {
@@ -113,11 +122,11 @@ public class PmsiDetailsWindow extends Window {
         return table;
 	}
 	
-	public static Table getDAD(final Long pmel_root, final Long pmel_position) {
+	public Table getDAD(final Long pmel_root, final Long pmel_position) {
         // RSFB CONTAINER
 		final LazyQueryContainer datasContainer = new LazyQueryContainer(
         		new LazyQueryDefinition(false, 1000, "pmel_id"),
-        		new RssDadDetailsQueryFactory(pmel_root, pmel_position));
+        		new RssDadDetailsQueryFactory(pmel_root, pmel_position, context));
 
         // COLUMNS DEFINITIONS
 		final LazyColumnType[] cols = new LazyColumnType[] {
@@ -140,7 +149,7 @@ public class PmsiDetailsWindow extends Window {
         // RSFB CONTAINER
 		final LazyQueryContainer datasContainer = new LazyQueryContainer(
         		new LazyQueryDefinition(false, 1000, "pmel_id"),
-        		new RsfBDetailsQueryFactory(pmel_root, pmel_position));
+        		new RsfBDetailsQueryFactory(pmel_root, pmel_position, context));
 
         // COLUMNS DEFINITIONS
 		final LazyColumnType[] cols = new LazyColumnType[] {
@@ -162,18 +171,10 @@ public class PmsiDetailsWindow extends Window {
         table.setCaption("RSF B");
 
         // EXECUTE AN ACTION
-        ActionEncloser.execute(new ActionEncloser.ActionExecuter() {
-			@Override
-			public void action() throws ActionException {
-				final BaseRsfB summary = new NavigationActions().GetFacturesBSummary(pmel_root, pmel_position);
-		        table.setFooterVisible(true);
-		        table.setColumnFooter("formattedmontanttotaldepense", summary.getFormattedmontanttotaldepense());
-			}
-			@Override
-			public String msgError(ActionException e) {
-				return "Erreur de lecture du résumé des factures B";
-			}
-		});
+        final BaseRsfB summary = ActionEncloser.execute((exception) -> "Erreur de lecture du résumé des factures B",
+        		() -> new NavigationActions(context).GetFacturesBSummary(pmel_root, pmel_position));
+        table.setFooterVisible(true);
+        table.setColumnFooter("formattedmontanttotaldepense", summary.getFormattedmontanttotaldepense());
         
         return table;
 	}
@@ -182,7 +183,7 @@ public class PmsiDetailsWindow extends Window {
         // RSFC CONTAINER
 		final LazyQueryContainer datasContainer = new LazyQueryContainer(
         		new LazyQueryDefinition(false, 1000, "pmel_id"),
-        		new RsfCDetailsQueryFactory(pmel_root, pmel_position));
+        		new RsfCDetailsQueryFactory(pmel_root, pmel_position, context));
 
         // COLUMNS DEFINITIONS
 		final LazyColumnType[] cols = new LazyColumnType[] {
@@ -202,18 +203,10 @@ public class PmsiDetailsWindow extends Window {
         table.setCaption("RSF C");
         
         // EXECUTE AN ACTION
-        ActionEncloser.execute(new ActionEncloser.ActionExecuter() {
-			@Override
-			public void action() throws ActionException {
-				final BaseRsfC summary = new NavigationActions().GetFacturesCSummary(pmel_root, pmel_position);
-		        table.setFooterVisible(true);
-		        table.setColumnFooter("formattedmontanttotalhonoraire", summary.getFormattedmontanttotalhonoraire());
-			}
-			@Override
-			public String msgError(ActionException e) {
-				return "Erreur de lecture du résumé des factures C";
-			}
-		});
+        final BaseRsfC summary = ActionEncloser.execute((exception) -> "Erreur de lecture du résumé des factures C",
+        		() -> new NavigationActions(context).GetFacturesCSummary(pmel_root, pmel_position));
+        table.setFooterVisible(true);
+        table.setColumnFooter("formattedmontanttotalhonoraire", summary.getFormattedmontanttotalhonoraire());
         
         return table;
 	}

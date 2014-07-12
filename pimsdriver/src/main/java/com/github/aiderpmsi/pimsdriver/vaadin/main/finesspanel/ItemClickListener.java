@@ -9,14 +9,11 @@ public class ItemClickListener implements ItemClickEvent.ItemClickListener {
 
 	private static final long serialVersionUID = 822165023770852409L;
 
-	@SuppressWarnings("unused")
-	private ItemClickListener() {};
+	private final RootWindow rootElement;
 	
-	private RootWindow rootElement;
-	
-	private HierarchicalContainer hc;
-	
-	public ItemClickListener(RootWindow rootElement, HierarchicalContainer hc) {
+	private final HierarchicalContainer hc;
+		
+	public ItemClickListener(final RootWindow rootElement, final HierarchicalContainer hc) {
 		this.rootElement = rootElement;
 		this.hc = hc;
 	}
@@ -28,21 +25,15 @@ public class ItemClickListener implements ItemClickEvent.ItemClickListener {
 		Integer eventDepth =
 				(Integer) hc.getContainerProperty(
 						event.getItemId(), "depth").getValue();
-		// GETS THE STATUS OF THE NODE (SUCCESSED OR FAILED)
-		UploadedPmsi.Status eventStatus =
-				(UploadedPmsi.Status) hc.getContainerProperty(
-						event.getItemId(), "status").getValue();
 
 		// DEPTH AT 3 MEANS AN UPLOAD HAS BEEN SELECTED
 		if (eventDepth == 3) {
 			//  PREVENT GUIUI THAT AN UPLOAD HAS BEEN SELECTED
-			rootElement.fireFinessSelected(
-					(UploadedPmsi) hc.getContainerProperty(event.getItemId(), "model").getValue(),
-					eventStatus);
+			rootElement.setUploadSelected((UploadedPmsi) hc.getContainerProperty(event.getItemId(), "model").getValue());
 		}
 		// SOMETHING ELSE HAS BEEN SELECTED, PREVENT THE MAIN WINDOW
 		else {
-			rootElement.fireFinessSelected(null, null);
+			rootElement.setUploadSelected(null);
 		}
 		
 	}

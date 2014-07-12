@@ -3,6 +3,8 @@ package com.github.aiderpmsi.pimsdriver.vaadin.pending;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.servlet.ServletContext;
+
 import org.vaadin.addons.lazyquerycontainer.Query;
 import org.vaadin.addons.lazyquerycontainer.QueryDefinition;
 import org.vaadin.addons.lazyquerycontainer.QueryFactory;
@@ -20,7 +22,7 @@ import com.vaadin.data.util.sqlcontainer.query.OrderBy;
 
 public class PmsiPendingQueryFactory implements QueryFactory {
 
-	private Object[][] mappings = new Object[][] {
+	private final Object[][] mappings = new Object[][] {
 			{"finess", "plud_finess"},
 			{"year", "plud_year"},
 			{"month", "plud_month"},
@@ -28,21 +30,21 @@ public class PmsiPendingQueryFactory implements QueryFactory {
 			{"processed", "plud_processed"}
 	};
 
-	private BaseQueryInit<UploadedPmsi> bqi;
+	private final BaseQueryInit<UploadedPmsi> bqi;
 	
-	private DBQueryMapping mapping;
+	private final DBQueryMapping mapping;
 	
-	public PmsiPendingQueryFactory() {
+	public PmsiPendingQueryFactory(final ServletContext context) {
 		// CREATES THE QUERY INITIALIZER
 		bqi = new BaseQueryInit<UploadedPmsi>() {
 
 			@Override
-			public void initFilters(List<Filter> filters) {
+			public void initFilters(final List<Filter> filters) {
 				filters.add(new Compare.Equal("processed", UploadedPmsi.Status.pending));
 			}
 
 			@Override
-			public void initOrders(LinkedList<Entry<Object, Boolean>> orderbys) {
+			public void initOrders(final LinkedList<Entry<Object, Boolean>> orderbys) {
 				// DO NOTHING
 			}
 
@@ -52,10 +54,10 @@ public class PmsiPendingQueryFactory implements QueryFactory {
 			}
 
 			@Override
-			public List<UploadedPmsi> loadBeans(List<Filter> filters,
-					List<OrderBy> orderBys, int startIndex, int count)
+			public List<UploadedPmsi> loadBeans(final List<Filter> filters,
+					final List<OrderBy> orderBys, final int startIndex, final int count)
 					throws ActionException {
-					return new NavigationActions().getUploadedPmsi(filters, orderBys, startIndex, count);
+					return new NavigationActions(context).getUploadedPmsi(filters, orderBys, startIndex, count);
 			}
 
 			@Override
@@ -64,12 +66,12 @@ public class PmsiPendingQueryFactory implements QueryFactory {
 			}
 
 			@Override
-			public int size(List<Filter> Filters) throws ActionException {
-				return new NavigationActions().getUploadedPmsiSize(Filters);
+			public int size(final List<Filter> Filters) throws ActionException {
+				return new NavigationActions(context).getUploadedPmsiSize(Filters);
 			}
 
 			@Override
-			public String sizeError(Exception e) {
+			public String sizeError(final Exception e) {
 				return "Erreur de lecture de la liste de fichiers";
 			}
 		};
@@ -79,7 +81,7 @@ public class PmsiPendingQueryFactory implements QueryFactory {
 	}
 	
 	@Override
-	public Query constructQuery(QueryDefinition qd) {
+	public Query constructQuery(final QueryDefinition qd) {
 		return new BaseQuery<>(bqi, mapping, qd);
 	}
 

@@ -1,5 +1,7 @@
 package com.github.aiderpmsi.pimsdriver.vaadin.upload;
 
+import javax.servlet.ServletContext;
+
 import com.github.aiderpmsi.pimsdriver.dto.model.UploadPmsi;
 import com.github.aiderpmsi.pimsdriver.vaadin.utils.FileUploader;
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
@@ -16,7 +18,7 @@ public class UploadWindow extends Window {
 	private FileUploader rsf;
 	private FileUploader rss;
 
-	public UploadWindow() {
+	public UploadWindow(ServletContext context) {
 		// TITLE
 		super("Ajouter un fichier Pmsi");
 		
@@ -75,7 +77,7 @@ public class UploadWindow extends Window {
         // ADD VALIDATOR
         binder.addCommitHandler(new com.github.aiderpmsi.pimsdriver.vaadin.upload.CommitHandler(rsf, rss));
         Button okButton = new Button("Valider");
-        okButton.addClickListener(new OKListener(binder, this, rsf, rss));
+        okButton.addClickListener(new OKListener(binder, this, rsf, rss, context));
         fl.addComponent(okButton);
         
         // ADD CLOSE LISTENER

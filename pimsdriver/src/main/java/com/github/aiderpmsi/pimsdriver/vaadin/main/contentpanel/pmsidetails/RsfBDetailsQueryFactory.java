@@ -3,6 +3,8 @@ package com.github.aiderpmsi.pimsdriver.vaadin.main.contentpanel.pmsidetails;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.servlet.ServletContext;
+
 import org.vaadin.addons.lazyquerycontainer.Query;
 import org.vaadin.addons.lazyquerycontainer.QueryDefinition;
 import org.vaadin.addons.lazyquerycontainer.QueryFactory;
@@ -20,7 +22,7 @@ import com.vaadin.data.util.sqlcontainer.query.OrderBy;
 
 public class RsfBDetailsQueryFactory implements QueryFactory {
 	
-	private Object[][] mappings = new Object[][] {
+	private final Object[][] mappings = new Object[][] {
 			{"pmel_id", "pmel_id"},
 			{"pmel_root", "pmel_root"},
 			{"pmel_parent", "pmel_parent"},
@@ -34,11 +36,11 @@ public class RsfBDetailsQueryFactory implements QueryFactory {
 			{"formattedmontanttotaldepense", "cast_to_int(montanttotaldepense, NULL)"}
 	};
 
-	private BaseQueryInit<BaseRsfB> bqi;
+	private final BaseQueryInit<BaseRsfB> bqi;
 	
-	private DBQueryMapping mapping;
+	private final DBQueryMapping mapping;
 	
-	public RsfBDetailsQueryFactory(final Long pmel_root, final Long pmel_position) {
+	public RsfBDetailsQueryFactory(final Long pmel_root, final Long pmel_position, final ServletContext context) {
 		// CREATES THE QUERY INITIALIZER
 		bqi = new BaseQueryInit<BaseRsfB>() {
 
@@ -65,7 +67,7 @@ public class RsfBDetailsQueryFactory implements QueryFactory {
 			public List<BaseRsfB> loadBeans(List<Filter> filters,
 					List<OrderBy> orderBys, int startIndex, int count)
 					throws ActionException {
-					return new NavigationActions().getFacturesB(filters, orderBys, startIndex, count);
+					return new NavigationActions(context).getFacturesB(filters, orderBys, startIndex, count);
 			}
 
 			@Override
@@ -75,7 +77,7 @@ public class RsfBDetailsQueryFactory implements QueryFactory {
 
 			@Override
 			public int size(List<Filter> Filters) throws ActionException {
-				return new NavigationActions().getFacturesBSize(Filters);
+				return new NavigationActions(context).getFacturesBSize(Filters);
 			}
 
 			@Override
@@ -89,7 +91,7 @@ public class RsfBDetailsQueryFactory implements QueryFactory {
 	}
 	
 	@Override
-	public Query constructQuery(QueryDefinition qd) {
+	public Query constructQuery(final QueryDefinition qd) {
 		return new BaseQuery<>(bqi, mapping, qd);
 	}
 
