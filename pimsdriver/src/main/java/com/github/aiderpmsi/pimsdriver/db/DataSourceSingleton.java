@@ -38,22 +38,25 @@ public class DataSourceSingleton {
 
 	public static synchronized Connection getConnection(final ServletContext context) throws SQLException {
 		// GET CONNECTION INFORMATIONS FROM CONTEXT
-		String url = null;
+		String urlContext = null, userContext = null, passwordContext	= null;
 		try {
 			final InitialContext jndiContext = new InitialContext();
-			Object urlContext = jndiContext.lookup("com.github.aiderpmsi.pimsdriver.jdbcurl");
-			url = (String) urlContext;
+			urlContext = (String) jndiContext.lookup("com.github.aiderpmsi.pimsdriver.jdbcurl");
+			userContext = (String) jndiContext.lookup("com.github.aiderpmsi.pimsdriver.jdbcuser");
+			passwordContext = (String) jndiContext.lookup("com.github.aiderpmsi.pimsdriver.jdbcpwd");
 		} catch (NamingException e) {
 			throw new SQLException(e);
 		}
 		
 		DataSource dataSource = null;
-		if ((dataSource = dataSources.get(url)) == null) {
-			// DATASOURCE DID NOT EXIST, WE HAVE TO INIT IT
-			dataSource = initDataSource("TODO", "", "");
-			dataSources.put(url, dataSource);
-			// INIT CLEANERS AND PROCESSORS
-			futures.put("TODO", Executors.newSingleThreadExecutor().submit(new ProcessTask(context)));			
+		synchronized (dataSources) {
+			if ((dataSource = dataSources.get(urlContext)) == null) {
+				// DATASOURCE DID NOT EXIST, WE HAVE TO INIT IT
+				dataSource = initDataSource(urlContext, userContext, passwordContext);
+				dataSources.put(urlContext, dataSource);
+				// INIT CLEANERS AND PROCESSORS
+				futures.put(urlContext, Executors.newSingleThreadExecutor().submit(new ProcessTask(context)));			
+			}
 		}
 		
 		final Connection con = dataSource.getConnection();
@@ -117,18 +120,20 @@ public class DataSourceSingleton {
 	
 	public static void clean() {
 		// STOPS EACH FUTURE AND CLEANS HASMAPS
-		Iterator<Entry<String, Future<Boolean>>> futuresIt = futures.entrySet().iterator();
-		while (futuresIt.hasNext()) {
-			final Entry<String, Future<Boolean>> futureEntry = futuresIt.next();
-			try {
-				futureEntry.getValue().cancel(true);
-				futureEntry.getValue().get();
-			} catch (InterruptedException | ExecutionException | CancellationException e) {
-				log.warning(e.getMessage());
+		synchronized (dataSources) {
+			Iterator<Entry<String, Future<Boolean>>> futuresIt = futures.entrySet().iterator();
+			while (futuresIt.hasNext()) {
+				final Entry<String, Future<Boolean>> futureEntry = futuresIt.next();
+				try {
+					futureEntry.getValue().cancel(true);
+					futureEntry.getValue().get();
+				} catch (InterruptedException | ExecutionException | CancellationException e) {
+					log.warning(e.getMessage());
+				}
+				futuresIt.remove();
+				// REMOVE THE DATABASE ENTRY TOO
+				dataSources.remove(futureEntry.getKey());
 			}
-			futuresIt.remove();
-			// REMOVE THE DATABASE ENTRY TOO
-			dataSources.remove(futureEntry.getKey());
 		}
 	}
 }

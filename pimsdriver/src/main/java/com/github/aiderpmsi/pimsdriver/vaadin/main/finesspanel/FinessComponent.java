@@ -66,7 +66,7 @@ public class FinessComponent extends Tree {
 			final String getterName = getter.getName();
 			if (getter.getParameterCount() == 0 && getterName.length() > 3 && getterName.startsWith("get")) {
 				// WE ARE IN AN GETTER, RETRIEVE THE NAME PROPERTY
-				final StringBuilder propertyNameBuilder = new StringBuilder(getterName.substring(2, 3).toLowerCase());
+				final StringBuilder propertyNameBuilder = new StringBuilder(getterName.substring(3, 4).toLowerCase());
 				propertyNameBuilder.append(getterName.substring(4));
 				final String propertyName = propertyNameBuilder.toString(); 
 				// SETS THE CORRESPONDING PROPERTY

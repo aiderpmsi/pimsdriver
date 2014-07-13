@@ -8,8 +8,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
-
-import com.sun.xml.txw2.annotation.XmlValue;
+import javax.xml.bind.annotation.XmlValue;
 
 /**
  * Represents a list of uploaded pmsi
@@ -22,7 +21,6 @@ public class UploadedPmsis {
 
 	private List<UploadedPmsi> elements;
 	
-	@XmlValue
 	@XmlElementWrapper(name="uploadedelements")
 	@XmlElements({
 		@XmlElement(name="uploadedelement", type=UploadedPmsi.class)

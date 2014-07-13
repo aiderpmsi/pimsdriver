@@ -29,12 +29,12 @@ public abstract class DbAction {
 		public R execute(final S dto) throws SQLException;
 	}
 	
-	public <R, S extends AutoCloseableDto<?>> R execute(final Class<S> dtoClass, DbExecution<R, S> execution) throws ActionException {
+	public <R, S extends AutoCloseableDto<?>> R execute(final Class<S> dtoClass, final DbExecution<R, S> execution) throws ActionException {
 		try {
-			final Constructor<S> constructor = dtoClass.getConstructor(Connection.class);
+			final Constructor<S> constructor = dtoClass.getConstructor(Connection.class, ServletContext.class);
 			try (
 					final Connection con = DataSourceSingleton.getConnection(getServletContext());
-					final S dto = constructor.newInstance(con);) {
+					final S dto = constructor.newInstance(con, context);) {
 	
 				// CONTINUE WHILE SELECTION HAS NOT SUCCEDED BECAUSE OF SERIALIZATION EXCEPTIONS
 				for (int i = 0 ; i < MAXRETRYS ; i++) {

@@ -11,14 +11,17 @@ public class SplitPanel extends HorizontalSplitPanel{
 
 	private final RootWindow parent;
 
-	private final PmsiContentPanel contentPanel = new PmsiContentPanel(this);
+	private final PmsiContentPanel contentPanel;
 	
-	private final FinessComponent finessPanel = new FinessComponent(this);
+	private final FinessComponent finessPanel;
 		
 	public SplitPanel(RootWindow parent) {
 		super();
 		
 		this.parent = parent;
+		this.contentPanel = new PmsiContentPanel(this);
+		this.finessPanel = new FinessComponent(this);
+		
 		setSplitPosition(.25f, Unit.PERCENTAGE);
 		addStyleName("pims-splitpanel");
 

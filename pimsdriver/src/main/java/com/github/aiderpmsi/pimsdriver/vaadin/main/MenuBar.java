@@ -39,11 +39,11 @@ public class MenuBar extends com.vaadin.ui.MenuBar {
  
 		files = addItem("Fichiers", null, null);
 		files.addItem("Ajouter Pmsi", null,
-				(selectedItem) ->  UI.getCurrent().addWindow(new UploadWindow()));
+				(selectedItem) ->  UI.getCurrent().addWindow(new UploadWindow(parent.getServletContext())));
 
 		files.addSeparator();
 		files.addItem("Traitements Pmsi", null,
-				(selectedItem) ->  UI.getCurrent().addWindow(new PendingPmsiWindow()));
+				(selectedItem) ->  UI.getCurrent().addWindow(new PendingPmsiWindow(parent.getServletContext())));
 		
 		rapports = addItem("Rapports", null, null);
 		rapports.setVisible(false);
