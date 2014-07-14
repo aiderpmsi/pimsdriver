@@ -77,35 +77,19 @@ public class GroupHandler implements LineHandler, AutoCloseable {
 	public void handle(IPmsiLine line) throws IOException {
 		if (line instanceof ConfiguredPmsiLine) {
 
-			// RETRIEVES THE NEW RSS NUM IF EXISTS
-			String newNumRss = null;
-			if (line.getName().equals("rssmain")) {
-				eachelement : for (Element element : line.getElements()) {
-					if (element.getName().equals("NumRSS")) {
-						newNumRss = element.getElement().toString();
-						break eachelement;
-					}
-				}
-			}
-
-			// IF THIS RSS IS A NEW RSS AND IF THIS IS NOT THE FIRST RSSMAIN (LASTNUMRSS NOT NULL), GROUP AND STORE 
-			if (lastNumRss != null && !newNumRss.equals(lastNumRss)) {
-				groupAndStore();
-				// REINIT FULL RSS
-				fullRss.clear();
-				pmsiPositions.clear();
-			}
-
 			// DEPENDING ON THE LINE TYPE :
 			// 1 - IF IT IS A RSSMAIN, CREATE A NEW RSSCONTENT IN FULLRSS
 			// 2 - IF IT IS A RSSACTE OR RSSDA, JUST INSERT THE DATAS TO CURRENT FULLRSS
 			// 3 - IF IT IS A RSSHEADER, INCREMENT PMSIPOSITION
 			if (line.getName().equals("rssmain")) {
 				RssContent newContent = new RssContent();
+				String newNumRss = null;
 
 				EnumMap<RssMain, String> mainContent = new EnumMap<>(RssMain.class);
 				for (Element element : line.getElements()) {
-					if (element.getName().equals("NbSeances"))
+					if (element.getName().equals("NumRSS"))
+						newNumRss = element.getElement().toString();
+					else if (element.getName().equals("NbSeances"))
 						mainContent.put(RssMain.nbseances, element.getElement().toString());
 					else if (element.getName().equals("DP"))
 						mainContent.put(RssMain.dp, element.getElement().toString());
@@ -130,9 +114,19 @@ public class GroupHandler implements LineHandler, AutoCloseable {
 				}
 
 				newContent.setRssmain(mainContent);
+				
+				// IF THIS RSS HAS A DIFFERENT NUMRSS THAN PRECEDENT, STORE PRECEDENTS (EXCEPT IF THERE WAS NO PRECEDENT RSS)
+				if (lastNumRss != null && !newNumRss.equals(lastNumRss)) {
+					groupAndStore();
+					// REINIT FULL RSS
+					fullRss.clear();
+					pmsiPositions.clear();
+				}
+				
 				fullRss.add(newContent);
 				lastNumRss = newNumRss;
 				pmsiPositions.add(pmsiPosition++);
+
 			} else if (line.getName().equals("rssacte")) {
 				EnumMap<RssActe, String> acteRss = new EnumMap<>(RssActe.class);
 

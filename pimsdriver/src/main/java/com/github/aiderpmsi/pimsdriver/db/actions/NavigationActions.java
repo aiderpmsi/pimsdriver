@@ -191,7 +191,7 @@ public class NavigationActions extends DbAction {
 				(dto) -> dto.readPmsiOverview(model, "rsfheader"));
 		}
 		if (model.rssoid != null) {
-			overview.rsf = execute(NavigationDTO.class,
+			overview.rss = execute(NavigationDTO.class,
 					(dto) -> dto.readPmsiOverview(model, "rssheader"));
 		}
 		return overview;
