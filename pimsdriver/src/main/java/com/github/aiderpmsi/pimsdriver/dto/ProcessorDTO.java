@@ -196,7 +196,7 @@ public class ProcessorDTO extends AutoCloseableDto<ProcessorDTO.Query> {
 				final Connection conn = ((DelegatingConnection<?>) getConnection()).getInnermostDelegateInternal();
 				final CopyManager cm = new CopyManager((org.postgresql.core.BaseConnection)conn);
 				
-				for (LineHandler lineHandler : lhs) {
+				for (final LineHandler lineHandler : lhs) {
 					if (lineHandler instanceof PmsiLineHandler) {
 						((PmsiLineHandler) lineHandler).applyOnFile(
 								(reader) -> cm.copyIn(pmsiQuery, reader));
@@ -210,7 +210,7 @@ public class ProcessorDTO extends AutoCloseableDto<ProcessorDTO.Query> {
 				throw new SQLException(e);
 			}
 
-			long time2 = System.currentTimeMillis();
+			final long time2 = System.currentTimeMillis();
 			System.out.println("Difference time : " + (time2 - time1));
 
 		} else {

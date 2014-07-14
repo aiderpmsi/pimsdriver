@@ -76,13 +76,11 @@ public class ProcessTask implements Callable<Boolean> {
 				final List<Long> pludIds = cu.getToCleanup();
 				
 				// TRAITEMENT DU NETTOYAGE TABLE PAR TABLE
-				for (final Long pludId : pludIds) {
-					futures.addLast(executorService.submit(
-							() -> cu.cleanup(pludId)));
+				pludIds.forEach((pludId) -> futures.addLast(executorService.submit(
+						() -> cu.cleanup(pludId))));
 
-					// WAIT FOR THE RESULT OF COMPUTATION
-					waitFuturesFinish();
-				}
+				// WAIT FOR THE RESULT OF COMPUTATION
+				waitFuturesFinish();
 			} catch (ActionException e) {
 				// DO NOTHING
 			}
@@ -109,18 +107,21 @@ public class ProcessTask implements Callable<Boolean> {
 					try {
 						// TRY TO GET FUTURE, WAIT 1000 MS BETWEEN SEEING IF THREAD HAS BEEN INTERRUPTED
 						futures.getFirst().get(1000, TimeUnit.MILLISECONDS);
+						// IF THIS ITEM IS TREATED, REMOVE FROM THE LIST
+						futures.removeFirst();
+						break;
 					} catch (TimeoutException e) {
 						// DO NOTHING, RETRY
 					}
 				}
 			} catch (InterruptedException e) {
 				// THREAD HAS BEEN INTERRUPTED, STOP
+				futures.removeFirst();
 				break;
 			} catch (ExecutionException e) {
+				futures.removeFirst();
 				log.warning("Erreur dans ProcessImpl : " + e.getMessage());
 			}
-			// REMOVE THIS ITEM THAT IS TREATED
-			futures.removeFirst();
 		}
 	}	
 }

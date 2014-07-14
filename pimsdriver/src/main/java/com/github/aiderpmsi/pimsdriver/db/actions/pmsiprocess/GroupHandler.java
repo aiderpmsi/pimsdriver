@@ -75,107 +75,104 @@ public class GroupHandler implements LineHandler, AutoCloseable {
 
 	@Override
 	public void handle(IPmsiLine line) throws IOException {
-		try (final Writer writer = Files.newBufferedWriter(tmpFile, Charset.forName("UTF-8"),
-				StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE)) {
-			if (line instanceof ConfiguredPmsiLine) {
-				
-				// RETRIEVES THE NEW RSS NUM IF EXISTS
-				String newNumRss = null;
-				if (line.getName().equals("rssmain") && lastNumRss != null) {
-					eachelement : for (Element element : line.getElements()) {
-						if (element.getName().equals("NumRSS")) {
-							newNumRss = element.getElement().toString();
-							break eachelement;
-						}
+		if (line instanceof ConfiguredPmsiLine) {
+
+			// RETRIEVES THE NEW RSS NUM IF EXISTS
+			String newNumRss = null;
+			if (line.getName().equals("rssmain")) {
+				eachelement : for (Element element : line.getElements()) {
+					if (element.getName().equals("NumRSS")) {
+						newNumRss = element.getElement().toString();
+						break eachelement;
 					}
 				}
-	
-				// IF THIS RSS IS A NEW RSS, GROUP AND STORE 
-				if (newNumRss != null && !newNumRss.equals(lastNumRss)) {
-					groupAndStore();
-					// REINIT FULL RSS
-					fullRss.clear();
-					pmsiPositions.clear();
-				}
-	
-				// DEPENDING ON THE LINE TYPE :
-				// 1 - IF IT IS A RSSMAIN, CREATE A NEW RSSCONTENT IN FULLRSS
-				// 2 - IF IT IS A RSSACTE OR RSSDA, JUST INSERT THE DATAS TO CURRENT FULLRSS
-				// 3 - IF IT IS A RSSHEADER, INCREMENT PMSIPOSITION
-				if (line.getName().equals("rssmain")) {
-					RssContent newContent = new RssContent();
-	
-					EnumMap<RssMain, String> mainContent = new EnumMap<>(RssMain.class);
-					for (Element element : line.getElements()) {
-						if (element.getName().equals("NbSeances"))
-							mainContent.put(RssMain.nbseances, element.getElement().toString());
-						else if (element.getName().equals("DP"))
-							mainContent.put(RssMain.dp, element.getElement().toString());
-						else if (element.getName().equals("DR"))
-							mainContent.put(RssMain.dr, element.getElement().toString());
-						else if (element.getName().equals("ModeEntree"))
-							mainContent.put(RssMain.modeentree, element.getElement().toString());
-						else if (element.getName().equals("ModeSortie"))
-							mainContent.put(RssMain.modesortie, element.getElement().toString());
-						else if (element.getName().equals("PoidsNouveauNe"))
-							mainContent.put(RssMain.poidsnouveaune, element.getElement().toString());
-						else if (element.getName().equals("Sexe"))
-							mainContent.put(RssMain.sexe, element.getElement().toString());
-						else if (element.getName().equals("DateEntree"))
-							mainContent.put(RssMain.dateentree, element.getElement().toString());
-						else if (element.getName().equals("DateSortie"))
-							mainContent.put(RssMain.datesortie, element.getElement().toString());
-						else if (element.getName().equals("DDN"))
-							mainContent.put(RssMain.ddn, element.getElement().toString());
-						else if (element.getName().equals("AgeGestationnel"))
-							mainContent.put(RssMain.agegestationnel, element.getElement().toString());
-					}
-	
-					newContent.setRssmain(mainContent);
-					fullRss.add(newContent);
-					lastNumRss = newNumRss;
-					pmsiPositions.add(pmsiPosition++);
-				} else if (line.getName().equals("rssacte")) {
-					EnumMap<RssActe, String> acteRss = new EnumMap<>(RssActe.class);
-	
-					for (Element element : line.getElements()) {
-						if (element.getName().equals("Activite"))
-							acteRss.put(RssActe.activite, element.getElement().toString());
-						else if (element.getName().equals("CodeCCAM"))
-							acteRss.put(RssActe.codeccam, element.getElement().toString());
-						else if (element.getName().equals("Phase"))
-							acteRss.put(RssActe.phase, element.getElement().toString());
-					}
-					
-					fullRss.get(fullRss.size() - 1).getRssacte().add(acteRss);
-					pmsiPosition++;
-				} else if (line.getName().equals("rssda")) {
-					EnumMap<RssDa, String> daRss = new EnumMap<>(RssDa.class);
-	
-					for (Element element : line.getElements()) {
-						if (element.getName().equals("DA"))
-							daRss.put(RssDa.da, element.getElement().toString());
-					}
-	
-					fullRss.get(fullRss.size() - 1).getRssda().add(daRss);
-					pmsiPosition++;
-				} else if (line.getName().equals("rssheader")) {
-					pmsiPosition++;
-				}
-			} else if (line instanceof LineNumberPmsiLine) {
-				
-			} else if (line instanceof EndOfFilePmsiLine) {
-				// GROUP AND STORE REMAIN RSS
-				if (fullRss.size() != 0) {
-					groupAndStore();
-					// REINIT FULL RSS
-					fullRss.clear();
-					pmsiPositions.clear();
-				}
-				// EOF, CLOSE WRITER
-				writer.close();
-				writerClosed = true;
 			}
+
+			// IF THIS RSS IS A NEW RSS AND IF THIS IS NOT THE FIRST RSSMAIN (LASTNUMRSS NOT NULL), GROUP AND STORE 
+			if (lastNumRss != null && !newNumRss.equals(lastNumRss)) {
+				groupAndStore();
+				// REINIT FULL RSS
+				fullRss.clear();
+				pmsiPositions.clear();
+			}
+
+			// DEPENDING ON THE LINE TYPE :
+			// 1 - IF IT IS A RSSMAIN, CREATE A NEW RSSCONTENT IN FULLRSS
+			// 2 - IF IT IS A RSSACTE OR RSSDA, JUST INSERT THE DATAS TO CURRENT FULLRSS
+			// 3 - IF IT IS A RSSHEADER, INCREMENT PMSIPOSITION
+			if (line.getName().equals("rssmain")) {
+				RssContent newContent = new RssContent();
+
+				EnumMap<RssMain, String> mainContent = new EnumMap<>(RssMain.class);
+				for (Element element : line.getElements()) {
+					if (element.getName().equals("NbSeances"))
+						mainContent.put(RssMain.nbseances, element.getElement().toString());
+					else if (element.getName().equals("DP"))
+						mainContent.put(RssMain.dp, element.getElement().toString());
+					else if (element.getName().equals("DR"))
+						mainContent.put(RssMain.dr, element.getElement().toString());
+					else if (element.getName().equals("ModeEntree"))
+						mainContent.put(RssMain.modeentree, element.getElement().toString());
+					else if (element.getName().equals("ModeSortie"))
+						mainContent.put(RssMain.modesortie, element.getElement().toString());
+					else if (element.getName().equals("PoidsNouveauNe"))
+						mainContent.put(RssMain.poidsnouveaune, element.getElement().toString());
+					else if (element.getName().equals("Sexe"))
+						mainContent.put(RssMain.sexe, element.getElement().toString());
+					else if (element.getName().equals("DateEntree"))
+						mainContent.put(RssMain.dateentree, element.getElement().toString());
+					else if (element.getName().equals("DateSortie"))
+						mainContent.put(RssMain.datesortie, element.getElement().toString());
+					else if (element.getName().equals("DDN"))
+						mainContent.put(RssMain.ddn, element.getElement().toString());
+					else if (element.getName().equals("AgeGestationnel"))
+						mainContent.put(RssMain.agegestationnel, element.getElement().toString());
+				}
+
+				newContent.setRssmain(mainContent);
+				fullRss.add(newContent);
+				lastNumRss = newNumRss;
+				pmsiPositions.add(pmsiPosition++);
+			} else if (line.getName().equals("rssacte")) {
+				EnumMap<RssActe, String> acteRss = new EnumMap<>(RssActe.class);
+
+				for (Element element : line.getElements()) {
+					if (element.getName().equals("Activite"))
+						acteRss.put(RssActe.activite, element.getElement().toString());
+					else if (element.getName().equals("CodeCCAM"))
+						acteRss.put(RssActe.codeccam, element.getElement().toString());
+					else if (element.getName().equals("Phase"))
+						acteRss.put(RssActe.phase, element.getElement().toString());
+				}
+				
+				fullRss.get(fullRss.size() - 1).getRssacte().add(acteRss);
+				pmsiPosition++;
+			} else if (line.getName().equals("rssda")) {
+				EnumMap<RssDa, String> daRss = new EnumMap<>(RssDa.class);
+
+				for (Element element : line.getElements()) {
+					if (element.getName().equals("DA"))
+						daRss.put(RssDa.da, element.getElement().toString());
+				}
+
+				fullRss.get(fullRss.size() - 1).getRssda().add(daRss);
+				pmsiPosition++;
+			} else if (line.getName().equals("rssheader")) {
+				pmsiPosition++;
+			}
+		} else if (line instanceof LineNumberPmsiLine) {
+			
+		} else if (line instanceof EndOfFilePmsiLine) {
+			// GROUP AND STORE REMAIN RSS
+			if (fullRss.size() != 0) {
+				groupAndStore();
+				// REINIT FULL RSS
+				fullRss.clear();
+				pmsiPositions.clear();
+			}
+			// EOF, CLOSE WRITER
+			writer.close();
+			writerClosed = true;
 		}
 	}
 

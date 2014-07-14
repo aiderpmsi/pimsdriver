@@ -121,8 +121,7 @@ public class DataSourceSingleton {
 	public static void clean() {
 		// STOPS EACH FUTURE AND CLEANS HASMAPS
 		synchronized (dataSources) {
-			Iterator<Entry<String, Future<Boolean>>> futuresIt = futures.entrySet().iterator();
-			while (futuresIt.hasNext()) {
+			for (final Iterator<Entry<String, Future<Boolean>>> futuresIt = futures.entrySet().iterator();futuresIt.hasNext();) {
 				final Entry<String, Future<Boolean>> futureEntry = futuresIt.next();
 				try {
 					futureEntry.getValue().cancel(true);

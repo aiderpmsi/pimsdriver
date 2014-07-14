@@ -6,10 +6,10 @@ import com.github.aiderpmsi.pimsdriver.dto.model.UploadedPmsi;
 import com.vaadin.annotations.Theme;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
+import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Layout;
 import com.vaadin.ui.UI;
-import com.vaadin.ui.VerticalLayout;
 
 @Theme("pimsdriver")
 public class RootWindow extends UI {
@@ -17,24 +17,28 @@ public class RootWindow extends UI {
 	/** Generated Serial */
 	private static final long serialVersionUID = 3109715875916629911L;
 	
-	@SuppressWarnings("serial")
-	private final Layout layout = new VerticalLayout() {{
-		addStyleName("pims-main-layout");
-	}};
+	private CssLayout layout;
 
-	@SuppressWarnings("serial")
-	private final Label header = new Label() {{
-		addStyleName("pims-main-header");
-	}};
+	private Label header;
 	
-	private final MenuBar menuBar = new MenuBar(this);
+	private MenuBar menuBar;
 
-	private final SplitPanel splitPanel = new SplitPanel(this);
+	private SplitPanel splitPanel;
 
-	private final ServletContext servletContext = VaadinServlet.getCurrent().getServletContext();
+	private ServletContext servletContext;
 	
 	@Override
 	protected void init(final VaadinRequest request) {
+		
+		servletContext = VaadinServlet.getCurrent().getServletContext();
+
+		layout = new CssLayout();
+		layout.addStyleName("pims-main-layout");
+		header = new Label("pimsdriver");
+		header.addStyleName("pims-main-header");
+		menuBar = new MenuBar(this);
+		splitPanel = new SplitPanel(this);
+		
 		layout.addComponent(header);
 		layout.addComponent(menuBar);
 		layout.addComponent(splitPanel);
