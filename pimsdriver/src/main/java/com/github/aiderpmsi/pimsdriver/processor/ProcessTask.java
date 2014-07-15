@@ -76,8 +76,10 @@ public class ProcessTask implements Callable<Boolean> {
 				final List<Long> pludIds = cu.getToCleanup();
 				
 				// TRAITEMENT DU NETTOYAGE TABLE PAR TABLE
-				pludIds.forEach((pludId) -> futures.addLast(executorService.submit(
-						() -> cu.cleanup(pludId))));
+				for (final Long pludId : pludIds) {
+				futures.addLast(executorService.submit(
+						() -> cu.cleanup(pludId)));
+				}
 
 				// WAIT FOR THE RESULT OF COMPUTATION
 				waitFuturesFinish();

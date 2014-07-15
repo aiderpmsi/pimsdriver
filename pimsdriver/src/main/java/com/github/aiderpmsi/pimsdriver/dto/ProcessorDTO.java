@@ -12,7 +12,6 @@ import java.util.Collection;
 
 import javax.servlet.ServletContext;
 
-import org.apache.commons.dbcp2.DelegatingConnection;
 import org.postgresql.PGConnection;
 import org.postgresql.copy.CopyManager;
 import org.postgresql.largeobject.LargeObjectManager;
