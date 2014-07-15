@@ -37,7 +37,9 @@ public class DataSourceSingleton {
 	private static final Logger log = Logger.getLogger(DataSourceSingleton.class.toString());
 
 	public static synchronized Connection getConnection(final ServletContext context) throws SQLException {
-		// GET CONNECTION INFORMATIONS FROM CONTEXT
+		// GETS CONNECTIONS FROM JNDI.
+		// CONFIGURE WITH SERIALIZABLE ISOLATION
+		
 		String urlContext = null, userContext = null, passwordContext	= null;
 		try {
 			final InitialContext jndiContext = new InitialContext();

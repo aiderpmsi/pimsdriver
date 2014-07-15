@@ -18,7 +18,7 @@
 		<init-param>
 			<description>Vaadin UI to display</description>
 			<param-name>UI</param-name>
-			<param-value>com.github.aiderpmsi.pimsdriver.vaadin.main.RootWindow</param-value>
+			<param-value>com.github.aiderpmsi.pimsdriver.vaadin.main.MainApplication</param-value>
 		</init-param>
 	</servlet>
 

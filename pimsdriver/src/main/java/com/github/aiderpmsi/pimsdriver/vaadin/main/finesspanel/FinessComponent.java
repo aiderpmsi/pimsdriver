@@ -14,7 +14,7 @@ public class FinessComponent extends Tree {
 	/** Generated serial id */
 	private static final long serialVersionUID = 5192397393504372354L;
 	
-	private final SplitPanel parent;
+	private final SplitPanel splitPanel;
 	
 	@SuppressWarnings("serial")
 	private final HierarchicalContainer hierarchicalContainer = new HierarchicalContainer() {{
@@ -35,9 +35,9 @@ public class FinessComponent extends Tree {
 		}
 	}};
 		
-	public FinessComponent(SplitPanel parent) {
+	public FinessComponent(SplitPanel splitPanel) {
 		super();
-		this.parent = parent;
+		this.splitPanel = splitPanel;
 
 		// SETS THE CONTAINER ORIGIN
 		setContainerDataSource(hierarchicalContainer);
@@ -45,16 +45,16 @@ public class FinessComponent extends Tree {
 		setImmediate(true); // MODIFICATIONS SHOULD BE SHOWED IMMEDIATELY
 		
 		// ADDS THE LISTENERS
-		ExpandListener el = new FinessExpandListener(hierarchicalContainer, this, getParent().getParent().getServletContext());
+		ExpandListener el = new FinessExpandListener(hierarchicalContainer, this, getSplitPanel().getRootWindow().getMainApplication().getServletContext());
 		CollapseListener cl = new FinessCollapseListener(hierarchicalContainer);
-		ItemClickListener icl = new ItemClickListener(parent.getParent(), hierarchicalContainer);
+		ItemClickListener icl = new ItemClickListener(getSplitPanel().getRootWindow(), hierarchicalContainer);
 
 		addExpandListener(el);
 		addCollapseListener(cl);
 		addItemClickListener(icl);
 
 		// ADD THE ACTION HANDLERS
-		addActionHandler(new DeleteHandler(hierarchicalContainer, this, getParent().getParent().getServletContext()));
+		addActionHandler(new DeleteHandler(hierarchicalContainer, this, getSplitPanel().getRootWindow().getMainApplication().getServletContext()));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -81,8 +81,8 @@ public class FinessComponent extends Tree {
 		return itemId;
 	}
 
-	public SplitPanel getParent() {
-		return parent;
+	public SplitPanel getSplitPanel() {
+		return splitPanel;
 	}
 	
 	public void removeContainerItem(HierarchicalContainer hc, Object itemId) {

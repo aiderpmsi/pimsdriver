@@ -9,12 +9,12 @@ public class ItemClickListener implements ItemClickEvent.ItemClickListener {
 
 	private static final long serialVersionUID = 822165023770852409L;
 
-	private final RootWindow rootElement;
+	private final RootWindow rootWindow;
 	
 	private final HierarchicalContainer hc;
 		
-	public ItemClickListener(final RootWindow rootElement, final HierarchicalContainer hc) {
-		this.rootElement = rootElement;
+	public ItemClickListener(final RootWindow rootWindow, final HierarchicalContainer hc) {
+		this.rootWindow = rootWindow;
 		this.hc = hc;
 	}
 
@@ -29,11 +29,11 @@ public class ItemClickListener implements ItemClickEvent.ItemClickListener {
 		// DEPTH AT 3 MEANS AN UPLOAD HAS BEEN SELECTED
 		if (eventDepth == 3) {
 			//  PREVENT GUIUI THAT AN UPLOAD HAS BEEN SELECTED
-			rootElement.setUploadSelected((UploadedPmsi) hc.getContainerProperty(event.getItemId(), "model").getValue());
+			rootWindow.setUploadSelected((UploadedPmsi) hc.getContainerProperty(event.getItemId(), "model").getValue());
 		}
 		// SOMETHING ELSE HAS BEEN SELECTED, PREVENT THE MAIN WINDOW
 		else {
-			rootElement.setUploadSelected(null);
+			rootWindow.setUploadSelected(null);
 		}
 		
 	}

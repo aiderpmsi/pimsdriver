@@ -23,7 +23,7 @@ public class MenuBar extends com.vaadin.ui.MenuBar {
 
 	private static final long serialVersionUID = 8541452935763539785L;
 
-	private final RootWindow parent;
+	private final RootWindow rootWindow;
 	
 	private final MenuItem files;
 	
@@ -31,19 +31,19 @@ public class MenuBar extends com.vaadin.ui.MenuBar {
 	
 	private final MenuItem rapports;
 	
-	public MenuBar(RootWindow parent) {
+	public MenuBar(RootWindow rootWindow) {
 		super();
 		addStyleName("pims-main-menubar");
 
-		this.parent = parent;
+		this.rootWindow = rootWindow;
  
 		files = addItem("Fichiers", null, null);
 		files.addItem("Ajouter Pmsi", null,
-				(selectedItem) ->  UI.getCurrent().addWindow(new UploadWindow(parent.getServletContext())));
+				(selectedItem) ->  UI.getCurrent().addWindow(new UploadWindow(rootWindow.getMainApplication().getServletContext())));
 
 		files.addSeparator();
 		files.addItem("Traitements Pmsi", null,
-				(selectedItem) ->  UI.getCurrent().addWindow(new PendingPmsiWindow(parent.getServletContext())));
+				(selectedItem) ->  UI.getCurrent().addWindow(new PendingPmsiWindow(rootWindow.getMainApplication().getServletContext())));
 		
 		rapports = addItem("Rapports", null, null);
 		rapports.setVisible(false);
@@ -60,9 +60,9 @@ public class MenuBar extends com.vaadin.ui.MenuBar {
 		// IF NEW MODEL, CREATE THE LINKS
 		if (model != null && model.getStatus() != null && model.getStatus() == Status.successed) {
 			navigations.addItem("Factures", null,
-					(selectedItem) -> parent.setMenuNavigationSelected(model, MenuBarSelected.factures));
+					(selectedItem) -> rootWindow.setMenuNavigationSelected(model, MenuBarSelected.factures));
 			navigations.addItem("Séjours", null,
-					(selectedItem) -> parent.setMenuNavigationSelected(model, MenuBarSelected.sejours));
+					(selectedItem) -> rootWindow.setMenuNavigationSelected(model, MenuBarSelected.sejours));
 			navigations.setVisible(true);
 
 			rapports.addItem("Factures", null,

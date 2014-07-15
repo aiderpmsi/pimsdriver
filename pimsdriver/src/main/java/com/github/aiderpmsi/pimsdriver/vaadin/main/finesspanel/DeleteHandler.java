@@ -43,7 +43,7 @@ public class DeleteHandler implements Action.Handler {
 	public void handleAction(Action action, Object sender, Object target) {
 		// CHECK THAT THIS TARGET HAS DEPTH 3
 		if (target != null) {
-			Integer depth = (Integer) hc.getContainerProperty(target, "depth").getValue();
+			final Integer depth = (Integer) hc.getContainerProperty(target, "depth").getValue();
 			if (depth == 3) {
 				// GETS THE ASSOCIATED MODEL
 				UploadedPmsi model = (UploadedPmsi) hc.getContainerProperty(target, "model").getValue();
@@ -51,12 +51,29 @@ public class DeleteHandler implements Action.Handler {
 				IOActions ioActions = new IOActions(context);
 				try {
 					ioActions.deletePmsi(model);
-					// REMOVE THE ITEM
+					// GETS PARENT
+					Object parentId = hc.getParent(target);
+					// REMOVE THIS ITEM
 					fp.removeItem(target);
+					// REMOVE PARENT ITEMS IF NO CHILDREN...
+					removeRecursively(parentId);
 				} catch (ActionException e) {
 					Notification.show("Erreur de suppression du fichier", Notification.Type.WARNING_MESSAGE);
 				}
 			}
+		}
+	}
+	
+	private void removeRecursively(Object itemId) {
+		// REMOVE THIS ITEM IF DEPTH IS MORE THAN 0 AND HAS NO CHILDREN
+		final Integer depth = (Integer) hc.getContainerProperty(itemId, "depth").getValue();
+		if (depth != 0 && hc.getChildren(itemId).size() == 0) {
+			// GETS PARENT
+			Object parentId = hc.getParent(itemId);
+			// REMOVE THIS ITEM
+			fp.removeItem(itemId);
+			// REMOVE PARENT ITEMS IF NO CHILDREN...
+			removeRecursively(parentId);
 		}
 	}
 }

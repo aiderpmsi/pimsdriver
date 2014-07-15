@@ -9,16 +9,16 @@ public class SplitPanel extends HorizontalSplitPanel{
 
 	private static final long serialVersionUID = -5501213861687043638L;
 
-	private final RootWindow parent;
+	private final RootWindow rootWindow;
 
 	private final PmsiContentPanel contentPanel;
 	
 	private final FinessComponent finessPanel;
 		
-	public SplitPanel(RootWindow parent) {
+	public SplitPanel(RootWindow rootWindow) {
 		super();
 		
-		this.parent = parent;
+		this.rootWindow = rootWindow;
 		this.contentPanel = new PmsiContentPanel(this);
 		this.finessPanel = new FinessComponent(this);
 		
@@ -42,8 +42,8 @@ public class SplitPanel extends HorizontalSplitPanel{
 		return finessPanel;
 	}
 
-	public RootWindow getParent() {
-		return parent;
+	public RootWindow getRootWindow() {
+		return rootWindow;
 	}
 	
 }

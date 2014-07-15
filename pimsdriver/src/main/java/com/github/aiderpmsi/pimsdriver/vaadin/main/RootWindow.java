@@ -1,50 +1,39 @@
 package com.github.aiderpmsi.pimsdriver.vaadin.main;
 
-import javax.servlet.ServletContext;
-
 import com.github.aiderpmsi.pimsdriver.dto.model.UploadedPmsi;
-import com.vaadin.annotations.Theme;
-import com.vaadin.server.VaadinRequest;
-import com.vaadin.server.VaadinServlet;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Layout;
-import com.vaadin.ui.UI;
 
-@Theme("pimsdriver")
-public class RootWindow extends UI {
+public class RootWindow extends CssLayout {
 
-	/** Generated Serial */
-	private static final long serialVersionUID = 3109715875916629911L;
+	/** Generated Serial Id */
+	private static final long serialVersionUID = -8909569781887366046L;
+
+	private final Label header;
 	
-	private CssLayout layout;
+	private final MenuBar menuBar;
 
-	private Label header;
-	
-	private MenuBar menuBar;
+	private final SplitPanel splitPanel;
 
-	private SplitPanel splitPanel;
+	private final MainApplication mainApplication;
 
-	private ServletContext servletContext;
-	
-	@Override
-	protected void init(final VaadinRequest request) {
-		
-		servletContext = VaadinServlet.getCurrent().getServletContext();
+	public RootWindow(MainApplication mainApplication) {
+		super();
+		this.mainApplication = mainApplication;
 
-		layout = new CssLayout();
-		layout.addStyleName("pims-main-layout");
+		addStyleName("pims-main-layout");
+
 		header = new Label("pimsdriver");
 		header.addStyleName("pims-main-header");
+		addComponent(header);
+		
 		menuBar = new MenuBar(this);
+		addComponent(menuBar);
+
 		splitPanel = new SplitPanel(this);
-		
-		layout.addComponent(header);
-		layout.addComponent(menuBar);
-		layout.addComponent(splitPanel);
-		setContent(layout);
+		addComponent(splitPanel);
 	}
-		
+	
 	public void setUploadSelected(final UploadedPmsi model) {
 		splitPanel.getContentPanel().setUpload(model);
 		menuBar.setUpload(model);
@@ -52,10 +41,6 @@ public class RootWindow extends UI {
 	
 	public void setMenuNavigationSelected(final UploadedPmsi model, final MenuBar.MenuBarSelected type) {
 		splitPanel.getContentPanel().show(type, model);
-	}
-
-	public Layout getLayout() {
-		return layout;
 	}
 
 	public Label getHeader() {
@@ -70,8 +55,8 @@ public class RootWindow extends UI {
 		return splitPanel;
 	}
 
-	public ServletContext getServletContext() {
-		return servletContext;
+	public MainApplication getMainApplication() {
+		return mainApplication;
 	}
-
+	
 }

@@ -40,7 +40,7 @@ public class PmsiContentPanel extends VerticalLayout {
 	/** body layout */
 	private final VerticalLayout body = new VerticalLayout();
 	
-	private final SplitPanel parent;
+	private final SplitPanel splitPanel;
 	
 	public PmsiContentPanel(SplitPanel splitPanel) {
 		super();
@@ -51,7 +51,7 @@ public class PmsiContentPanel extends VerticalLayout {
 		addComponent(body);
 		
 		// SETS PARENT
-		parent = splitPanel;
+		this.splitPanel = splitPanel;
 	}
 	
 	public void setUpload(final UploadedPmsi model) {
@@ -63,7 +63,7 @@ public class PmsiContentPanel extends VerticalLayout {
 		if (model != null && model.getStatus() != null && model.getStatus() == UploadedPmsi.Status.successed)  {
 			final NavigationActions.Overview overview = ActionEncloser.execute(
 					(exception) -> "Erreur lors de la récupération des éléments des rsf et rss ", 
-					() -> new NavigationActions(getParent().getParent().getServletContext()).getOverview(model));
+					() -> new NavigationActions(getSplitPanel().getRootWindow().getMainApplication().getServletContext()).getOverview(model));
 			
 			// CREATES THE CONFIG TABLE
 			final Object[][] headers = new Object[][] {
@@ -95,7 +95,7 @@ public class PmsiContentPanel extends VerticalLayout {
         // RSS MAIN CONTAINER
         final LazyQueryContainer datasContainer = new LazyQueryContainer(
         		new LazyQueryDefinition(false, 1000, "pmel_id"),
-        		new SejoursQueryFactory(model.recordid, getParent().getParent().getServletContext()));
+        		new SejoursQueryFactory(model.recordid, getSplitPanel().getRootWindow().getMainApplication().getServletContext()));
 		
         // COLUMNS DEFINITIONS
         final LazyColumnType[] cols = new LazyColumnType[] {
@@ -127,7 +127,7 @@ public class PmsiContentPanel extends VerticalLayout {
         // RSFA CONTAINER
         final LazyQueryContainer datasContainer = new LazyQueryContainer(
         		new LazyQueryDefinition(false, 1000, "pmel_id"),
-        		new FacturesQueryFactory(model.recordid, getParent().getParent().getServletContext()));
+        		new FacturesQueryFactory(model.recordid, getSplitPanel().getRootWindow().getMainApplication().getServletContext()));
 
         // COLUMNS DEFINITIONS
         final LazyColumnType[] cols = new LazyColumnType[] {
@@ -153,7 +153,7 @@ public class PmsiContentPanel extends VerticalLayout {
 
         // FILLS THE SUMMARY
         final BaseRsfA summary = ActionEncloser.execute((exception) -> "Erreur de lecture du résumé des factures",
-        		() -> new NavigationActions(getParent().getParent().getServletContext()).GetFacturesSummary(model.recordid));
+        		() -> new NavigationActions(getSplitPanel().getRootWindow().getMainApplication().getServletContext()).GetFacturesSummary(model.recordid));
         
         table.setFooterVisible(true);
         table.setColumnFooter("formattedtotalfacturehonoraire", summary.getFormattedtotalfacturehonoraire());
@@ -163,13 +163,13 @@ public class PmsiContentPanel extends VerticalLayout {
         		new ActionHandlerEncloser(ACTIONS[0], (action, sender, target) -> {
         			final Long pmel_position = (Long) datasContainer.getContainerProperty(target, "pmel_position").getValue();
     				String numfacture = (String) datasContainer.getContainerProperty(target, "numfacture").getValue();
-        			UI.getCurrent().addWindow(new PmsiDetailsWindow(model.recordid, pmel_position, type, numfacture, getParent().getParent().getServletContext()));
+        			UI.getCurrent().addWindow(new PmsiDetailsWindow(model.recordid, pmel_position, type, numfacture, getSplitPanel().getRootWindow().getMainApplication().getServletContext()));
         		}));
         table.addActionHandler(
         		new ActionHandlerEncloser(ACTIONS[1], (action, sender, target) -> {
         			final Long pmel_position = (Long) datasContainer.getContainerProperty(target, "pmel_position").getValue();
     				String numfacture = (String) datasContainer.getContainerProperty(target, "numfacture").getValue();
-        			UI.getCurrent().addWindow(new PmsiSourceWindow(model.recordid, pmel_position, type, numfacture, getParent().getParent().getServletContext()));
+        			UI.getCurrent().addWindow(new PmsiSourceWindow(model.recordid, pmel_position, type, numfacture, getSplitPanel().getRootWindow().getMainApplication().getServletContext()));
         		}));
         return table;
 	}
@@ -206,8 +206,8 @@ public class PmsiContentPanel extends VerticalLayout {
 		return layout;
 	}
 
-	public SplitPanel getParent() {
-		return parent;
+	public SplitPanel getSplitPanel() {
+		return splitPanel;
 	}
 
 	private static final Action[] ACTIONS = new Action[] {new Action("détails"), new Action("source")};
